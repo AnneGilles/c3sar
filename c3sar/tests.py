@@ -17,7 +17,7 @@ class TestMyView(unittest.TestCase):
         testing.tearDown()
 
     def test_it(self):
-        from c3sar.views import my_view
+        from c3sar.views.my_view import my_view
         request = testing.DummyRequest()
         info = my_view(request)
         self.assertEqual(info['root'].name, 'root')
