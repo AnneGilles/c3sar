@@ -6,7 +6,6 @@ from sqlalchemy import (
     Column,
     Integer,
     Unicode,
-    String,
     Boolean,
     ForeignKey,
     DateTime,
@@ -42,7 +41,7 @@ def a_random_string():
 class EmailAddress(Base):
     __tablename__ = 'email_addresses'
     id = Column((Integer), primary_key=True)
-    email_address = Column(String, nullable = False)
+    email_address = Column(Unicode, nullable = False)
     confirm_code = Column(Unicode(10))
     is_confirmed = Column(Boolean)
     user_id = Column(Integer, ForeignKey('users.id'))
@@ -60,7 +59,7 @@ class EmailAddress(Base):
 class PhoneNumber(Base):
     __tablename__ = 'phone_numbers'
     id = Column((Integer), primary_key=True)
-    phone_number = Column(String, nullable = False)
+    phone_number = Column(Unicode, nullable = False)
     user_id = Column(Integer, ForeignKey('users.id'))
 
 #    user = relationship("User", backref=backref('phone_numbers', order_by=id))
@@ -96,8 +95,8 @@ class User(Base): # ===========================================================
     #                       backref="users")
 
     @property
-    def __acl__(self):
-        return [
+    def __acl__(self): 
+        return [ #PRAGMA: no cover
             (Allow, 'user:%s' % self.id, 'editUser'), # user may edit herself
             (Allow, 'group:accountant', ('view', 'editUser')),  # accountant group may edit
             (Allow, 'group:admin', ('view', 'editUser')),  # admin group may edit
@@ -193,11 +192,12 @@ def populate():
     session.flush()
 #    transaction.commit()
 
-    user1 = User(username='eins', surname='sur eins', lastname='last eins',
-                 email='eins@shri.de', email_conf=False, email_conf_code='QWERTZ',
-                 password='password')
+    user1 = User(username=u'eins', surname=u'sur eins', lastname=u'last eins',
+                 email=u'eins@shri.de', email_conf=False, email_conf_code=u'QWERTZ',
+                 password=u'password')
  
-    user1.email_addresses = [ EmailAddress(email_address = 'test@shri.de',) ]
+    user1.email_addresses = [ EmailAddress(email_address='c@shri.de'),
+                              EmailAddress(email_address='g@shri.de'), ]
     session.add(user1)
 
     session.flush()
