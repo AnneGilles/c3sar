@@ -4,12 +4,16 @@ import cryptacular.bcrypt
 
 from sqlalchemy import (
     Column,
+    ForeignKey,
+)
+
+from sqlalchemy.types import (
     Integer,
     Unicode,
     Boolean,
-    ForeignKey,
     DateTime,
 )
+
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
@@ -80,8 +84,8 @@ class User(Base): # ===========================================================
     surname = Column(Unicode(255))
     lastname = Column(Unicode(255))
     telefax = Column(Unicode(255))
-    phone_numbers = relationship("PhoneNumber", order_by="PhoneNumber.id")
-    email_addresses = relationship("EmailAddress", order_by="EmailAddress.id")
+    phone_numbers = relationship(u"PhoneNumber", order_by="PhoneNumber.id")
+    email_addresses = relationship(u"EmailAddress", order_by="EmailAddress.id")
     date_registered = Column(DateTime(), nullable=False)
     last_login = Column(DateTime(), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)

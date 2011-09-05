@@ -3,3 +3,4 @@
 *.egg
 *.db
 *~
+.coverage
