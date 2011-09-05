@@ -36,7 +36,7 @@ setup(name='c3sar',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      test_suite='c3sar',
+      test_suite='c3sar.tests',
       install_requires = requires,
       entry_points = """\
       [paste.app_factory]

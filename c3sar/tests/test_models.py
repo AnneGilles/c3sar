@@ -89,7 +89,7 @@ class UserModelTests(unittest.TestCase):
     #     instance = self._makeOne()
     #     print "ACLs: " + repr(instance.__acl__())
 # XXX ToDo: how to test the models ACLs?
-
+# http://markmail.org/message/a2xii23tgktw67py has an answer
 
     def test_get_by_username(self):
         instance = self._makeOne()
