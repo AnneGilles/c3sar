@@ -72,65 +72,77 @@ class UserModelTests(unittest.TestCase):
                  email=u'some@email.de',
                  email_conf=False,
                  email_conf_code=u'ABCDEFG'):
-        print type(self.session)
+        print "type(self.session): " + str(type(self.session))
         return self._getTargetClass()(username,password,surname,lastname,
                                       email,email_conf,email_conf_code)
     
 
     def test_constructor(self):
         instance = self._makeOne()
-        self.assertEqual(instance.username, 'SomeUsername')
-        self.assertEqual(instance.surname, 'SomeSurname')
-        self.assertEqual(instance.lastname, 'SomeLastname')
+        self.assertEqual(instance.username, 'SomeUsername', "No match!")
+        self.assertEqual(instance.surname, 'SomeSurname', "No match!")
+        self.assertEqual(instance.lastname, 'SomeLastname', "No match!")
         # password does not reveal real password
-        self.assertNotEqual(instance._get_password(), 'p4ssw0rd')
+        self.assertNotEqual(instance._get_password(), 'p4ssw0rd', "No match!")
         # password hash is not empty
-        self.assertNotEqual(instance._get_password(), '')
+        self.assertNotEqual(instance._get_password(), '', "No match!")
         # XXX ToDo: how to test the password !?
-        print "the password: " + instance._get_password()
-        self.assertEqual(instance.email, 'some@email.de')
-        self.assertEqual(instance.email_conf_code, 'ABCDEFG')
+        print "result of instance.get_password: " + instance._get_password()
+        self.assertEqual(instance.email, 'some@email.de', "No match!")
+        self.assertEqual(instance.email_conf_code, 'ABCDEFG', "No match!")
         self.assertEqual(instance.email_conf, False, "expected False")
 
-    # def test_acl(self):
-    #     instance = self._makeOne()
-    #     print "ACLs: " + repr(instance.__acl__())
-# XXX ToDo: how to test the models ACLs?
-# http://markmail.org/message/a2xii23tgktw67py has an answer
-
-    def off_test_ACLs(self):
-        import webtest
-        from pyramid.exceptions import Forbidden
-        from c3sar import main
-
-        app = webtest.TestApp(main({}, **{'sqlalchemy.url': 'sqlite://'}))
-
-        url = '/user/edit/2'
-        # Make sure the view is not visible to the public
-        self.assertRaises(Forbidden, app.get, url)
-
-
-    def test_get_by_username(self):
+        #     # def test_acl(self):
+        #     #     instance = self._makeOne()
+        #     #     print "ACLs: " + repr(instance.__acl__())
+        # # XXX ToDo: how to test the models ACLs?
+        # # http://markmail.org/message/a2xii23tgktw67py has an answer
+        
+        #     def off_test_ACLs(self):
+        #         import webtest
+        #         from pyramid.exceptions import Forbidden
+        #         from c3sar import main
+        
+        #         app = webtest.TestApp(main({}, **{'sqlalchemy.url': 'sqlite://'}))
+        
+        #         url = '/user/edit/2'
+        #         # Make sure the view is not visible to the public
+        #         self.assertRaises(Forbidden, app.get, url)
+        
+    def test_user_listing(self):
         instance = self._makeOne()
-        from c3sar.models import User
-        print str(User.get_by_username('SomeUsername'))
-        foo = User.get_by_username('SomeUsername')
-        print "test_get_by_username: type(foo): " + str(type(foo))
-        self.assertEqual(foo.username, 'SomeUsername')
+        user_cls = self._getTargetClass()
+        result = user_cls.user_listing('foo')
+        print "user_cls.user_listing('foo')" + repr(result)
 
-    def off_test_get_by_user_id(self):
-        instance = self._makeOne()
-        from c3sar.models import User
-        foo = User.get_by_user_id('1')
-        self.assertEqual(instance.username, 'SomeUsername')
-        self.assertEqual(foo.username, 'SomeUsername')
+        #result =
+#        print help(user_cls.user_listing('foo'))
+#       print "dir(user_cls.user_listing('foo'))" + repr(result)
 
-    def off_test_check_password(self):
-        instance = self._makeOne()
-        from c3sar.models import User
-        result = User.check_password('SomeUsername', instance.password)
 
-        self.assertTrue(result, "result was not True")
+#     def test_get_by_username(self):
+#         instance = self._makeOne()
+#         #from c3sar.models import User
+#         myUserClass = self._getTargetClass()
+#         print "myUserClass: " +str(myUserClass)
+#         print str(myUserClass.get_by_username('SomeUsername'))
+#         foo = myUserClass.get_by_username(instance.username)
+#         print "test_get_by_username: type(foo): " + str(type(foo))
+#         self.assertEqual(foo.username, 'SomeUsername')
+
+#     def off_test_get_by_user_id(self):
+#         instance = self._makeOne()
+#         from c3sar.models import User
+#         foo = User.get_by_user_id('1')
+#         self.assertEqual(instance.username, 'SomeUsername')
+#         self.assertEqual(foo.username, 'SomeUsername')
+
+#     def off_test_check_password(self):
+#         instance = self._makeOne()
+#         from c3sar.models import User
+#         result = User.check_password('SomeUsername', instance.password)
+
+#         self.assertTrue(result, "result was not True")
 
 
 

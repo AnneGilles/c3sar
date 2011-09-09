@@ -2,6 +2,7 @@ from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 
 from c3sar.models import initialize_sql
+from c3sar.models import initialize_s3
 
 
 # for user sessioning
@@ -15,6 +16,7 @@ def main(global_config, **settings):
     """
     engine = engine_from_config(settings, 'sqlalchemy.')
     initialize_sql(engine)
+    initialize_s3()
     
     # user sessioning
     session_factory = UnencryptedCookieSessionFactoryConfig('secret')

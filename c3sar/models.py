@@ -2,6 +2,7 @@ import transaction
 from datetime import datetime
 import cryptacular.bcrypt
 
+# sqlalchemy stuff
 from sqlalchemy import (
     Column,
     ForeignKey,
@@ -31,7 +32,13 @@ from zope.sqlalchemy import ZopeTransactionExtension
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
+# s3 stuff
+from c3sar.s3 import (
+    initialize_s3,
+    I2S3,
+)
 
+# password crypt
 crypt = cryptacular.bcrypt.BCRYPTPasswordManager()
 
 def hash_password(password):
@@ -39,7 +46,7 @@ def hash_password(password):
 
 def a_random_string():
     import random, string
-    N = 6   # length of string to be produced 
+    N = 6   # length of string to be produced
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(N))
 
 class EmailAddress(Base):
@@ -99,7 +106,7 @@ class User(Base): # ===========================================================
     #                       backref="users")
 
     @property
-    def __acl__(self): 
+    def __acl__(self):
         return [ #PRAGMA: no cover
             (Allow, 'user:%s' % self.id, 'editUser'), # user may edit herself
             (Allow, 'group:accountant', ('view', 'editUser')),  # accountant group may edit
@@ -177,7 +184,12 @@ class User(Base): # ===========================================================
             return None
         return user
 
-
+    @classmethod
+    def user_listing(cls, order_by, how_many=10):
+        #DBSession = getSession()
+        q = DBSession.query(cls).all()
+        # return q.order_by(order_by)[:how_many]
+        return q
 
 class MyModel(Base):
     __tablename__ = 'models'
@@ -199,7 +211,7 @@ def populate():
     user1 = User(username=u'eins', surname=u'sur eins', lastname=u'last eins',
                  email=u'eins@shri.de', email_conf=False, email_conf_code=u'QWERTZ',
                  password=u'password')
- 
+
     user1.email_addresses = [ EmailAddress(email_address='c@shri.de'),
                               EmailAddress(email_address='g@shri.de'), ]
     session.add(user1)
@@ -215,3 +227,6 @@ def initialize_sql(engine):
         populate()
     except IntegrityError:
         transaction.abort()
+
+
+    

@@ -4,3 +4,6 @@
 *.db
 *~
 .coverage
+bin/
+lib/
+include/
