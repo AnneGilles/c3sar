@@ -1,57 +1,63 @@
 import unittest
 from pyramid.config import Configurator
 from pyramid import testing
+import os
 
 def _initTestingDB():
     from sqlalchemy import create_engine
     from c3sar.models import DBSession
     from c3sar.models import Base
-    from c3sar.models import initialize_sql
-    engine = create_engine('sqlite:///:memory:')
+
+    from c3sar.models import populate
+    from sqlalchemy.exc import IntegrityError
+
+    if os.path.isfile('testing.db'):
+        # delete existing db
+        os.unlink('testing.db')
+    engine = create_engine('sqlite:///testing.db')
 #    session = initialize_sql(create_engine('sqlite://'))
-    DBSession.configure(bind=engine)
+#    DBSession.configure(bind=engine)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
+    try:
+        populate()
+    except Exception, e:
+        print str(e)
+#        transaction.abort()
     return DBSession
 
-# class TestMyView(unittest.TestCase):
-#     def setUp(self):
-#         self.config = testing.setUp()
-#         _initTestingDB()
 
-#     def tearDown(self):
-#         testing.tearDown()
+class TestInitializeSql(unittest.TestCase):
 
-#     def test_it(self):
-#         from c3sar.views.my_view import my_view
-#         request = testing.DummyRequest()
-#         info = my_view(request)
-#         self.assertEqual(info['root'].name, 'root')
-#         self.assertEqual(info['project'], 'c3sar')
+    def setUp(self):
+        from c3sar.models import DBSession
+        DBSession.remove()
 
-#     def test_populate(self):
-#         #from c3sar.views.my_view import my_view
-#         #request = testing.DummyRequest()
-#         #info = my_view(request)
-#         #self.assertEqual(info['root'].name, 'root')
-#         #self.assertEqual(info['project'], 'c3sar')
-#         #print user1
-
-#         # https://docs.pylonsproject.org/projects/pyramid/current/tutorials/wiki2/tests.html
-#         # https://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/tests/tutorial/tests.py
-#         pass
-
-# class  InitializeSqlTests(unittest.TestCase):
-
-#     def setUp(self):
-#         from c3sar.models import DBSession
+    def tearDown(self):
+        from c3sar.models import DBSession
+        DBSession.remove()
         
+
+    def _callFUT(self, engine):
+        from c3sar.models import initialize_sql
+        return initialize_sql(engine)
+        
+    def test_initialize_sql(self):
+        from sqlalchemy import create_engine
+        engine = create_engine('sqlite:///:memory:')
+        self._callFUT(engine)
+        from c3sar.models import User, DBSession
+        self.assertEqual(DBSession.query(User).one().username,
+            'eins')
+
+
+
 
 class UserModelTests(unittest.TestCase):
     
     def setUp(self):
         self.session = _initTestingDB()
-#        self.session.remove()
+        self.session.close()
 #        print "setUp(): type(self.session): " + str(type(self.session))
 #        print "setUp(): dir(self.session): " + str(dir(self.session))
         
@@ -72,7 +78,8 @@ class UserModelTests(unittest.TestCase):
                  email=u'some@email.de',
                  email_conf=False,
                  email_conf_code=u'ABCDEFG'):
-        print "type(self.session): " + str(type(self.session))
+#        print "type(self.session): " + str(type(self.session))
+#        print "dir(self.session): " + str(dir(self.session))
         return self._getTargetClass()(username,password,surname,lastname,
                                       email,email_conf,email_conf_code)
     
@@ -86,8 +93,7 @@ class UserModelTests(unittest.TestCase):
         self.assertNotEqual(instance._get_password(), 'p4ssw0rd', "No match!")
         # password hash is not empty
         self.assertNotEqual(instance._get_password(), '', "No match!")
-        # XXX ToDo: how to test the password !?
-        print "result of instance.get_password: " + instance._get_password()
+        #print "result of instance.get_password: " + instance._get_password()
         self.assertEqual(instance.email, 'some@email.de', "No match!")
         self.assertEqual(instance.email_conf_code, 'ABCDEFG', "No match!")
         self.assertEqual(instance.email_conf, False, "expected False")
@@ -113,7 +119,7 @@ class UserModelTests(unittest.TestCase):
         instance = self._makeOne()
         user_cls = self._getTargetClass()
         result = user_cls.user_listing('foo')
-        print "user_cls.user_listing('foo')" + repr(result)
+        #print "user_cls.user_listing('foo')" + repr(result)
 
         #result =
 #        print help(user_cls.user_listing('foo'))
@@ -124,26 +130,44 @@ class UserModelTests(unittest.TestCase):
         instance = self._makeOne()
         #from c3sar.models import User
         myUserClass = self._getTargetClass()
-        print "myUserClass: " +str(myUserClass)
+        #print "myUserClass: " +str(myUserClass)
 #        print "str(myUserClass.get_by_username('SomeUsername')): " + str(myUserClass.get_by_username('SomeUsername'))
 #        foo = myUserClass.get_by_username(instance.username)
 #        print "test_get_by_username: type(foo): " + str(type(foo))
         self.assertEqual(instance.username, 'SomeUsername')
 
-#     def off_test_get_by_user_id(self):
-#         instance = self._makeOne()
-#         from c3sar.models import User
-#         foo = User.get_by_user_id('1')
-#         self.assertEqual(instance.username, 'SomeUsername')
-#         self.assertEqual(foo.username, 'SomeUsername')
+    def test_get_by_user_id(self):
+        instance = self._makeOne()
+        from c3sar.models import User
+        foo = User.get_by_user_id('1')
+        self.assertEqual(instance.username, 'SomeUsername')
+        self.assertEqual(foo.username, 'eins')
 
-#     def off_test_check_password(self):
-#         instance = self._makeOne()
-#         from c3sar.models import User
-#         result = User.check_password('SomeUsername', instance.password)
+    def test_check_password(self):
+        instance = self._makeOne()
+        result = self._getTargetClass().check_password('eins', 'password')
+        self.assertTrue(result, "result was not True")
 
-#         self.assertTrue(result, "result was not True")
+    def test_check_password_False(self):
+        result = self._getTargetClass().check_password('nonexistant', 'somepassword')
+        self.assertFalse(result, "result was not False")
 
+    def test_check_username_exists(self):
+        result = self._getTargetClass().check_username_exists('eins')
+        self.assertTrue(result, "result was not True")
+
+    def test_check_username_exists_False(self):
+        result = self._getTargetClass().check_username_exists('nonexistant')
+        self.assertFalse(result, "result was not False")
+
+    def test_check_user_or_None(self):
+        result = self._getTargetClass().check_user_or_None('eins')
+        self.assertTrue(result, "result was not True")
+
+    def test_check_user_or_None_None(self):
+        result = self._getTargetClass().check_user_or_None('nonexistant')
+        #print "result of check_user_or_None('nonexistant'): " +  str(result)
+        self.assertEquals(result, None, "result was not None")
 
 
 class EmailAddressModelTests(unittest.TestCase):

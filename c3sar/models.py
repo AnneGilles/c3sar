@@ -203,17 +203,17 @@ class MyModel(Base):
 
 def populate():
     session = DBSession()
-    model = MyModel(name=u'root', value=55)
-    session.add(model)
-    session.flush()
+#    model = MyModel(name=u'root', value=55)
+#    session.add(model)
+#    session.flush()
 #    transaction.commit()
 
     user1 = User(username=u'eins', surname=u'sur eins', lastname=u'last eins',
                  email=u'eins@shri.de', email_conf=False, email_conf_code=u'QWERTZ',
                  password=u'password')
 
-    user1.email_addresses = [ EmailAddress(email_address='c@shri.de'),
-                              EmailAddress(email_address='g@shri.de'), ]
+    user1.email_addresses = [ EmailAddress(email_address=u'c@shri.de'),
+                              EmailAddress(email_address=u'g@shri.de'), ]
     session.add(user1)
 
     session.flush()
