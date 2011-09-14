@@ -16,7 +16,7 @@ def main(global_config, **settings):
     """
     engine = engine_from_config(settings, 'sqlalchemy.')
     initialize_sql(engine)
-    initialize_s3()
+    #initialize_s3()
     
     # user sessioning
     session_factory = UnencryptedCookieSessionFactoryConfig('secret')
