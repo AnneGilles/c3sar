@@ -206,7 +206,13 @@ def populate():
                               EmailAddress(email_address=u'g@shri.de'), ]
     session.add(user1)
 
-    session.flush()
+    try:
+        session.flush()
+    except Exception, e: #PRAGMA: no cover
+        session.rollback()
+        print "--- ROLLBACK cause:  -------------------------------------- "
+        print str(e)
+        print "----------------------------------------------------------- "
     transaction.commit()
 
 def initialize_sql(engine):
@@ -215,7 +221,9 @@ def initialize_sql(engine):
     Base.metadata.create_all(engine)
     try:
         populate()
-    except IntegrityError: #PRAGMA: no cover
+    except IntegrityError, e: #PRAGMA: no cover
+        print "--- initialize_sql aborted due to IntegrityError: "
+        print e
         transaction.abort()
 
 
