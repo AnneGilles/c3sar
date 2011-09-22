@@ -1,0 +1,66 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+      <!-- metal  :  use-macro="loggedinpt" -->
+
+
+<tal:block metal:fill-slot="content">
+
+  <h1>Basic Functionality</h1>
+
+    <div id="menu">
+      <p>
+	Users:
+        <a href="/user/list">index</a> |
+        <a href="/user/view/1">view</a> |
+	<a href="/register">create</a> |
+        <a href="/user/edit/1">edit</a> |
+        <a href="/user/rm">delete</a>
+        <br/>
+      </p>
+      <p>
+	Bands:
+	<a href="/band/list">index</a> |
+	<a href="/band/add">create</a> |
+	<a href="/band/edit/1">edit</a> |
+	<a href="/band/rm/1">delete</a> |
+	<a href="/band/view/1">show</a> |
+      </p>
+      <p>
+	Tracks:
+	<a href="/track/list">index</a> |
+	<a href="/track/add">create</a> |
+	<a href="/track/edit/1">edit</a> |
+	<a href="/track/rm/1">delete</a> |
+	<a href="/track/view/1">show</a> |
+      </p>
+      <p>
+	Licenses:
+	<a href="/license/list">index</a> |
+	<a href="/license/create">create</a> |
+	<a href="/license/add">add</a> |
+	<a href="/license/edit/1">edit</a> |
+	<a href="/license/rm/1">delete</a> |
+	<a href="/license/view/1">show</a> |
+      </p>
+      <hr>
+      <a href="http://localhost:6543/url_param_test?license_url=http://creativecommons.org/licenses/by/3.0/&license_name=Creative%20Commons%20Attribution%203.0%20Unported&userID=42&user-work=foo.jpg">Test some url parameters</a>, as well as <a href="http://localhost:6543/url_param_test">without parameters</a>, like a query "?foo=bar" appended to the url. We need this for the CC license chooser mentioned <a href="http://wiki.creativecommons.org/Web_Integration_Guide">here</a> in Part1, especially for the "exit url" view.
+  </div>
+
+
+  <h1>Statistics</h1>
+
+
+  <p>Number of Users: ${num_users}</p>
+  <p>Number of Tracks: ${num_tracks}</p>
+  <p>Number of Bands: ${num_bands}</p>
+  <p>Space used by Tracks: </p>
+  <p></p>
+  
+
+</tal:block>
+
+
+</html>
