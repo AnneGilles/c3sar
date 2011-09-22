@@ -20,9 +20,21 @@
     </head>
     <body>
       <div id="wrap">
-	<tal:block metal:define-slot="loggedin"></tal:block>		
+	
 	<div id="top">
-	  
+	  <!-- login bar --> 
+	  <span tal:condition="exists: logged_in">
+	    <span tal:condition="not logged_in">
+              You need to <a href="/login">log in</a> to see your member page or for obtaining a license. &nbsp;&nbsp;
+              Not a member? <a href="/register">Register</a>.
+	    </span>
+	    <span tal:condition="logged_in">
+	      You are logged in! Welcome <span tal:replace="request.user.surname or None">dear User</span> &nbsp;&nbsp;
+              <a href="${request.application_url}/logout" id="logout-link">Logout</a> | 
+              <a href="${request.application_url}/user/edit/${request.user.id}" id="edit-profile">edit profile</a>
+	    </span>
+	  </span>	
+	  <!-- /login bar --> 
 	  <div class="top align-center">
             <div>
 	      <a href="${request.route_url('home')}">
