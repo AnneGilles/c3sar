@@ -72,60 +72,63 @@ def license_add(request):
     if viewer_username == None:
         viewer_username = "not logged in"
 
+    dbsession = DBSession()
+
     #form = Form(request, LicenseSchema)
     form = Form(request)
 
 
     if 'form.submitted' in request.POST:
-        # request.session.flash("Here comes request.str_POST")
-        # request.session.flash(request.str_POST)
-        # request.session.flash("And this is request.POST")
-        # request.session.flash(request.POST)
 
         my_results_dict = request.str_POST
-        request.session.flash(my_results_dict.keys())
+        #request.session.flash(my_results_dict.keys())
 
-        request.session.flash(my_results_dict['cc_js_want_cc_license'])
-        request.session.flash(my_results_dict['cc_js_result_uri'])
-        request.session.flash(my_results_dict['cc_js_result_img'])
-        request.session.flash(my_results_dict[u'cc_js_result_name'])
+        #request.session.flash("cc license? " + my_results_dict['cc_js_want_cc_license'])
+        #request.session.flash("uri: " + my_results_dict['cc_js_result_uri'])
+        #request.session.flash("img: " + my_results_dict['cc_js_result_img'])
+        #request.session.flash("name: " + my_results_dict[u'cc_js_result_name'])
 
-        # so here is what we need to store:
-        #the_license = License(
-        #    cc_license = my_results_dict['cc_js_want_cc_license'])
 
+        if (my_results_dict['cc_js_want_cc_license'] == 'sure'):
+            request.session.flash("we got a cc license...")
+
+
+            # request.session.flash("license? :" + form.data['cc_js_want_cc_license'])
+            # request.session.flash("sharing? :" + form.data['cc_js_share'])
+            # request.session.flash("remixing? :" + form.data['cc_js_remix'])
+            # request.session.flash("locale :" + form.data['cc_js_jurisdiction'])
+            # request.session.flash("URI :" + request.POST.cc_js_result_uri)
+            # request.session.flash("img :" + form.data['cc_js_result_img'])
+            # request.session.flash("name :" + form.data['cc_js_result_name'])
+
+
+            license = License(
+                name = my_results_dict['cc_js_result_name'],
+                uri = my_results_dict['cc_js_result_uri'],
+                img = my_results_dict['cc_js_result_img'],
+                author = viewer_username
+                )
+
+            dbsession.add(license)
+            request.session.flash(u'writing to database ...')
+            dbsession.flush()
+
+        else:
+            request.session.flash("we got an all rights reserved license...")
         
-        #request.session.flash("license? :" + form.data['cc_js_want_cc_license'])
-        # request.session.flash("sharing? :" + form.data['cc_js_share'])
-        # request.session.flash("remixing? :" + form.data['cc_js_remix'])
-        # request.session.flash("locale :" + form.data['cc_js_jurisdiction'])
-#        request.session.flash("URI :" + request.POST.cc_js_result_uri)
-        # request.session.flash("img :" + form.data['cc_js_result_img'])
-        # request.session.flash("name :" + form.data['cc_js_result_name'])
+            license = License(
+                name = 'All rights reserved',
+                uri = '',
+                img = '', 
+                author = viewer_username
+                )
+            
+            dbsession.add(license)
+            request.session.flash(u'writing to database ...')
+            dbsession.flush()
+        
+        # redirect to license_view 
 
-
-    
-    # if 'form.submitted' in request.POST and not form.validate():
-    #     # form didn't validate
-    #     request.session.flash('form does not validate!')
-    #     request.session.flash(form.data['license_name'])
-    #     request.session.flash(form.data['license_url'])
-
-
-    # if 'form.submitted' in request.POST and form.validate():
-    #     request.session.flash('form validated!')
-    #     license_name = form.data['license_name']
-
-    #     license = License(
-    #         license_name = form.data['license_name'],
-    #         license_album = form.data['license_album'],
-    #         license_url = form.data['license_url'],
-    #         )
-
-    #     dbsession.add(license)
-    #     request.session.flash(u'writing to database ...')
-
-    #     # ToDo: https://redmine.local/issues/5
 
     return {
         'viewer_username': viewer_username,

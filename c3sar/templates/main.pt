@@ -46,7 +46,8 @@
 	<a href="/license/view/1">show</a> |
       </p>
       <hr>
-      <a href="http://localhost:6543/url_param_test?license_url=http://creativecommons.org/licenses/by/3.0/&license_name=Creative%20Commons%20Attribution%203.0%20Unported&userID=42&user-work=foo.jpg">Test some url parameters</a>, as well as <a href="http://localhost:6543/url_param_test">without parameters</a>, like a query "?foo=bar" appended to the url. We need this for the CC license chooser mentioned <a href="http://wiki.creativecommons.org/Web_Integration_Guide">here</a> in Part1, especially for the "exit url" view.
+      <a href="http://localhost:6543/url_param_test?license_url=http://creativecommons.org/licenses/by/3.0/&license_name=Creative%20Commons%20Attribution%203.0%20Unported&userID=42&user-work=foo.jpg">Test some url parameters</a>, as well as <a href="http://localhost:6543/url_param_test">without parameters</a>, like a query "?foo=bar" appended to the url.<br>
+ We need this for the CC license chooser mentioned <a href="http://wiki.creativecommons.org/Web_Integration_Guide">here</a> in Part1, especially for the "exit url" view.
   </div>
 
 
