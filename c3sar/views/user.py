@@ -160,7 +160,7 @@ def user_register(request):
             ]
 
 #        user.groups.append('User')
-        session.add(user)
+        dbsession.add(user)
 
         # boto stuff: creating a bucket for that user
         # don't do that -- we better have one bucket for all tracks...
@@ -464,7 +464,9 @@ def user_edit(request):
         'form': FormRenderer(form),
         }
 
-# formencode schema for user default license ####################################
+
+
+## formencode schema for user default license 
 class UserDefaultLicenseSchema(formencode.Schema):
     allow_extra_fields = True
     filter_extra_fields = True
@@ -486,19 +488,7 @@ def user_set_default_license(request):
     user = User.get_by_user_id(user_id)
 
     form = Form(request, schema = UserDefaultLicenseSchema, obj = user)
-#    form = Form(request, obj = user)
 
-
-#    if form.validate():
-#        request.session.flash("Yes! form.validate() !!!")
-
-
-    if 'form.submitted' in request.POST and not form.validate():
-        # form didn't validate
-        request.session.flash('form does not validate!')
-        request.session.flash(form.data['user_surname'])
-        request.session.flash(form.data['user_lastname'])
-        request.session.flash(form.data['user_email'])
 
     if 'form.submitted' in request.POST and form.validate():
         # ready for registration!

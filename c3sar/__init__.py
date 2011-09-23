@@ -262,7 +262,11 @@ def main(global_config, **settings):
     ## routes for RESTful interface ##
     config.add_route('api_get_user', '/api/get/user/{id}')
 
-
+    ##
+    config.add_route('url_param_test', '/url_param_test')
+    config.add_view('c3sar.views.license.url_param_test',
+                    route_name='url_param_test',
+                    renderer='templates/url_params_test.pt')
 
 
     #config.scan()

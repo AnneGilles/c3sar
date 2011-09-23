@@ -16,8 +16,9 @@
 
     <h1>${license.name}</h1>
     <p>ID: ${license.id}</p>
-    <p>URL: ${license.url}</p>
-    <p>Author: <b class="hits">${license.author}</b>.</p>
+    <p>URL: ${license.uri}</p>
+    <p>IMG: ${license.img}</p> <img src="${license.img}">
+    <p>Author: ${license.author}</p>
 
 </tal:block>
 

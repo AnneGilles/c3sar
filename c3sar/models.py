@@ -197,16 +197,19 @@ class License(Base):
     __tablename__ = 'licenses'
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(255))
-    url = Column(Unicode(255))
+    uri = Column(Unicode(255))
+    img = Column(Unicode(255))
     author = Column(Unicode(255))
 
     def __init__(self,
                  name,
-                 url,
+                 uri,
+                 img,
                  author,
                  ):
         self.name = name
-        self.url = url
+        self.uri = uri
+        self.img = img
         self.author = author
 
     @classmethod
@@ -404,9 +407,24 @@ def populate():
                    bytesize=None)
     dbsession.add(track2)
 
-    license1 = License(name=u"testLicense1", url="http://ex.com/my_license",
+
+#<a rel="license" href="http://creativecommons.org/licenses/by/3.0/">
+#<img alt="Creative Commons License" style="border-width:0" 
+#     src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />
+#This work is licensed under a <a rel="license" 
+#     href="http://creativecommons.org/licenses/by/3.0/">
+#     Creative Commons Attribution 3.0 Unported License</a>.
+    license1 = License(name=u"Creative Commons Attribution 3.0 Unported", 
+                       uri=u"http://creativecommons.org/licenses/by/3.0/",
+                       img="http://i.creativecommons.org/l/by/3.0/88x31.png",
                        author=u"Somebody")
     dbsession.add(license1)
+
+    license2 = License(name=u"All Rights reserved", 
+                       uri=u"",
+                       img="",
+                       author=u"Somebody")
+    dbsession.add(license2)
 
     try:
         dbsession.flush()
