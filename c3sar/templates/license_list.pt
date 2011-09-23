@@ -1,0 +1,23 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xml:lang="en" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal"      
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+  
+  <tal:block metal:fill-slot="content">
+    <div id="main">
+      <h1>List of Licenses</h1>
+      
+      <table border="1" cellpadding="10" width="90%">
+	<tr><td>id</td><td>name</td><td>author</td><td>edit</td><td>view</td></tr>
+	<tr tal:repeat="license licenses">
+	  <td><a href="/license/view/${license.license_id}">${license.license_id}</a></td>
+	  <td><a href="/license/view/${license.license_id}">${license.license_name}</a></td>
+	  <td>${license.license_author}</td>
+	  <td><a href="/license/edit/${license.license_id}">edit</a></td>	  
+	  <td><a href="/license/view/${license.license_id}">view</a></td>
+	</tr>
+      </table>
+    </div>
+  </tal:block>
+</html>

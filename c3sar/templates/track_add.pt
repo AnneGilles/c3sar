@@ -1,0 +1,81 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+
+  <tal:block metal:fill-slot="content">
+    <h1>Add a Track, ${viewer_username}!</h1>
+    ${form.begin(request.route_url('track_add'), enctype="multipart/form-data")}
+
+    ${form.csrf_token()}
+    <fieldset>
+      <table>
+	<tr>
+	  <td>
+	    The <strong>Name</strong> of your Track:
+	  </td>
+	  <td>
+	    ${form.text('track_name')}
+	  </td>
+	  <td>
+	    ${form.errorlist('track_name')}
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+            The <strong>Album</strong> this Track belongs to: &nbsp;
+          </td>
+          <td>
+            ${form.text('track_album')}
+          </td>
+	  <td>
+            ${form.errorlist('track_album')}
+          </td>
+        </tr>
+	</table>
+
+      <hr>
+	You may either specify where on the Internet you have put your audio file
+	or upload an audio file into the system.
+
+	<table>
+        <tr>
+          <td>
+            ${form.label('track_url', u'URL:')}
+          </td>
+          <td>
+            ${form.text('track_url')}
+          </td>
+          <td>
+            ${form.errorlist('track_url')}
+          </td>
+        </tr>
+	<tr>
+          <td>
+            OR
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            ${form.label('track_file', u'Choose file to upload:')}
+          </td>
+          <td>
+            ${form.file('track_file')}
+          </td>
+          <td>
+            ${form.errorlist('track_file')}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            ${form.submit('form.submitted', 'Save', class_='submit')}
+	  </td>
+	</tr>
+      </table>
+    </fieldset>
+    ${form.end()}
+  </tal:block>
+
+</html>

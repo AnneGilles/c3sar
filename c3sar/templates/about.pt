@@ -1,0 +1,47 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+  
+  <tal:block metal:fill-slot="content">
+    <h1>about C3S</h1>
+    <div id="about">
+    
+      <p>
+	C3S is a new upcoming European collecting society
+	for Artists and Bands to register their works.</p>
+
+      <p>
+	Members can choose to upload their works or not. 
+	They can also choose to link to works they have uploaded elsewhere.
+      </p>
+
+      <p>.</p>
+
+      <p>
+	Featurewise this collecting society will be a system
+	not specifically designed to replace GEMA and the others,
+	but we will offer all features they do. And many more.
+      </p>
+
+      <p>.</p>
+
+      <p>
+	We will actually be making an announcement and offer 
+	to all members of GEMA et al. It is likely to be equal or 
+	better than the current deals. We'll see.
+      </p>
+
+      <p>.</p>
+
+      <p>This was designed to take the process of licensing
+	of cultural work to the internet level. 
+	Of course we will have to produce a paper trail.
+	Making contracts still requires dead wood and a signature...
+      </p>
+
+      <p>.</p>
+
+    </div>    
+  </tal:block>
+</html>

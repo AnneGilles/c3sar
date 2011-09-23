@@ -29,7 +29,7 @@
               Not a member? <a href="/register">Register</a>.
 	    </span>
 	    <span tal:condition="logged_in">
-	      You are logged in! Welcome <span tal:replace="request.user.surname or None">dear User</span> &nbsp;&nbsp;
+	      You are logged in! Welcome <span tal:replace="request.user or None">dear User</span> &nbsp;&nbsp;
               <a href="${request.application_url}/logout" id="logout-link">Logout</a> | 
               <a href="${request.application_url}/user/edit/${request.user.id}" id="edit-profile">edit profile</a>
 	    </span>

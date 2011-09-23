@@ -1,0 +1,36 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+
+<tal:block metal:fill-slot="content">
+
+    <p>
+      <a href="/license/list">all</a> |
+      <a href="/license/rm">delete</a> 
+    </p>
+
+    <h1>Information on Creative Commons Licenses</h1>
+    
+    <p>To find out which license to choose for a particular work, you have to answer three questions:</p>
+
+    <h2>Is Sampling Allowed?</h2>
+
+    <p>You may choose to let people build upon your work and use it in other works. 
+      If you dissallow sampling, you get a license comprising the ND (No Derivatives) clause.</p>
+
+    <p>If you do not want anybody to change your work, then the third question is automatically not available anymore. </p>
+
+    <h2>Is Commercial Use Allowed?</h2>
+
+    <p></p>
+
+    <h2>Want to ?</h2>
+
+    <p>share alike</p>
+    
+</tal:block>
+
+</html>
+
+
