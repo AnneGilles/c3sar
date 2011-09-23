@@ -15,6 +15,7 @@ requires = [
     'pyramid_debugtoolbar',
     'zope.sqlalchemy',
     'cryptacular',
+    'pyramid_beaker',
     'pyramid_simpleform',
     'pyramid_mailer',
     'boto',

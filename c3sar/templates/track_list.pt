@@ -1,0 +1,23 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xml:lang="en" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal"      
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+  
+  <tal:block metal:fill-slot="content">
+    <div id="main">
+      <h1>List of Tracks</h1>
+      
+      <table border="1" cellpadding="10" width="90%">
+	<tr><td>id</td><td>name</td><td>album</td><td>edit</td><td>view</td></tr>
+	<tr tal:repeat="track tracks">
+	  <td><a href="/track/view/${track.id}">${track.id}</a></td>
+	  <td><a href="/track/view/${track.id}">${track.name}</a></td>
+	  <td>${track.album}</td>
+	  <td><a href="/track/edit/${track.id}">edit</a></td>	  
+	  <td><a href="/track/view/${track.id}">view</a></td>
+	</tr>
+      </table>
+    </div>
+  </tal:block>
+</html>

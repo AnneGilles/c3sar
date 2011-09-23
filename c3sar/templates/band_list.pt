@@ -1,0 +1,24 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xml:lang="en" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal"      
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+  
+  <tal:block metal:fill-slot="content">
+    <div id="main">
+      <h1>List of Bands</h1>
+      
+      <table border="1" cellpadding="10" width="90%">
+	<tr><td>id</td><td>name</td><td>homepage</td><td>email</td><td>edit</td><td>view</td></tr>
+	<tr tal:repeat="band bands">
+	  <td><a href="/band/view/${band.id}">${band.id}</a></td>
+	  <td>${band.name}</td>
+	  <td><a href="${band.homepage}" target="_blank">${band.homepage}</a></td>
+	  <td><a href="mailto:${band.email}">${band.email}</a></td>
+	  <td><a href="/band/edit/${band.id}">edit</a></td>	  
+	  <td><a href="/band/view/${band.id}">view</a></td>
+	</tr>
+      </table>
+    </div>
+  </tal:block>
+</html>

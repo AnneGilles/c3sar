@@ -9,7 +9,9 @@ from c3sar.security.request import RequestWithUserAttribute
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import unauthenticated_userid
-from pyramid.session import UnencryptedCookieSessionFactoryConfig
+#from pyramid.session import UnencryptedCookieSessionFactoryConfig
+# user sessioning with pyramid_beaker
+from pyramid_beaker import session_factory_from_settings
 
 
 def includeme(config):
@@ -34,7 +36,8 @@ def main(global_config, **settings):
     #initialize_s3()
 
     # user sessioning
-    session_factory = UnencryptedCookieSessionFactoryConfig('secret')
+    #session_factory = UnencryptedCookieSessionFactoryConfig('secret')
+    session_factory = session_factory_from_settings(settings)
     authn_policy = AuthTktAuthenticationPolicy('s0secret!!')
     authz_policy = ACLAuthorizationPolicy()
 

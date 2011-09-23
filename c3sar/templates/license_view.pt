@@ -1,0 +1,25 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+
+<tal:block metal:fill-slot="content">
+  <p>you are ${viewer_username}.
+
+    <p>
+      <a href="${prev_id}">previous</a> | 
+      <a href="/license/list">all</a> |
+      <a href="${next_id}">next</a> |
+      <a href="/license/edit">edit</a> |
+      <a href="/license/rm">delete</a> 
+    </p>
+
+    <h1>${license.license_name}</h1>
+    <p>ID: ${license.license_id}</p>
+    <p>Author: <b class="hits">${license.license_author}</b>.</p>
+
+</tal:block>
+
+</html>
+
+

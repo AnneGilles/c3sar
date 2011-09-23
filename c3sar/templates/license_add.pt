@@ -1,0 +1,33 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+
+<tal:block metal:fill-slot="content">
+  <p>you are ${viewer_username}.
+
+    <p>
+      <a href="/license/list">all</a> |
+      <a href="/license/rm">delete</a> 
+    </p>
+
+    <h1>Add a license</h1>
+    <p>You can make up your own license by choosing a base license and adding to it.
+
+    <h2>Choose</h2>
+    
+    ${form.begin(request.url)} 
+    ${form.csrf_token()}
+
+    <script type="text/javascript" src="http://api.creativecommons.org/jswidget/tags/0.97/complete.js?locale=de_DE"></script> 
+
+    ${form.submit('form.submitted', 'Save', class_='submit')}
+    
+    ${form.end()}
+	   
+
+</tal:block>
+
+</html>
+
+
