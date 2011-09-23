@@ -1,0 +1,57 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+
+  <tal:block metal:fill-slot="content">
+    <p>you are ${request.user.username | 'not logged in'}.
+
+    <p>
+      <a href="${prev_id}">previous</a> |
+      <a href="/user/list">all</a> |
+      <a href="${next_id}">next</a> |
+      <a href="/user/edit">edit</a> |
+      <a href="/user/rm">delete</a>
+    </p>
+
+    <h1>User information about ${user.username}</h1>
+    <p>ID: <b>${user.id}</b>.</p>
+    <p>Surname: <b>${user.surname}</b>.</p>
+    <p>Lastname: <b>${user.lastname}</b>.</p>
+    <p>Email: <b>$ off {user.email}</b>.</p>
+    <p>Email confirmed?: <b> $ off {user.email_conf}</b>.</p>
+    <p>Telephone: <b> $ off {user.telephone}</b>.</p>
+    <p>Telefax: <b> $ off {user.telefax}</b>.</p>
+    <p>Date of registration: <b>${user.date_registered}</b>.</p>
+    <p>Last login: <b>${user.last_login}</b>.</p>
+    <p>Last password change: <b>${user.last_password_change}</b>.</p>
+    <p>Active? <b>${user.is_active}</b>.</p>
+    <p>Groups: <b>$ off {user.get_group_list()} </b></p>
+
+
+    <hr>
+
+    <h2>More Information (Mock)</h2>
+    <h3>Bands</h3>
+    <p> number of bands: 2.
+      <ul>
+	<li>The Moos</li>
+	<li>The Mullers</li>
+      </ul>
+
+    <h3>Tracks</h3>
+    ....
+
+    <h2>Default License</h2>
+    <p>You can set a default license to use with your works. 
+
+      At this moment, your default license is set to: <strong>$ off {user.default_license}.</strong>
+      
+      <a href="/user/set_default_license/${user.id}">Set or change your default license</a>
+    </p>
+
+</tal:block>
+
+</html>
+
+

@@ -1,0 +1,18 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xml:lang="en" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+
+<tal:block metal:fill-slot="content">
+    <h1>404 - not found</h1>
+
+    <p>The page you wanted to see does not exist.</p>
+
+
+    <p>Please go back and try again!</p>
+
+
+</tal:block>
+
+</html>

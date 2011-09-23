@@ -1,0 +1,41 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xml:lang="en" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+  
+  
+  <tal:block metal:fill-slot="content">
+
+
+    <h1> listen to stuff </h1>
+
+    note: this is just a dumb template.
+
+
+    <ul>
+
+      <li>Die kleine Raupe: <audio src="/static/kleine-raupe.ogg"></li>
+      
+      <li>Rinderwahn (1): <audio src="http://localhost/musik/Rinderwahn.mp3" autoplay="autoplay" controls="controls"> Your browser does not support audio and/or HTML5</audio></li>
+
+      <li>Rinderwahn (2): <audio src="http://localhost/musik/Rinderwahn.mp3" autoplay="autoplay" controls="controls"> Your browser does not support audio and/or HTML5</audio></li>
+
+      <li>Rinderwahn (3): <audio src="http://localhost/musik/Rinderwahn.mp3" controls="controls"> Your browser does not support audio and/or HTML5</audio></li>
+    
+      <li>Accentuate the positive: 
+	<audio id='apN' autobuffer="true">
+	  <source src='http://localhost/musik/Accentuate%20the%20Positive.mp3' type='audio/mp3; codecs="mp3"'>
+	  	      Your browser sucks and can't play mp3 audio embedded with the <code>audio</code> HTML5 element. Get <a href="http://getfirefox.com/">Firefox</a>.
+	</audio>
+	<a id="togglePlay" href="#">Play/Pause</a>
+	<a id="toggleVocal" href="#">Toggle Vocals</a>
+
+
+</li>
+
+
+  </tal:block>
+  
+  
+</html>

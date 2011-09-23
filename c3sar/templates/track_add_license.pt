@@ -1,0 +1,44 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+
+  <tal:block metal:fill-slot="content">
+    <p>you are ${viewer_username}.
+
+    <p>
+      <a href="/track/list">all</a> |
+      <a href="/track/edit">edit</a> |
+      <a href="/track/rm">delete</a>
+    </p>
+
+    <h1>${track.name}</h1>
+    <p>Album: <b class="hits">${track.album}</b>.</p>
+    <p>URL: <b class="hits">${track.url}</b>.</p>
+    <!-- deprecated:    <p>File: <b class="hits">$ off {track.file}</b>.</p> -->
+    <p>FilePath: <b>${track.filepath}</b> </p>
+    <p>FileSize: <b>${track.bytesize}</b></p>
+    <p><a href="/${track.filepath}">download now</a>.</p>
+
+
+    <h2>License</h2>
+
+    <h3>current license</h3>
+
+    ...show it here...
+
+    <h3>add or change license</h3>
+
+    ${form.begin(request.url)}
+    ${form.csrf_token()}
+    <script type="text/javascript" src="http://api.creativecommons.org/jswidget/tags/0.97/complete.js?locale=de_DE"></script>
+    ${form.submit('form.submitted', 'Save', class_='submit')}
+    ${form.end()} 
+
+
+
+  </tal:block>
+
+</html>
+
+

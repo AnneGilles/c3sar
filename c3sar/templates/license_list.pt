@@ -11,11 +11,11 @@
       <table border="1" cellpadding="10" width="90%">
 	<tr><td>id</td><td>name</td><td>author</td><td>edit</td><td>view</td></tr>
 	<tr tal:repeat="license licenses">
-	  <td><a href="/license/view/${license.license_id}">${license.license_id}</a></td>
-	  <td><a href="/license/view/${license.license_id}">${license.license_name}</a></td>
-	  <td>${license.license_author}</td>
-	  <td><a href="/license/edit/${license.license_id}">edit</a></td>	  
-	  <td><a href="/license/view/${license.license_id}">view</a></td>
+	  <td><a href="/license/view/${license.id}">${license.id}</a></td>
+	  <td><a href="/license/view/${license.id}">${license.name}</a></td>
+	  <td>${license.author}</td>
+	  <td><a href="/license/edit/${license.id}">edit</a></td>	  
+	  <td><a href="/license/view/${license.id}">view</a></td>
 	</tr>
       </table>
     </div>

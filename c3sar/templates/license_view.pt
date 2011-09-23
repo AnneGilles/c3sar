@@ -14,9 +14,10 @@
       <a href="/license/rm">delete</a> 
     </p>
 
-    <h1>${license.license_name}</h1>
-    <p>ID: ${license.license_id}</p>
-    <p>Author: <b class="hits">${license.license_author}</b>.</p>
+    <h1>${license.name}</h1>
+    <p>ID: ${license.id}</p>
+    <p>URL: ${license.url}</p>
+    <p>Author: <b class="hits">${license.author}</b>.</p>
 
 </tal:block>
 

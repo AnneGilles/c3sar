@@ -195,6 +195,95 @@ def track_add(request):
         'form': FormRenderer(form)
         }
 
+
+## track: add license
+## track_edit
+@view_config(route_name='track_add_license',
+             permission='view',
+             renderer='../templates/track_add_license.pt')
+def track_add_license(request):
+    # which one?
+    id = request.matchdict['track_id']
+    track = Track.get_by_track_id(id)
+
+    # who is doing this?
+    viewer_username = authenticated_userid(request)
+
+    form = Form(request) 
+
+    DEBUG = True
+    if DEBUG:
+        import pprint
+        pp = pprint.PrettyPrinter(depth=6)
+
+    if 'form.submitted' in request.POST:
+        # request.session.flash("Here comes request.str_POST")
+        # request.session.flash(request.str_POST)
+        # request.session.flash("And this is request.POST")
+        # request.session.flash(request.POST)
+
+        my_results_dict = request.str_POST
+        #request.session.flash(my_results_dict.keys())
+
+        if DEBUG:
+            print "===== DEBUG ===== DEBUG ===== DEBUG ====="
+            pp.pprint(my_results_dict.keys())
+            pp.pprint(my_results_dict['cc_js_want_cc_license'])
+
+            
+        request.session.flash("cc license? " + my_results_dict['cc_js_want_cc_license'])
+        request.session.flash(my_results_dict['cc_js_result_uri'])
+        request.session.flash(my_results_dict['cc_js_result_img'])
+        request.session.flash(my_results_dict[u'cc_js_result_name'])
+
+        # so here is what we need to store:
+        #the_license = License(
+        #    cc_license = my_results_dict['cc_js_want_cc_license'])
+
+        
+        #request.session.flash("license? :" + form.data['cc_js_want_cc_license'])
+        # request.session.flash("sharing? :" + form.data['cc_js_share'])
+        # request.session.flash("remixing? :" + form.data['cc_js_remix'])
+        # request.session.flash("locale :" + form.data['cc_js_jurisdiction'])
+#        request.session.flash("URI :" + request.POST.cc_js_result_uri)
+        # request.session.flash("img :" + form.data['cc_js_result_img'])
+        # request.session.flash("name :" + form.data['cc_js_result_name'])
+
+
+    
+    # if 'form.submitted' in request.POST and not form.validate():
+    #     # form didn't validate
+    #     request.session.flash('form does not validate!')
+    #     request.session.flash(form.data['license_name'])
+    #     request.session.flash(form.data['license_url'])
+
+
+    # if 'form.submitted' in request.POST and form.validate():
+    #     request.session.flash('form validated!')
+    #     license_name = form.data['license_name']
+
+    #     license = License(
+    #         license_name = form.data['license_name'],
+    #         license_album = form.data['license_album'],
+    #         license_url = form.data['license_url'],
+    #         )
+
+    #     dbsession.add(license)
+    #     request.session.flash(u'writing to database ...')
+
+    #     # ToDo: https://redmine.local/issues/5
+
+
+    return {
+        'viewer_username': viewer_username,
+        'track_id': id,
+        'track': track,
+        'form': FormRenderer(form)
+        }
+
+
+
+
 ## track_view
 
 @view_config(route_name='track_view',

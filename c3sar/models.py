@@ -404,8 +404,9 @@ def populate():
                    bytesize=None)
     dbsession.add(track2)
 
-
-        
+    license1 = License(name=u"testLicense1", url="http://ex.com/my_license",
+                       author=u"Somebody")
+    dbsession.add(license1)
 
     try:
         dbsession.flush()
