@@ -62,6 +62,18 @@ def main(global_config, **settings):
     #                 renderer='templates/mytemplate.pt'
     #                 )
 
+    # about
+    config.add_route('about', '/about')
+    config.add_view('c3sar.views.basic.about_view',
+                    route_name='about',
+                    renderer='templates/about.pt'
+                    )
+    # listen
+    config.add_route('listen', '/listen')
+    config.add_view('c3sar.views.basic.listen_view',
+                    route_name='listen',
+                    renderer='templates/listen.pt'
+                    )
     # prepare to use the base template
     config.add_subscriber('c3sar.subscribers.add_base_template',
                           'pyramid.events.BeforeRender')
@@ -91,11 +103,14 @@ def main(global_config, **settings):
                     renderer='templates/user_view.pt')
 
     # user edit
-#    config.add_route('user_edit', '/user/edit/{user_id}')
+    config.add_route('user_edit', '/user/edit/{user_id}')
 #    config.add_route('user_edit', '/user/edit/{user_id}', traverse='/{user_id}')
     #config.add_route('user_edit', '/user/edit/{user_id}',
     #                 factory=UserContainer,
     #                 )
+    config.add_view('c3sar.views.user.user_edit',
+                    route_name='user_edit',
+                    renderer='templates/user_edit_table.pt')
 
     # delete
     #config.add_route('user_del', '/user/rm')
@@ -112,6 +127,15 @@ def main(global_config, **settings):
     config.add_view('c3sar.views.user.logout_view',
                     route_name='logout',
                     renderer='templates/user_login.pt')
+    # user set default license
+    config.add_route('user_set_default_license', '/user/set_default_license/{user_id}')
+#    config.add_route('user_edit', '/user/edit/{user_id}', traverse='/{user_id}')
+    #config.add_route('user_edit', '/user/edit/{user_id}',
+    #                 factory=UserContainer,
+    #                 )
+    config.add_view('c3sar.views.user.user_set_default_license',
+                    route_name='user_set_default_license',
+                    renderer='templates/user_set_default_license.pt')
 
     ## routes for bands ##
     # band create
@@ -169,6 +193,14 @@ def main(global_config, **settings):
     # config.add_view('c3sar.views.track.track_edit',
     #                 route_name='track_edit',
     #                 renderer='templates/track_edit.pt')
+
+    # track: add license
+    config.add_route('track_add_license', '/track/add_license/{track_id}')
+    config.add_view('c3sar.views.track.track_add_license',
+                    route_name='track_add_license',
+                    renderer='templates/track_add_license.pt')
+
+
     # delete
     config.add_route('track_del', '/track/rm/{track_id}')
     config.add_view('c3sar.views.track.track_del',

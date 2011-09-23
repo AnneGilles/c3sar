@@ -1,0 +1,46 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+
+<tal:block metal:fill-slot="content">
+
+
+    <h1>You were choosing a license!</h1>
+
+    <p>This view is used as entry point on our side, and as exit_url on the CreativeCommons.org license chooser partner interface.</p>
+
+    <p>We try and capture the URL parameters supplied.
+
+    <p>This is where we would have to send our users to, over at the CC Partner Interface:
+      <ul>
+	<li>
+	  http://creativecommons.org/choose/?partner={partner}&exit_url={exit_url}&stylesheet={stylesheet}&partner_icon_url={partner_icon_url}
+	</li>
+	<li>
+	  http://creativecommons.org/choose/?partner={partner}&exit_url=http://alpha.cc-vg.de/license/chosen&stylesheet={stylesheet}&partner_icon_url=http://cdn.cc-vg.de/logo/cc_lc.c3s.png
+	</li>
+      </ul>
+    
+
+      <p>maybe we can decode into the exit url some parameters we need to recognize which track (or something) this license would be attributed to... and use that to go back there and (after checking security) ask the user if she really wants this license to be attributed. [Save].</p>
+
+      <p>Or maybe this should go into a Lightbox or the like.</p>
+  
+
+    <h2>Parameters:</h2>
+    
+    The URLs parameters (is a dict!):<br>
+    ${url_params}
+    <hr>
+    <h2>Let's display them nicely *aka* Your License:</h2>
+    License Name: ${license_name}<br>
+    License URL: <a href="${license_url}">${license_url}</a><br>
+    License Image: !? ${license_image}
+
+
+</tal:block>
+
+</html>
+
+

@@ -125,8 +125,7 @@ def user_register(request):
     if 'form.submitted' in request.POST and form.validate():
         # ready for registration!
         request.session.flash('form validated!')
-        session = DBSession()
-        #session = getSession()
+        dbsession = DBSession()
         username = form.data['username']
 
 
@@ -366,9 +365,9 @@ class UserSettingsSchema(formencode.Schema):
 #                              UniqueUsername())
 #    new_password = formencode.validators.PlainText(not_empty = True)
 #    confirm_password =  formencode.validators.String(not_empty = True)
-    user_email = formencode.validators.Email(resolve_domain = False, not_empty=True)
-    user_surname =  formencode.validators.String(not_empty = True)
-    user_lastname =  formencode.validators.String(not_empty = True)
+#    user_email = formencode.validators.Email(resolve_domain = False, not_empty=True)
+    surname =  formencode.validators.String(not_empty = True)
+    lastname =  formencode.validators.String(not_empty = True)
 #    password =  formencode.validators.String(not_empty = True)
 #    chained_validators = [
 #        formencode.validators.FieldsMatch('new_password', 'confirm_password')
@@ -379,89 +378,176 @@ class UserSettingsSchema(formencode.Schema):
 # #from formencode import htmlfill
 # from c3sregistration.security import UserContainer
 
-# @view_config(route_name='user_edit', 
-#              #permission='view',
-#              permission='editUser',
-# #             context=UserContainer,
-#              renderer='../templates/user_edit_table.pt')
-# def user_edit(request):
-#     """
-#     let users change some of their details
-#     """
-#     session = getSession()
+@view_config(route_name='user_edit', 
+             #permission='view',
+             permission='editUser',
+#             context=UserContainer,
+             renderer='../templates/user_edit_table.pt')
+def user_edit(request):
+    """
+    let users change some of their details
+    """
+    dbsession = DBSession()
 
-#     user_id = request.matchdict['user_id']
-#     user = User.get_by_user_id(user_id)
+    user_id = request.matchdict['user_id']
+    user = User.get_by_user_id(user_id)
 
-# #    request.session.flash("email confirmed? " + str(user.user_email_conf))
-#     if user.user_email_conf == True:
-#         email_is_confirmed = "Yes"
-#     else:
-#         email_is_confirmed = "No"
+#    request.session.flash("email confirmed? " + str(user.user_email_conf))
+#    if user.email_conf == True:
+#        email_is_confirmed = "Yes"
+#    else:
+#        email_is_confirmed = "No"
 
-#     form = Form(request, schema = UserSettingsSchema, obj = user)
-
-
-#     if form.validate():
-#         request.session.flash("Yes! form.validate() !!!")
+    form = Form(request, schema = UserSettingsSchema, obj = user)
 
 
-#     if 'form.submitted' in request.POST and not form.validate():
-#         # form didn't validate
-#         request.session.flash('form does not validate!')
-#         request.session.flash(form.data['user_surname'])
-#         request.session.flash(form.data['user_lastname'])
-#         request.session.flash(form.data['user_email'])
-
-#     if 'form.submitted' in request.POST and form.validate():
-#         # ready for registration!
-#         request.session.flash('form validated!')
-#         #session = DBSession()
-#         #username = form.data['username']
-
-#         # user = User(
-#         #     username = user.username,
-#         #     #password = form.data['password'],
-#         #     user_surname = form.data['user_surname'],
-#         #     user_lastname = form.data['user_lastname'],
-#         #     user_email = form.data['user_email']
-#         #     )
-
-#         if form.data['user_surname'] !=  user.user_surname:
-#             request.session.flash('surname was not same --> changing')
-#             user.user_surname = form.data['user_surname']
-
-#         if form.data['user_lastname'] !=  user.user_lastname:
-#             request.session.flash('lastname was not same --> changing')
-#             user.user_lastname = form.data['user_lastname']
-
-#         if form.data['user_email'] !=  user.user_email:
-#             request.session.flash('email was not same --> changing')
-#             user.user_email = form.data['user_email']
-
-# # ToDo
-#         # if form.data['user_telephone'] !=  user.user_telephone:
-#         #     request.session.flash('telephone was not same --> changing')
-#         #     user.user_telephone = form.data['user_telephone']
-
-#         # if form.data['user_telefax'] !=  user.user_telefax:
-#         #     request.session.flash('telefax was not same --> changing')
-#         #     user.user_telefax = form.data['user_telefax']
+    if form.validate():
+        request.session.flash("Yes! form.validate() !!!")
 
 
+    if 'form.submitted' in request.POST and not form.validate():
+        # form didn't validate
+        request.session.flash('form does not validate!')
+        request.session.flash(form.data['user_surname'])
+        request.session.flash(form.data['user_lastname'])
+        request.session.flash(form.data['user_email'])
 
-#         #redirect_url = route_url('user_view', request)
+    if 'form.submitted' in request.POST and form.validate():
+        # ready for registration!
+        request.session.flash('form validated!')
+        #username = form.data['username']
+
+        # user = User(
+        #     username = user.username,
+        #     #password = form.data['password'],
+        #     user_surname = form.data['user_surname'],
+        #     user_lastname = form.data['user_lastname'],
+        #     user_email = form.data['user_email']
+        #     )
+
+        if form.data['surname'] !=  user.surname:
+            request.session.flash('surname was not same --> changing')
+            user.surname = form.data['surname']
+
+        if form.data['lastname'] !=  user.lastname:
+            request.session.flash('lastname was not same --> changing')
+            user.lastname = form.data['lastname']
+
+#        if form.data['user_email'] !=  user.email:
+#            request.session.flash('email was not same --> changing')
+#            user.user_email = form.data['user_email']
+
+# ToDo
+        # if form.data['user_telephone'] !=  user.user_telephone:
+        #     request.session.flash('telephone was not same --> changing')
+        #     user.user_telephone = form.data['user_telephone']
+
+        # if form.data['user_telefax'] !=  user.user_telefax:
+        #     request.session.flash('telefax was not same --> changing')
+        #     user.user_telefax = form.data['user_telefax']
 
 
-# #       return HTTPFound(location = redirect_url, headers=headers)
-#        # return dict (
-#        #     message = 'You won!'
-#        #     )
+
+        #redirect_url = route_url('user_view', request)
 
 
-#     return {
-#         'the_user_id': user_id,
-#         'the_username': user.username,
-#         'email_is_confirmed': email_is_confirmed,
-#         'form': FormRenderer(form),
-#         }
+#       return HTTPFound(location = redirect_url, headers=headers)
+       # return dict (
+       #     message = 'You won!'
+       #     )
+
+
+    return {
+        'the_user_id': user_id,
+        'the_username': user.username,
+ #       'email_is_confirmed': email_is_confirmed,
+        'form': FormRenderer(form),
+        }
+
+# formencode schema for user default license ####################################
+class UserDefaultLicenseSchema(formencode.Schema):
+    allow_extra_fields = True
+    filter_extra_fields = True
+
+
+## default license
+@view_config(route_name='user_set_default_license', 
+             #permission='view',
+             permission='editUser',
+#             context=UserContainer,
+             renderer='../templates/user_set_default_license.pt')
+def user_set_default_license(request):
+    """
+    let users change some of their details
+    """
+    dbsession = DBSession()
+
+    user_id = request.matchdict['user_id']
+    user = User.get_by_user_id(user_id)
+
+    form = Form(request, schema = UserDefaultLicenseSchema, obj = user)
+#    form = Form(request, obj = user)
+
+
+#    if form.validate():
+#        request.session.flash("Yes! form.validate() !!!")
+
+
+    if 'form.submitted' in request.POST and not form.validate():
+        # form didn't validate
+        request.session.flash('form does not validate!')
+        request.session.flash(form.data['user_surname'])
+        request.session.flash(form.data['user_lastname'])
+        request.session.flash(form.data['user_email'])
+
+    if 'form.submitted' in request.POST and form.validate():
+        # ready for registration!
+        request.session.flash('form validated!')
+
+# ToDo XXX
+        # user = User(
+        #     username = user.username,
+        #     #password = form.data['password'],
+        #     user_surname = form.data['user_surname'],
+        #     user_lastname = form.data['user_lastname'],
+        #     user_email = form.data['user_email']
+        #     )
+
+        # if form.data['surname'] !=  user.surname:
+        #     request.session.flash('surname was not same --> changing')
+        #     user.surname = form.data['surname']
+
+        # if form.data['lastname'] !=  user.lastname:
+        #     request.session.flash('lastname was not same --> changing')
+        #     user.lastname = form.data['lastname']
+
+#        if form.data['user_email'] !=  user.email:
+#            request.session.flash('email was not same --> changing')
+#            user.user_email = form.data['user_email']
+
+# ToDo
+        # if form.data['user_telephone'] !=  user.user_telephone:
+        #     request.session.flash('telephone was not same --> changing')
+        #     user.user_telephone = form.data['user_telephone']
+
+        # if form.data['user_telefax'] !=  user.user_telefax:
+        #     request.session.flash('telefax was not same --> changing')
+        #     user.user_telefax = form.data['user_telefax']
+
+
+
+        #redirect_url = route_url('user_view', request)
+
+
+#       return HTTPFound(location = redirect_url, headers=headers)
+       # return dict (
+       #     message = 'You won!'
+       #     )
+
+
+    return {
+        'the_user_id': user_id,
+        'the_username': user.username,
+ #       'email_is_confirmed': email_is_confirmed,
+        'form': FormRenderer(form),
+        }

@@ -1,0 +1,103 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xml:lang="en" 			
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+  
+  
+  <tal:block metal:fill-slot="content">
+    
+    
+    <h1>Account settings for ${the_username}</h1>
+    
+    <!-- $ disabled {form.begin(request.route_url('user_edit'))} -->
+    ${form.begin(request.url)}
+            ${form.csrf_token()}
+
+    <fieldset>
+      <table>
+	<tr>
+	  <td>
+            ${form.label('surname', 'Surname:')}
+	  </td>
+	  <td>
+            ${form.text('surname')}
+          </td>
+	  <td>
+            ${form.errorlist('surname')}
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+            ${form.label('lastname', 'Lastname:')}
+	  </td>
+	  <td>
+            ${form.text('lastname')}
+          </td>
+	  <td>
+            ${form.errorlist('lastname')}
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+            ${form.label('user_email', 'Email:')}
+	  </td>
+	  <td>
+            ${form.text('user_email')} 
+          </td>
+	  <td>
+            ${form.errorlist('user_email')}
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+            Email confirmed?:
+	  </td>
+	  <td>
+            $ off {email_is_confirmed}
+          </td>
+	  <td>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+            ${form.label('user_telephone', 'Telephone:')}
+	  </td>
+	  <td>
+            ${form.text('user_telephone')}
+          </td>
+	  <td>
+            ${form.errorlist('user_telephone')}
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+            ${form.label('user_telefax', 'Telefax:')}
+	  </td>
+	  <td>
+            ${form.text('user_telefax')}
+          </td>
+	  <td>
+            ${form.errorlist('user_telefax')}
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	  </td>
+	  <td>
+            ${form.submit('form.submitted', 'Save', class_='submit')}
+	  </td>
+	</tr>
+      </table>
+    </fieldset>
+    ${form.end()}
+
+
+    <h2>Other Settings</h2>
+
+    <ul>
+      <li>Change your password <a href="${request.application_url}/user/change_password/${the_user_id}">here</a></li>
+      <li>Request email confirmation link</li>
+    
+  </tal:block>
+</html>
