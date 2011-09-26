@@ -342,6 +342,7 @@ def track_view(request):
         track_is_licensed = True
         license = track.license[0]
         request.session.flash("track_is_licensed: " + str(track_is_licensed))
+        request.session.flash("track.license.name: " + str(track.license[0].img))
         
 
     print "===================================="
