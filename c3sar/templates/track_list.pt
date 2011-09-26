@@ -14,7 +14,7 @@
 	<!-- table content -->
 	<tr tal:repeat="track tracks">
 	  <td><a href="/track/view/${track.id}">${track.id}</a></td>
-	  <td><img src="${track.license.img | 'None'}"></td>
+	  <td><img src="${track.license[0].img | None}"></td>
 	  <td><a href="/track/view/${track.id}">${track.name}</a></td>
 	  <td>${track.album}</td>
 	  <td><a href="/track/edit/${track.id}">edit</a></td>	  
