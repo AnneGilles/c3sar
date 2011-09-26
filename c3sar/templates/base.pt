@@ -9,7 +9,7 @@
   	<meta name="keywords" content="creative commons collecting society" />
 	<meta name="description" content="creative commons collecting society" />
   	<link rel="shortcut icon" href="${request.static_url('c3sar:static/favicon.ico')}" />
-  	<link rel="stylesheet" href="${request.static_url('c3sar:static/pylons.css')}" type="text/css" media="screen" charset="utf-8" />
+  	<link rel="stylesheet" href="${request.static_url('c3sar:static/pylons_off.css')}" type="text/css" media="screen" charset="utf-8" />
   	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton|Nobile:regular,i,b,bi&amp;subset=latin" 
 	      type="text/css" media="screen" charset="utf-8" />
 	<!--[if lte IE 6]>
@@ -29,7 +29,7 @@
               Not a member? <a href="/register">Register</a>.
 	    </span>
 	    <span tal:condition="logged_in">
-	      You are logged in! Welcome <span tal:replace="request.user.username or None">Username</span> &nbsp;&nbsp;
+	      You are logged in! Welcome <span tal:replace="request.user.username | None">Username</span> &nbsp;&nbsp;
               <a href="${request.application_url}/logout" id="logout-link">Logout</a> | 
               <a href="${request.application_url}/user/view/${request.user.id}" id="view-profile">view profile</a> |
               <a href="${request.application_url}/user/edit/${request.user.id}" id="edit-profile">edit profile</a>
@@ -38,8 +38,8 @@
 	  <!-- /login bar --> 
 	  <div class="top align-center">
             <div>
-	      <a href="${request.route_url('home')}">
-		<img src="${request.static_url('c3sar:static/c3s-logo.png')}" width="750" height="169" alt="c3s"/>
+	      <a href="${request.route_url('home')}"> <!-- width 750, height 169 -->
+		<img src="${request.static_url('c3sar:static/c3s-logo.png')}" width="375" height="83" alt="c3s"/>
 	      </a>
 	    </div>
 	  </div>
@@ -59,7 +59,7 @@
 	      
 	  </span>
 	  
-	<div style="margin-left: 10%">
+	<div style="margin-left: 20px">
 	  
 	  <tal:block metal:define-slot="content"></tal:block>
 
@@ -89,6 +89,7 @@
 	    <div>
 
 	    </div>
+<hr>
 	    <div id="footer">
 
 	      <div class="footer">

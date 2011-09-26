@@ -1,14 +1,15 @@
 import formencode
 from formencode import validators
 
+from pyramid.security import authenticated_userid
+from pyramid.url import route_url
 from pyramid.view import view_config
 
 from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
 
-from pyramid.security import authenticated_userid
-
 from c3sar.models import Track
+from c3sar.models import License
 from c3sar.models import DBSession
 
 dbsession = DBSession()
@@ -44,10 +45,10 @@ class TrackSchema(formencode.Schema):
     #     #URLorFile()
 #         )
     #track_file = formencode.validators.FieldStorageUploadConverter()
-    track_file = formencode.All(
-        validators.FieldStorageUploadConverter(),
-        #validators.FileUploadKeeper()
-        )
+#    track_file = formencode.All(
+#        validators.FieldStorageUploadConverter(),
+#        #validators.FileUploadKeeper()
+#        )
     #              FileUploadKeeper
     # see  site-packages/FormEncode-1.2.4-py2.6.egg/formencode/validators.py
 
@@ -108,9 +109,11 @@ def track_add(request):
         pp.pprint(request.POST)
         
         print "yes, Im here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1"
+        print str(form.data['track_file'] == '')
 
         # check if the form contained a file and if yes....
-        if hasattr(form.data['track_file'], 'file'):
+        #if 'track_file' in form.data:
+        if form.data['track_file'] != '':
             #request.session.flash('there is a file supplied through the form')
             #request.session.flash('filename: ' + str(form.data['file'].filename))
             #request.session.flash('file: ' + str(form.data['file'].file))
@@ -184,9 +187,9 @@ def track_add(request):
         # ToDo: send user to track_view/this_id
         # ToDo: send mail...
 
-        from pyramid.url import route_url
+        
         #redirect_url = route_url('track_list', request)
-        redirect_url = route_url('track_view', request) + str(track.id)
+        redirect_url = route_url('track_view', request, track_id=track.id) #+ str(track.id)
         from pyramid.httpexceptions import HTTPFound
         return HTTPFound(location = redirect_url)
 
@@ -197,7 +200,6 @@ def track_add(request):
 
 
 ## track: add license
-## track_edit
 @view_config(route_name='track_add_license',
              permission='view',
              renderer='../templates/track_add_license.pt')
@@ -205,7 +207,9 @@ def track_add_license(request):
     # which one?
     id = request.matchdict['track_id']
     track = Track.get_by_track_id(id)
-
+    #license = track.license[1]
+#    request.session.flash(track.license[0])
+#    request.session.flash(track.license[1])
     # who is doing this?
     viewer_username = authenticated_userid(request)
 
@@ -231,53 +235,58 @@ def track_add_license(request):
             pp.pprint(my_results_dict['cc_js_want_cc_license'])
 
             
-        request.session.flash("cc license? " + my_results_dict['cc_js_want_cc_license'])
-        request.session.flash(my_results_dict['cc_js_result_uri'])
-        request.session.flash(my_results_dict['cc_js_result_img'])
-        request.session.flash(my_results_dict[u'cc_js_result_name'])
+            # request.session.flash("cc license? " + my_results_dict['cc_js_want_cc_license'])
+            # request.session.flash(my_results_dict['cc_js_result_uri'])
+            # request.session.flash(my_results_dict['cc_js_result_img'])
+            # request.session.flash(my_results_dict[u'cc_js_result_name'])
 
-        # so here is what we need to store:
-        #the_license = License(
-        #    cc_license = my_results_dict['cc_js_want_cc_license'])
+            if (my_results_dict['cc_js_want_cc_license'] == 'sure'):
+                request.session.flash("we got a cc license...")
+
+                # track.license = [
+                #     License(
+                #         name = my_results_dict['cc_js_result_name'],
+                #         uri = my_results_dict['cc_js_result_uri'],
+                #         img = my_results_dict['cc_js_result_img'],
+                #         author = viewer_username
+                #         )
+                #     ]
+                track.license.append(License(
+                    name = my_results_dict['cc_js_result_name'],
+                    uri = my_results_dict['cc_js_result_uri'],
+                    img = my_results_dict['cc_js_result_img'],
+                    author = viewer_username
+                    )
+                                     )
+                #                dbsession.add(license) # no, add via track
+                #                dbsession.add(track) # no, don't add, just update
+                request.session.flash(u'writing to database ... by flush')
+                dbsession.flush()
+                
+            else:
+                request.session.flash("we got an all rights reserved license...")
+                
+                track.license = License(
+                    name = 'All rights reserved',
+                    uri = '',
+                    img = '', 
+                    author = viewer_username
+                    )
+                
+                request.session.flash(u'writing to database ... by flushing')
+                dbsession.flush()
+        
+        # redirect to license_view
+        redirect_url = route_url('track_view', request, track_id=str(track.id)) #+ str(track.id)
+        from pyramid.httpexceptions import HTTPFound
+        return HTTPFound(location = redirect_url)
 
         
-        #request.session.flash("license? :" + form.data['cc_js_want_cc_license'])
-        # request.session.flash("sharing? :" + form.data['cc_js_share'])
-        # request.session.flash("remixing? :" + form.data['cc_js_remix'])
-        # request.session.flash("locale :" + form.data['cc_js_jurisdiction'])
-#        request.session.flash("URI :" + request.POST.cc_js_result_uri)
-        # request.session.flash("img :" + form.data['cc_js_result_img'])
-        # request.session.flash("name :" + form.data['cc_js_result_name'])
-
-
-    
-    # if 'form.submitted' in request.POST and not form.validate():
-    #     # form didn't validate
-    #     request.session.flash('form does not validate!')
-    #     request.session.flash(form.data['license_name'])
-    #     request.session.flash(form.data['license_url'])
-
-
-    # if 'form.submitted' in request.POST and form.validate():
-    #     request.session.flash('form validated!')
-    #     license_name = form.data['license_name']
-
-    #     license = License(
-    #         license_name = form.data['license_name'],
-    #         license_album = form.data['license_album'],
-    #         license_url = form.data['license_url'],
-    #         )
-
-    #     dbsession.add(license)
-    #     request.session.flash(u'writing to database ...')
-
-    #     # ToDo: https://redmine.local/issues/5
-
-
     return {
         'viewer_username': viewer_username,
         'track_id': id,
         'track': track,
+        'license': license,
         'form': FormRenderer(form)
         }
 
@@ -294,6 +303,20 @@ def track_view(request):
     id = request.matchdict['track_id']
     track = Track.get_by_track_id(id)
 
+    # catch Error if id /not /exists
+    try:
+        print "===== track.id: " + str(track.id)
+        print "===== track.license.__len__(): " + str(track.license.__len__())
+    except AttributeError, a:
+        #'NoneType' object has no attribute 'license'
+        print "========================================================="
+        print "========================================================="
+        print a
+        print "========================================================="
+        print "========================================================="
+        # here we should redirect to NotFound or give some info
+
+        
     #calculate for next/previous-navigation
     if int(id) == 1:
         prev_id = 1
@@ -307,12 +330,40 @@ def track_view(request):
 
     # show who is watching. maybe we should log this ;-)
     viewer_username = authenticated_userid(request)
+#    request.session.flash("track.license.__len__(): " + str(track.license.__len__()))
+    #request.session.flash("track.license.name: " + track.license[0].name)
 
-    track_is_licensed = False
+    if track.license.__len__() == 0:
+        track_is_licensed = False
+        license = License(name=u"All Rights Reserved.",
+                          uri=u"", img=u"", author=u"default license")
+        request.session.flash("track_is_licensed: " + str(track_is_licensed))
+    else:
+        track_is_licensed = True
+        license = track.license[0]
+        request.session.flash("track_is_licensed: " + str(track_is_licensed))
+        
 
+    print "===================================="
+    print "str(type(track.license)): " + str(type(license))
+    print "===================================="
+    print "str(dir(track.license)): " + str(dir(license))
+    print "===================================="
+#    print "str(help(track.license.pop())): " + str(help(track.license.pop()))
+    print "===================================="
+    print "str(type(license)): " + str(type(license))
+    print "===================================="
+#    print "str(type(license.name)): " + str(type(license.name))
+    print "===================================="
+#    print str(dir(license))
+#    print "===================================="
+#    print str(license.name)
+    print "===================================="
+        
     return {
         'track': track,
         'track_is_licensed': track_is_licensed,
+        'license': license,
         'viewer_username': viewer_username,
         'prev_id': prev_id,
         'id': id,

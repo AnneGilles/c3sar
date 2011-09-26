@@ -1,7 +1,8 @@
 from pyramid.view import view_config
 
+from pyramid.httpexceptions import HTTPFound
 from pyramid.security import authenticated_userid
-
+from pyramid.url import route_url
 
 #import formencode
 from pyramid_simpleform import Form
@@ -128,7 +129,8 @@ def license_add(request):
             dbsession.flush()
         
         # redirect to license_view 
-
+        redirect_url = route_url('license_list', request)
+        return HTTPFound(location = redirect_url) 
 
     return {
         'viewer_username': viewer_username,

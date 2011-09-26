@@ -31,9 +31,10 @@
 	<p>Mode information about licenses: <a href="/license/faq">See the License FAQ.</a>
       </span>
       <span tal:condition="track_is_licensed">
-	<p>License name: ${track.license_name}</p>
-	<p>License image: ${track.license_img}</p>
-	<p>License URL: ${track.license_url}</p>
+	<p>License name: ${license.name}</p>
+	<p>License image: ${license.img}</p>
+	<p>License URL: ${license.uri}</p>
+	<p><a href="${license.uri}"><img src="${license.img}"></a></p>
       </span>
     </span>
 
