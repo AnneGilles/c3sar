@@ -82,8 +82,13 @@ class UserViewIntegrationTests(unittest.TestCase):
     def test_user_confirm_email_view(self):
         from c3sar.views.user import user_confirm_email
         request = testing.DummyRequest()
+        # mock values
+        request.matchdict['code'] = 'IDoExist'
+        request.matchdict['user'] = 'firstUsername'
+        request.matchdict['email'] = 'some@email.com'
         # mailer = get_mailer(request)
         result = user_confirm_email(request)
+        
         # print "dir(result): " + str(dir(result))
         # print "type(result): " + str(type(result))
         # print "type(result.items): " + str(type(result.items))

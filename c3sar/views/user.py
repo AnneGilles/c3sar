@@ -204,6 +204,8 @@ def user_confirm_email(request):
     # values from URL/matchdict
     conf_code = request.matchdict['code']
     user_name = request.matchdict['user_name']
+    user_email = request.matchdict['user_email']
+    # XXX ToDo: refactor to also check email-address belongs to user...
     #get matching user from db
     user = User.get_by_username(user_name)
     print "--- in users.py:confirm_email: type(user): " + str(type(user))
