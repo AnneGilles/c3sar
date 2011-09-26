@@ -223,6 +223,7 @@ class License(Base):
 #        return q.order_by(order_by)[:how_many]
         return q
 
+    
 
 # table for relation between bands and members(=users)
 bands_members = Table('bands_members', Base.metadata,
@@ -243,6 +244,12 @@ licenses_tracks = Table('licenses_tracks', Base.metadata,
     Column('license_id', Integer, ForeignKey('licenses.id')),
     Column('track_id', Integer, ForeignKey('tracks.id')))
 
+track_license = Table('track_license',
+                      Base.metadata,
+                      Column('track_id', Integer, ForeignKey('tracks.id')),
+                      Column('license_id', Integer, ForeignKey('licenses.id'))
+                      )
+
 
 class Track(Base): ##########################################################
     """
@@ -255,6 +262,12 @@ class Track(Base): ##########################################################
     album = Column(Unicode(255))
     filepath = Column(Unicode(255))
     bytesize = Column(Integer)
+
+    license = relationship("License",
+                           secondary='track_license',
+                           #primaryjoin="_and(Track.id==License.track_id)",
+                           order_by="License.id")
+    
     # track_composers = reference to User(s) or 'some text'
     # track_lyrics = reference to User(s) or 'some text'
 
@@ -264,6 +277,7 @@ class Track(Base): ##########################################################
         self.url = url
         self.filepath = filepath
         self.bytesize = bytesize
+#        self.license = license
 
     @classmethod
     def get_by_track_name(cls, track_name):
@@ -397,17 +411,26 @@ def populate():
                  registrar_id=2)
     dbsession.add(band2)
         
-    track1 = Track(name=u"TestTrack1", album=u'TestAlbum1',
-                   url=u'http://testband.io/t1.mp3', filepath=None,
-                   bytesize=None)
-    dbsession.add(track1)
+    # track1 = Track(name=u"TestTrack1", album=u'TestAlbum1',
+    #                url=u'http://testband.io/t1.mp3', filepath=None,
+    #                bytesize=None)
+    # dbsession.add(track1)
 
     track2 = Track(name=u"TestTrack2", album=u'TestAlbum2',
                    url=u'http://testband.io/t2.mp3', filepath=None,
-                   bytesize=None)
+                   bytesize=None,
+                   )
+    track2.license = [
+        License(
+            name=u"Creative Commons Attribution 3.0 Unported", 
+            uri=u"http://creativecommons.org/licenses/by/3.0/",
+            img="http://i.creativecommons.org/l/by/3.0/88x31.png",
+            author=u"Somebody"
+            )
+        ]
     dbsession.add(track2)
-
-
+    
+    
 #<a rel="license" href="http://creativecommons.org/licenses/by/3.0/">
 #<img alt="Creative Commons License" style="border-width:0" 
 #     src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />

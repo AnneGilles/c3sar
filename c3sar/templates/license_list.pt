@@ -7,7 +7,7 @@
   <tal:block metal:fill-slot="content">
     <div id="main">
       <h1>List of Licenses</h1>
-      
+      <p>for now we just list all of the licenses created here, so you see what you (and others) created.</p>
       <table border="1" cellpadding="10" width="90%">
 	<tr><td>id</td><td>name</td><td>author</td><td>edit</td><td>view</td></tr>
 	<tr tal:repeat="license licenses">
