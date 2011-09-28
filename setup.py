@@ -19,6 +19,7 @@ requires = [
     'pyramid_simpleform',
     'pyramid_mailer',
     'boto',
+    'fdfgen',
     ]
 
 if sys.version_info[:3] < (2,5,0):
