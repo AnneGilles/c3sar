@@ -359,6 +359,32 @@ def user_view(request):
         'next_id': next_id,
         }
 
+#################################################################### user_view
+@view_config(route_name='user_profile',
+             permission='view',
+             renderer='../templates/user_profile.pt')
+def user_profile(request):
+    user_id = request.matchdict['user_id']
+    user = User.get_by_user_id(user_id)
+
+    # calculate for next/previous navigation
+    prev_id = int(user_id) - 1
+    next_id = int(user_id) + 1
+    # ToDo: what if foo_id == 0 or nonexistant?
+    # maybe use template logic to not show prev-next-link?
+    # maybe try to figure out max_id? what is cheaper? just fail/404?
+    # we need the 404 anyway, if user picks random url/user_id
+
+    # show who is watching. maybe we should log this ;-)
+    viewer_username = authenticated_userid(request)
+
+    return {
+        'user': user,
+        'viewer_username': viewer_username,
+        'prev_id': prev_id,
+        'next_id': next_id,
+        }
+
 # formencode schema for user settings ####################################
 class UserSettingsSchema(formencode.Schema):
     allow_extra_fields = True
@@ -543,3 +569,105 @@ def user_set_default_license(request):
  #       'email_is_confirmed': email_is_confirmed,
         'form': FormRenderer(form),
         }
+
+
+## get contract as pdf for printout
+@view_config(route_name='user_bv_de', 
+             #permission='view',
+             permission='editUser'
+             )
+# url scheme: /user/bv/<id>
+def user_get_bv(request):
+    """
+    get a PDF for the user to print out, sign and mail back
+    """
+    dbsession = DBSession()
+
+    user_id = request.matchdict['user_id']
+#    user = User.get_by_user_id(user_id)
+
+    from pyramid.response import Response
+    response = Response(content_type='application/pdf')
+#    print "=== dir(request.url): " + str(dir(request.url))
+    # 'url', 'urlargs', 'urlvars'
+#    print "=== request.: " + str(request.)
+#    print "=== request.url: " + str(request.url)
+#    print "=== request.resource_url(): " + str(request.resource_url())
+#    print "=== request.urlargs: " + str(request.urlargs)
+#    print "=== request.urlvars: " + str(request.urlvars)
+#    print "=== dir(response): " + str(dir(response))
+#    print "=== response.location: " + str(response.location)
+    response.app_iter = open('pdftk/output.pdf')
+    return response
+
+
+# from pyramid.httpexceptions import HTTPMovedPermanently
+# response = HTTPMovedPermanently(location=new_url)
+#
+#
+#
+
+@view_config(route_name='user_contract_de', 
+             permission='view',
+             #permission='editUser'
+             )
+# url scheme: /user/bv/C3S_contract_de.<SurnameLastname>
+def user_contract_de(request):
+    """
+    get a PDF for the user to print out, sign and mail back
+    """
+    dbsession = DBSession()
+
+    user_id = request.matchdict['user_id']
+    user = User.get_by_user_id(user_id)
+
+    from fdfgen import forge_fdf
+    fields = [
+        ('surname', request.user.surname),
+        ('lastname', request.user.lastname),
+        ('street', request.user.street),
+        ('number', request.user.number),
+        ('postcode', request.user.postcode),
+        ('city', request.user.city),
+        ('email', request.user.email_addresses[0].email_address),
+        ('user_id', request.user.id),
+        ('username', request.user.username),
+        ('date_registered', request.user.date_registered),
+        ]
+    #generate fdf string
+    fdf = forge_fdf("", fields, [], [], [])
+    # write to file
+    my_fdf_filename = "fdf" + str(request.user.id) + ".fdf"
+    import os
+    fdf_file = open(my_fdf_filename , "w")
+    fdf_file.write(fdf)
+    fdf_file.close()
+    print "fdf file written."
+    print os.popen('pwd').read()
+    print os.popen('pdftk pdftk/berechtigungsvertrag-2.2.pdf fill_form %s output formoutput.pdf flatten'% my_fdf_filename).read()
+    print "done: put data into form and finalized it"
+
+    # delete the fdf file
+    print os.popen('rm %s'% my_fdf_filename)
+
+    # combine
+    print "combining with bank account form"
+    print os.popen('pdftk formoutput.pdf pdftk/bankaccount.pdf output output.pdf').read()
+    print "combined personal form and bank form"
+
+    # delete the fdf file
+    print os.popen('rm formoutput.pdf').read()
+
+    # return a pdf file
+    from pyramid.response import Response
+    response = Response(content_type='application/pdf')
+    response.app_iter = open("output.pdf" , "r")
+#open('pdftk/output.pdf')
+    return response
+
+
+# from pyramid.httpexceptions import HTTPMovedPermanently
+# response = HTTPMovedPermanently(location=new_url)
+#
+#
+#

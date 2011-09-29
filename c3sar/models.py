@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import transaction
 from datetime import datetime
 import cryptacular.bcrypt
@@ -92,9 +93,17 @@ class User(Base): # ===========================================================
     username = Column(Unicode(255), unique=True)
     surname = Column(Unicode(255))
     lastname = Column(Unicode(255))
+    # address
+    street =  Column(Unicode(255))
+    number =  Column(Unicode(255))
+    postcode =  Column(Unicode(255))
+    city =  Column(Unicode(255))
+    country =  Column(Unicode(255))
+    # contact
     telefax = Column(Unicode(255))
     phone_numbers = relationship(u"PhoneNumber", order_by="PhoneNumber.id")
     email_addresses = relationship(u"EmailAddress", order_by="EmailAddress.id")
+    # account meta
     date_registered = Column(DateTime(), nullable=False)
     last_login = Column(DateTime(), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
@@ -135,6 +144,13 @@ class User(Base): # ===========================================================
         self.password = password
         self.date_registered = datetime.now()
         self.last_login = datetime.now()
+
+    def set_address(self, street, number, postcode, city, country):
+        self.street = street
+        self.number = number
+        self.postcode = postcode
+        self.city = city
+        self.country = country
 
     @classmethod
     def get_by_username(cls, username):
@@ -392,6 +408,9 @@ def populate():
     user1.email_addresses = [
         EmailAddress(email_address=u'first1@shri.de',is_confirmed=True),
         EmailAddress(email_address=u'first2@shri.de'), ]
+    user1.set_address(street=u'Teststraße', number=u'1234a',
+                      postcode=u'35039', city=u'Marburg Mitte',
+                      country=u'Deutschland')
     dbsession.add(user1)
 
     user2 = User(username=u'secondUsername', surname=u'secondSurname',
