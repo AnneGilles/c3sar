@@ -17,9 +17,23 @@
 from fdfgen import forge_fdf
 import os
 
+
+class C3sContract_De_Pdf():
+    """
+    produce and return a PDF for printout
+
+    returns file object
+    """
+    def __init__(self):
+        print "this is C3sContract_De_Pdf.__init__()
+
+    return c3s_contract_de_pdf
+
+
 def make_berechtigungsvertrag():
     
     pass
+
 
 
 def gen_martins_fields():
