@@ -408,6 +408,10 @@ def populate():
     user1.email_addresses = [
         EmailAddress(email_address=u'first1@shri.de',is_confirmed=True),
         EmailAddress(email_address=u'first2@shri.de'), ]
+    user1.phone_numbers.append(
+        PhoneNumber(phone_number = u'+49 6421 968300422')
+        )
+    user1.telefax = u'+49 6421 690 6996'
     user1.set_address(street=u'Teststraße', number=u'1234a',
                       postcode=u'35039', city=u'Marburg Mitte',
                       country=u'Deutschland')

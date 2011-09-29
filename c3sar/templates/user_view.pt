@@ -18,10 +18,10 @@
     <p>ID: <b>${user.id}</b>.</p>
     <p>Surname: <b>${user.surname}</b>.</p>
     <p>Lastname: <b>${user.lastname}</b>.</p>
-    <p>Email: <b>$ off {user.email}</b>.</p>
-    <p>Email confirmed?: <b> $ off {user.email_conf}</b>.</p>
-    <p>Telephone: <b> $ off {user.telephone}</b>.</p>
-    <p>Telefax: <b> $ off {user.telefax}</b>.</p>
+    <p>Email: <b>${user.email_addresses[0].email_address}</b>.</p>
+    <p>Email confirmed?: <b> ${str(user.email_addresses[0].is_confirmed)}</b>.</p>
+    <p>Telephone: <b> ${str(user.phone_numbers[0].phone_number) | 'None'}</b>.</p>
+    <p>Telefax: <b> ${str(user.telefax) | 'None'}</b>.</p>
     <p>Date of registration: <b>${user.date_registered}</b>.</p>
     <p>Last login: <b>${user.last_login}</b>.</p>
     <p>Last password change: <b>${user.last_password_change}</b>.</p>
@@ -52,8 +52,9 @@
     To complete your registration, you have to sign the "Berechtigungsvertrag" 
     and submit information about your bank account.<br><br>
 
-    <a href="/user/bv/${request.user.id}">Get it here (PDF, ca. 90K)</a>
-    <a href="/user/bv/C3S_contract_de.${request.user.id}.pdf">Get it here (PDF, ca. 90K)</a>
+    <a href="/user/bv/${request.user.id | None}">Get it here (PDF, ca. 90K)</a>
+    <a href="/user/bv/C3S_contract_de.${request.user.id | blank}.pdf">Get it here (PDF, ca. 90K)</a>
+    <a href="/user/bv/C3S_contract_${request.user.username | blank}.pdf">Get it here (PDF, ca. 90K)</a>
 
 </tal:block>
 
