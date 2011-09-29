@@ -54,7 +54,7 @@
 	  message: ${request.session.pop_flash()}
 	  <!-- end flash messages -->
 	  <br>
-	    debugging request.user: $ off {str(request.user)} 
+	    debugging request.user: ${request.user.username | 'anonymous/None'} 
 	    <br>debugging request.user.groups: ${str(request.user.get_group_list()) | "None"} <hr>
 	      
 	  </span>
