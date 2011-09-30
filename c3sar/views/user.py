@@ -22,6 +22,7 @@ from c3sar.models import (
     EmailAddress,
     )
 
+import os
 import re
 import random
 import string
@@ -572,47 +573,12 @@ def user_set_default_license(request):
         }
 
 
-# ## get contract as pdf for printout
-# @view_config(route_name='user_bv_de', 
-#              #permission='view',
-#              permission='editUser'
-#              )
-# # url scheme: /user/bv/<id>
-# def user_get_bv(request):
-#     """
-#     get a PDF for the user to print out, sign and mail back
-#     """
-#     dbsession = DBSession()
-
-#     user_id = request.matchdict['user_id']
-# #    user = User.get_by_user_id(user_id)
-
-#     from pyramid.response import Response
-#     response = Response(content_type='application/pdf')
-# #    print "=== dir(request.url): " + str(dir(request.url))
-#     # 'url', 'urlargs', 'urlvars'
-# #    print "=== request.: " + str(request.)
-# #    print "=== request.url: " + str(request.url)
-# #    print "=== request.resource_url(): " + str(request.resource_url())
-# #    print "=== request.urlargs: " + str(request.urlargs)
-# #    print "=== request.urlvars: " + str(request.urlvars)
-# #    print "=== dir(response): " + str(dir(response))
-# #    print "=== response.location: " + str(response.location)
-#     response.app_iter = open('pdftk/output.pdf')
-#     return response
-
-
-# # from pyramid.httpexceptions import HTTPMovedPermanently
-# # response = HTTPMovedPermanently(location=new_url)
-# #
-# #
-# #
 
 @view_config(route_name='user_contract_de', 
              permission='view',
              #permission='editUser'
              )
-# url scheme: /user/bv/C3S_contract_de.<SurnameLastname>
+# url scheme: /user/bv/C3S_contract_de_{username}
 def user_contract_de(request):
     """
     get a PDF for the user to print out, sign and mail back
@@ -623,41 +589,17 @@ def user_contract_de(request):
 
     # check if user is not logged in
     if user_id == 'blank':
-        print "===== user is not logged in"
-        
-        #generate fdf string
-        fdf = forge_fdf("", [], [], [], [])
-        # write to file
-        my_fdf_filename = "fdf_blank.fdf"
-        import os
-        fdf_file = open(my_fdf_filename , "w")
-        fdf_file.write(fdf)
-        fdf_file.close()
-        print "fdf file written."
-        #print os.popen('pwd').read()
-        print os.popen('pdftk pdftk/berechtigungsvertrag-2.2_outlined.pdf fill_form %s output formoutput.pdf flatten'% my_fdf_filename).read()
-        print "done: put data into form and finalized it"
-        
-        # delete the fdf file
-        print os.popen('rm %s'% my_fdf_filename)
-
-        # combine
-        print "combining with bank account form"
-        print os.popen('pdftk formoutput.pdf pdftk/bankaccount.pdf output output.pdf').read()
-        print "combined personal form and bank form"
-        
-        # delete the fdf file
-        print os.popen('rm formoutput.pdf').read()
-        
+        print "===== user is not logged in, so we will give her a contract "
+        "without any data"
+                
         # return a pdf file
         from pyramid.response import Response
         response = Response(content_type='application/pdf')
-        response.app_iter = open("output.pdf" , "r")
+        response.app_iter = open("berechtigungsvertrag-2.2_outlined.pdf" , "r")
         
         return response
 
     user = User.get_by_user_id(user_id)
-
 
     fields = [
         ('surname', request.user.surname),
@@ -699,15 +641,8 @@ def user_contract_de(request):
     from pyramid.response import Response
     response = Response(content_type='application/pdf')
     response.app_iter = open("output.pdf" , "r")
-#open('pdftk/output.pdf')
     return response
 
-
-# from pyramid.httpexceptions import HTTPMovedPermanently
-# response = HTTPMovedPermanently(location=new_url)
-#
-#
-#
 
 
 @view_config(route_name='user_contract_de_username', 
@@ -727,34 +662,10 @@ def user_contract_de_username(request):
     if user_id == 'blank':
         print "===== user is not logged in"
         
-        #generate fdf string
-        fdf = forge_fdf("", [], [], [], [])
-        # write to file
-        my_fdf_filename = "fdf_blank.fdf"
-        import os
-        fdf_file = open(my_fdf_filename , "w")
-        fdf_file.write(fdf)
-        fdf_file.close()
-        print "fdf file written."
-        #print os.popen('pwd').read()
-        print os.popen('pdftk pdftk/berechtigungsvertrag-2.2_outlined.pdf fill_form %s output formoutput.pdf flatten'% my_fdf_filename).read()
-        print "done: put data into form and finalized it"
-        
-        # delete the fdf file
-        print os.popen('rm %s'% my_fdf_filename)
-
-        # combine
-        print "combining with bank account form"
-        print os.popen('pdftk formoutput.pdf pdftk/bankaccount.pdf output output.pdf').read()
-        print "combined personal form and bank form"
-        
-        # delete the fdf file
-        print os.popen('rm formoutput.pdf').read()
-        
         # return a pdf file
         from pyramid.response import Response
         response = Response(content_type='application/pdf')
-        response.app_iter = open("output.pdf" , "r")
+        response.app_iter = open("pdftk/berechtigungsvertrag-2.2_outlined.pdf" , "r")
         
         return response
 
@@ -801,12 +712,4 @@ def user_contract_de_username(request):
     from pyramid.response import Response
     response = Response(content_type='application/pdf')
     response.app_iter = open("output.pdf" , "r")
-#open('pdftk/output.pdf')
     return response
-
-
-# from pyramid.httpexceptions import HTTPMovedPermanently
-# response = HTTPMovedPermanently(location=new_url)
-#
-#
-#

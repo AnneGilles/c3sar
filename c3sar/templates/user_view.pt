@@ -52,9 +52,9 @@
     To complete your registration, you have to sign the "Berechtigungsvertrag" 
     and submit information about your bank account.<br><br>
 
-    <a href="/user/bv/${request.user.id | None}">Get it here (PDF, ca. 90K)</a>
-    <a href="/user/bv/C3S_contract_de.${request.user.id | blank}.pdf">Get it here (PDF, ca. 90K)</a>
-    <a href="/user/bv/C3S_contract_${request.user.username | blank}.pdf">Get it here (PDF, ca. 90K)</a>
+    <a href="/user/bv/C3S_contract_de.${request.user.id | blank}.pdf">Get it here (PDF, ca. 90K) (Filename contains your id)</a><br>
+    or<br>
+    <a href="/user/bv/C3S_contract_${request.user.username | blank}.pdf">Get it here (PDF, ca. 90K) (Filename contains your username)</a>
 
 </tal:block>
 
