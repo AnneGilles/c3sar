@@ -585,6 +585,20 @@ def user_set_default_license(request):
         }
 
 
+def generate_contract_de_blank():
+    print "===== user is not logged in, so we will give her a contract without any data"
+    
+    # return a pdf file with a blank contract
+    from pyramid.response import Response
+    response = Response(content_type='application/pdf')
+    response.app_iter = open("pdftk/berechtigungsvertrag-2.2_outlined.pdf" , "r")
+    
+    return response
+    
+
+def generate_contract_de(userid):
+    # stub
+    pass
 
 @view_config(route_name='user_contract_de', 
              permission='view',
@@ -599,19 +613,15 @@ def user_contract_de(request):
     from fdfgen import forge_fdf
     user_id = request.matchdict['user_id']
 
-    # check if user is not logged in
-    if user_id == 'blank':
-        print "===== user is not logged in, so we will give her a contract "
-        "without any data"
-                
-        # return a pdf file
-        from pyramid.response import Response
-        response = Response(content_type='application/pdf')
-        response.app_iter = open("berechtigungsvertrag-2.2_outlined.pdf" , "r")
-        
-        return response
+    print "user_id = " + str(user_id)
+    # check if user is not logged in, then return blank contract
+    if user_id == 'blank' or not hasattr(request.user, 'id'):
+        print "user_id equalled blank"
+        return generate_contract_de_blank()
+
 
     user = User.get_by_user_id(user_id)
+    from datetime import datetime
 
     fields = [
         ('surname', request.user.surname),
@@ -624,6 +634,7 @@ def user_contract_de(request):
         ('user_id', request.user.id),
         ('username', request.user.username),
         ('date_registered', request.user.date_registered),
+        ('date_generated', datetime.now()),
         ]
     #generate fdf string
     fdf = forge_fdf("", fields, [], [], [])
@@ -635,7 +646,7 @@ def user_contract_de(request):
     fdf_file.close()
     print "fdf file written."
     print os.popen('pwd').read()
-    print os.popen('pdftk pdftk/berechtigungsvertrag-2.2.pdf fill_form %s output formoutput.%s.pdf flatten'% my_fdf_filename, str(request.user.id)).read()
+    print os.popen('pdftk pdftk/berechtigungsvertrag-2.2.pdf fill_form %s output formoutput.%s.pdf flatten'% (my_fdf_filename, str(request.user.id)) ).read()
     print "done: put data into form and finalized it"
 
     # delete the fdf file
@@ -643,7 +654,7 @@ def user_contract_de(request):
 
     # combine
     print "combining with bank account form"
-    print os.popen('pdftk formoutput.%s.pdf pdftk/bankaccount.pdf output output.%s.pdf' % str(request.user.id),str(request.user.id)).read()
+    print os.popen('pdftk formoutput.%s.pdf pdftk/bankaccount.pdf output output.%s.pdf' % (str(request.user.id),str(request.user.id))).read()
     print "combined personal form and bank form"
 
     # delete the fdf file
@@ -661,7 +672,7 @@ def user_contract_de(request):
              permission='view',
              #permission='editUser'
              )
-# url scheme: /user/bv/C3S_contract_de.<Username>
+# url scheme: /user/bv/C3S_contract_.<Username>.pdf
 def user_contract_de_username(request):
     """
     get a PDF for the user to print out, sign and mail back
@@ -695,6 +706,7 @@ def user_contract_de_username(request):
         ('user_id', request.user.id),
         ('username', request.user.username),
         ('date_registered', request.user.date_registered),
+        ('date_generated', datetime.now()),
         ]
     #generate fdf string
     fdf = forge_fdf("", fields, [], [], [])
