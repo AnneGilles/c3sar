@@ -13,7 +13,7 @@ class RequestWithUserAttribute(Request):
     def user(self):
         #dbsession = DBSession()
         userid = unauthenticated_userid(self)
-        print "--- in RequestWithUserAttribute: userid = " + userid
+        print "--- in RequestWithUserAttribute: userid = " + str(userid)
         if userid is not None:
             # this should return None if the user doesn't exist
             # in the database
