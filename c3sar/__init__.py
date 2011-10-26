@@ -2,7 +2,7 @@ from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 
 from c3sar.models import initialize_sql
-from c3sar.models import initialize_s3
+#from c3sar.models import initialize_s3
 from c3sar.security.request import RequestWithUserAttribute
 
 # for user sessioning
@@ -83,7 +83,7 @@ def main(global_config, **settings):
     config.add_route('register', '/register')
     config.add_view('c3sar.views.user.user_register',
                      route_name='register',
-                     renderer='templates/user_register.pt'
+                     renderer='templates/user_add.pt'
                      )
     # user confirm_email
     config.add_route('confirm_email', '/user/confirm/{code}/{user_name}')

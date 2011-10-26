@@ -35,10 +35,10 @@ DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
 # s3 stuff
-from c3sar.s3 import (
-    initialize_s3,
-    I2S3,
-)
+#from c3sar.s3 import (
+#    initialize_s3,
+#    I2S3,
+#)
 
 # password crypt
 crypt = cryptacular.bcrypt.BCRYPTPasswordManager()

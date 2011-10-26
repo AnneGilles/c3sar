@@ -3,39 +3,122 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="base">
-
-<tal:block metal:fill-slot="content">
+  
+  <tal:block metal:fill-slot="content">
     <h1>Register</h1>
-    ${form.begin(request.route_url('register'))}
-        <fieldset>
-            ${form.csrf_token()}
-            ${form.errorlist('username')}
-            ${form.label('username', 'Username:')}
-            ${form.text('username')}
-            <br />
-            ${form.errorlist('password')}
-            ${form.label('password', 'Password:')}
-            ${form.password('password')}
-            <br />
-            ${form.errorlist('confirm_password')}
-            ${form.label('confirm_password', 'Confirm password:')}
-            ${form.password('confirm_password')}
-            <br />
-            ${form.errorlist('user_surname')}
-            ${form.label('user_surname', 'Surname:')}
-            ${form.text('user_surname')}
-            <br />
-            ${form.errorlist('user_lastname')}
-            ${form.label('user_lastname', 'Lastname:')}
-            ${form.text('user_lastname')}
-            <br />
-            ${form.errorlist('user_email')}
-            ${form.label('user_email', 'Email:')}
-            ${form.text('user_email')}
-            <br />
-            ${form.submit('form.submitted', 'Register', class_='submit')}
-        </fieldset>
+    <h2>Account Information</h2>
+    <table>
+      <tr>
+	<td>
+	  ${form.begin(request.route_url('register'))}	  
+	  ${form.csrf_token()}
+	  ${form.label('username', 'Username:')}
+	</td><td>
+	  ${form.text('username')}
+	</td><td>
+	  ${form.errorlist('username')}
+      </td></tr>
+      <tr><td>
+          ${form.label('password', 'Password:')}
+	</td><td>
+          ${form.password('password')}
+	</td><td>
+          ${form.errorlist('password')}
+      </td></tr><tr><td>
+          ${form.label('confirm_password', 'Confirm password:')}
+	</td><td>
+          ${form.password('confirm_password')}
+	</td><td>
+          ${form.errorlist('confirm_password')}
+      </td></tr><tr><td>
+          ${form.label('surname', 'Surname:')}
+	</td><td>
+          ${form.text('surname')}
+	</td><td>
+          ${form.errorlist('surname')}
+      </td></tr><tr><td>
+          ${form.label('lastname', 'Lastname:')}
+	</td><td>
+          ${form.text('lastname')}
+	</td><td>
+          ${form.errorlist('lastname')}
+	</td>
+      </tr>
+    </table>
+    <h2>Contact Information</h2>
+    <table>
+      <tr>
+	<td>
+          ${form.label('email', 'Email:')}
+	</td><td>
+          ${form.text('email')}
+	</td><td>
+          ${form.errorlist('email')}
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  ${form.label('phone', 'Phone number:')}
+	</td><td>
+	  ${form.text('phone')}
+	</td><td>
+	  ${form.errorlist('phone')}
+      </td></tr>
+    </table>
+    <h2>Address</h2>
+    <table>
+      <tr>
+	<td>
+	  ${form.label('street', 'Street:')}
+	</td><td>
+	  ${form.text('street')}
+	</td><td>
+	  ${form.errorlist('street')}
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  ${form.label('number', 'Number:')}
+	</td><td>
+	  ${form.text('number')}
+	</td><td>
+	  ${form.errorlist('number')}
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  ${form.label('postcode', 'Postode:')}
+	</td><td>
+	  ${form.text('postcode')}
+	</td><td>
+	  ${form.errorlist('postcode')}
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  ${form.label('city', 'City:')}
+	</td><td>
+	  ${form.text('city')}
+	</td><td>
+	  ${form.errorlist('city')}
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  ${form.label('country', 'Country:')}
+	</td><td>
+	  ${form.text('country')}
+	</td><td>
+	  ${form.errorlist('country')}
+	</td>
+      </tr>
+      <tr><td>
+          ${form.submit('form.submitted', 'Register', class_='submit')}
+      </td></tr>
+
+    </table>
+
     ${form.end()}
-</tal:block>
+  </tal:block>
 
 </html>

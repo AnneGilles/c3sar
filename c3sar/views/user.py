@@ -20,6 +20,7 @@ from c3sar.models import (
     DBSession,
     User,
     EmailAddress,
+    PhoneNumber,
     )
 
 import os
@@ -93,9 +94,9 @@ class SecurePassword(validators.FancyValidator):
                                         non_letter=self.non_letter),
                           value, state)
 
-@view_config(route_name='register',
-             permission='view',
-             renderer='templates/user_register.pt')
+#@view_config(route_name='register',
+#             permission='view',
+#             renderer='templates/user_add.pt')
 def user_register(request):
     """
     a user registers with the system
@@ -159,6 +160,17 @@ def user_register(request):
         user.email_addresses = [
             EmailAddress(email_address=form.data['email'])
             ]
+
+        user.phone_numbers.append(
+            PhoneNumber(phone_number=form.data['phone'])
+            )
+
+        user.set_address(street=form.data['street'],
+                         number=form.data['number'],
+                         postcode=form.data['postcode'],
+                         city=form.data['city'],
+                         country=form.data['country'],
+                         )
 
 #        user.groups.append('User')
         dbsession.add(user)
@@ -623,24 +635,24 @@ def user_contract_de(request):
     fdf_file.close()
     print "fdf file written."
     print os.popen('pwd').read()
-    print os.popen('pdftk pdftk/berechtigungsvertrag-2.2.pdf fill_form %s output formoutput.pdf flatten'% my_fdf_filename).read()
+    print os.popen('pdftk pdftk/berechtigungsvertrag-2.2.pdf fill_form %s output formoutput.%s.pdf flatten'% my_fdf_filename, str(request.user.id)).read()
     print "done: put data into form and finalized it"
 
     # delete the fdf file
-    print os.popen('rm %s'% my_fdf_filename)
+    print os.popen('rm %s'% my_fdf_filename).read()
 
     # combine
     print "combining with bank account form"
-    print os.popen('pdftk formoutput.pdf pdftk/bankaccount.pdf output output.pdf').read()
+    print os.popen('pdftk formoutput.%s.pdf pdftk/bankaccount.pdf output output.%s.pdf' % str(request.user.id),str(request.user.id)).read()
     print "combined personal form and bank form"
 
     # delete the fdf file
-    print os.popen('rm formoutput.pdf').read()
+    print os.popen('rm formoutput.%s.pdf' % str(request.user.id)).read()
 
     # return a pdf file
     from pyramid.response import Response
     response = Response(content_type='application/pdf')
-    response.app_iter = open("output.pdf" , "r")
+    response.app_iter = open("output.%s.pdf" % str(request.user.id) , "r")
     return response
 
 
