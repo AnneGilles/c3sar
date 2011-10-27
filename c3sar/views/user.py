@@ -57,6 +57,12 @@ class RegistrationSchema(formencode.Schema):
     chained_validators = [
         formencode.validators.FieldsMatch('password', 'confirm_password')
         ]
+    phone =  formencode.validators.String(not_empty = True)
+    street =  formencode.validators.String(not_empty = True)
+    number =  formencode.validators.String(not_empty = True)
+    postcode =  formencode.validators.String(not_empty = True)
+    city=  formencode.validators.String(not_empty = True)
+    country =  formencode.validators.String(not_empty = True)
 
 class SecurePassword(validators.FancyValidator):
     """
