@@ -6,6 +6,9 @@
   
   <tal:block metal:fill-slot="content">
     <h1>Register</h1>
+
+    <p><strong>Please note:</strong> For now this is an early alpha and all information you enter will be publicly viewable! So choose a wrong name, etc.<p>
+
     <h2>Account Information</h2>
     <table>
       <tr>
