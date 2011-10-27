@@ -1,7 +1,9 @@
 import re
 import formencode
 from formencode import validators
-
+from c3sar.models import (
+    User,
+    )
 
 class UniqueUsername(validators.FancyValidator):
     """
