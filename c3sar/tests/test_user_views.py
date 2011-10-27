@@ -80,13 +80,21 @@ class UserViewIntegrationTests(unittest.TestCase):
         pp.pprint(result)
 
     def test_user_confirm_email_view(self):
+        """
+        a test for the user_email_confirm view
+        """
         from c3sar.views.user import user_confirm_email
         request = testing.DummyRequest()
         # mock values
         request.matchdict['code'] = 'IDoExist'
-        request.matchdict['user'] = 'firstUsername'
-        request.matchdict['email'] = 'some@email.com'
+        request.matchdict['user_name'] = 'firstUsername'
+        request.matchdict['user_email'] = 'some@email.com'
         # mailer = get_mailer(request)
+
+        #print "== DEBUG: ======================"
+        #help(user_confirm_email)
+        #dir(user_confirm_email)
+        #print "== /DEBUG ======================"
         result = user_confirm_email(request)
         
         # print "dir(result): " + str(dir(result))
@@ -102,7 +110,10 @@ class UserViewIntegrationTests(unittest.TestCase):
 #        self.assertTrue('form' in result.viewkeys(), 'form was not seen.')
 
         pp = pprint.PrettyPrinter(indent=4)
+
+        print "=============== results for test_user_confirm_email_view ======"
         pp.pprint(result)
+        print "=============== results for test_user_confirm_email_view /end ======"
 
 
 class BasicViewIntegrationTests(unittest.TestCase):
@@ -125,7 +136,7 @@ class BasicViewIntegrationTests(unittest.TestCase):
     # def _makeOne(self, name
 
 
-    def test_home_view(self):
+    def off_test_home_view(self):
         from c3sar.views.basic import home_view
         from c3sar.models import DBSession
         dbsession = DBSession()
