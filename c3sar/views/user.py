@@ -137,6 +137,9 @@ def user_register(request):
             print("sending email........")
             #mailer.send(message)
             #mailer.send(msg_accountants)
+
+            # instead of sending mails, we inform in-browser
+            request.session.flash('DEBUG: not sending email. to test email confirmation view, click here: <a href="/user/confirm/' + randomstring + '/' + str(user.username) + '/' + str(form.data['email']) + '">Confirm Email</a>')
         except:
             print "could not send email. no mail configured?"
 
@@ -156,26 +159,64 @@ def user_register(request):
 @view_config(route_name='confirm_email',
              permission='view',
              renderer='../templates/user_confirm_email.pt')
-# url structure: /user/confirm/{code}/{user_name}
+# url structure: /user/confirm/{code}/{user_name}/{user_email}
 def user_confirm_email(request):
+    """
+    this view takes two arguments from the URL aka request.matchdict
+    - code
+    - user_name
+    and tries to match them to database entries.
+    if matching is possible,
+    - the email address in question is confirmed as validated
+    - the database entry is changed to reflect this
+    """
+    DEBUG = True
     # values from URL/matchdict
     conf_code = request.matchdict['code']
     user_name = request.matchdict['user_name']
     user_email = request.matchdict['user_email']
     # XXX ToDo: refactor to also check email-address belongs to user...
+    if DEBUG:
+        print " -- confirmation code: " + conf_code
+        print " -- user name: " + user_name
+        print " -- user email: " + user_email
+
+    dbsession = DBSession()
     #get matching user from db
     user = User.get_by_username(user_name)
-    print "--- in users.py:confirm_email: type(user): " + str(type(user))
+    if DEBUG: print "--- in users.py:confirm_email: type(user): " + str(type(user))
 
+    #DEBUG
+    if DEBUG:
+        print "==============================================================="
+        print "==============================================================="
+        print "====== user.email_addresses : ================================="
+        print str(type(user.email_addresses))
+        print "==============================================================="
+        print str(dir(user.email_addresses))
+        print "==============================================================="
+        for item in user.email_addresses:
+            print str(item)
+            print str(dir(item))
+            print str(item.email_address)
+
+    # get all email addresses of that user
+    email_addresses_list = []
+    for address in user.email_addresses:
+        email_addresses_list.append(address.email_address)
+
+    print repr(email_addresses_list)
+        
     # if database says already confirmed:
-    if user.email_conf == True:
+    if user_email in email_addresses_list:
         #request.session.flash('Your email address is confirmed already!')
         return { 'result_msg': "Your email is verified already!" }
 
     #request.session.flash("code from db: " + user.user_email_conf_code)
     #request.session.flash("is already conf'ed: " + str(user.user_email_conf))
 
-    result = (conf_code == user.user_email_conf_code)
+    #    result = (conf_code == user.user_email_conf_code)
+    result = False
     if (result == True):
         #request.session.flash("result is True")
         result_msg = "your email has been successfully verified!"
