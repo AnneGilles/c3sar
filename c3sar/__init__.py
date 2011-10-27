@@ -86,7 +86,7 @@ def main(global_config, **settings):
                      renderer='templates/user_add.pt'
                      )
     # user confirm_email
-    config.add_route('confirm_email', '/user/confirm/{code}/{user_name}')
+    config.add_route('confirm_email', '/user/confirm/{code}/{user_name}/{user_email}')
     config.add_view('c3sar.views.user.user_confirm_email',
                     route_name='confirm_email',
                     renderer='templates/user_confirm_email.pt')
@@ -109,6 +109,11 @@ def main(global_config, **settings):
                     renderer='templates/user_profile.pt')
 
     # user edit
+    config.add_route('user_edit_no_id', '/user/edit') # if no id appended
+    config.add_view('c3sar.views.user.user_edit',
+                    route_name='user_edit_no_id',
+                    renderer='templates/user_edit_table.pt')
+
     config.add_route('user_edit', '/user/edit/{user_id}')
 #    config.add_route('user_edit', '/user/edit/{user_id}', traverse='/{user_id}')
     #config.add_route('user_edit', '/user/edit/{user_id}',
@@ -117,6 +122,7 @@ def main(global_config, **settings):
     config.add_view('c3sar.views.user.user_edit',
                     route_name='user_edit',
                     renderer='templates/user_edit_table.pt')
+
 
     # delete
     #config.add_route('user_del', '/user/rm')
