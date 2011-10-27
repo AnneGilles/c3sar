@@ -46,10 +46,6 @@ crypt = cryptacular.bcrypt.BCRYPTPasswordManager()
 def hash_password(password):
     return unicode(crypt.encode(password))
 
-def a_random_string():
-    import random, string
-    N = 6   # length of string to be produced
-    return ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(N))
 
 class EmailAddress(Base):
     __tablename__ = 'email_addresses'
@@ -61,9 +57,9 @@ class EmailAddress(Base):
 
 #    user = relationship("User", backref=backref('addresses', order_by=id))
 
-    def __init__(self, email_address, is_confirmed=False):
+    def __init__(self, email_address, conf_code, is_confirmed=False):
         self.email_address = email_address
-        self.confirm_code = a_random_string()
+        self.confirm_code = conf_code
         #self.is_confirmed = False
         self.is_confirmed = is_confirmed
 
@@ -406,8 +402,8 @@ def populate():
     user1 = User(username=u'firstUsername', surname=u'firstSurname',
                  lastname=u'firstSurname',password=u'password')
     user1.email_addresses = [
-        EmailAddress(email_address=u'first1@shri.de',is_confirmed=True),
-        EmailAddress(email_address=u'first2@shri.de'), ]
+        EmailAddress(email_address=u'first1@shri.de',conf_code=u'barfbarf',is_confirmed=True),
+        EmailAddress(email_address=u'first2@shri.de',conf_code=u'barfbarf'), ]
     user1.phone_numbers.append(
         PhoneNumber(phone_number = u'+49 6421 968300422')
         )
@@ -420,8 +416,8 @@ def populate():
     user2 = User(username=u'secondUsername', surname=u'secondSurname',
                  lastname=u'secondSurname',password=u'password')
     user2.email_addresses = [
-        EmailAddress(email_address=u'second1@shri.de',is_confirmed=True),
-        EmailAddress(email_address=u'second2@shri.de'), ]
+        EmailAddress(email_address=u'second1@shri.de',conf_code=u'möökmöök',is_confirmed=True),
+        EmailAddress(email_address=u'second2@shri.de',conf_code=u'möökmöök'), ]
     dbsession.add(user2)
 
     band1 = Band(name=u"TestBand1", email=u"testband1@shri.de",
