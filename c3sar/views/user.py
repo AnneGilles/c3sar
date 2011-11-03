@@ -378,7 +378,14 @@ def user_edit(request):
     """
     dbsession = DBSession()
 
-    user_id = request.matchdict['user_id']
+    # if no user_id in URL and not logged in, tell user to login
+
+    try:
+        user_id = request.matchdict['user_id']
+    except:
+        print "no user_id in matchdict !!!"
+        return HTTPFound(location=request.route_url('user_login_first'))
+
     user = User.get_by_user_id(user_id)
 
 #    request.session.flash("email confirmed? " + str(user.user_email_conf))
@@ -677,3 +684,13 @@ def user_contract_de_username(request):
     response = Response(content_type='application/pdf')
     response.app_iter = open("output.pdf" , "r")
     return response
+
+
+from pyramid.response import Response
+@view_config(route_name='user_login_first',
+             permission='view',
+             renderer='../templates/have_to_login.pt')
+def user_login_first(request):
+    the_message = "Please login first."
+    return Response(the_message)
+

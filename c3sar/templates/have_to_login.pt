@@ -1,0 +1,16 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+  
+  <tal:block metal:fill-slot="content">
+    <h1>please log in</h1>
+    <div id="explanation">
+    
+      <p>
+      You have to login (or even register first) to make this work!
+      </p>
+
+    </div>    
+  </tal:block>
+</html>

@@ -164,6 +164,13 @@ def main(global_config, **settings):
 #                    route_name='user_get_bv')
     
 
+    config.add_route('user_login_first',
+                     'user/loginfirst')
+    config.add_view('c3sar.views.user.user_login_first',
+                    route_name='user_login_first')
+
+
+
     ## routes for bands ##
     # band create
     config.add_route('band_add', '/band/add')
