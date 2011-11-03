@@ -1,6 +1,3 @@
-import formencode
-from formencode import validators
-
 from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
 
@@ -24,75 +21,18 @@ from c3sar.models import (
     )
 
 import os
-import re
 import random
 import string
 
+from c3sar.views.validators import (
+    UniqueUsername,
+    RegistrationSchema,
+    SecurePassword,
+    LoginSchema,
+    UserSettingsSchema,
+    UserDefaultLicenseSchema,
+    )
 
-class UniqueUsername(validators.FancyValidator):
-    """
-    check if username already exists in database
-    """
-    def _to_python(self, username, state):
-        if User.get_by_username(username):
-            raise formencode.Invalid(
-                'That username already exists', username, state)
-        return username
-
-
-class RegistrationSchema(formencode.Schema):
-    """
-    formencode schema for user registration
-    """
-    allow_extra_fields = True
-    username = formencode.All(validators.PlainText(not_empty = True),
-                              UniqueUsername())
-    password = formencode.validators.PlainText(not_empty = True)
-    email = formencode.validators.Email(
-        resolve_domain = False, not_empty=True)
-    surname =  formencode.validators.String(not_empty = True)
-    lastname =  formencode.validators.String(not_empty = True)
-    #password =  formencode.validators.String(not_empty = True)
-    confirm_password =  formencode.validators.String(not_empty = True)
-    chained_validators = [
-        formencode.validators.FieldsMatch('password', 'confirm_password')
-        ]
-
-class SecurePassword(validators.FancyValidator):
-    """
-    check for the password to be secure
-
-    see
-    http://formencode.org/Validator.html#writing-your-own-validator
-    """
-    #min = 8 #ToDo XXX
-    min = 1
-    non_letter = 1
-    letter_regex = re.compile(r'[a-zA-Z]')
-
-    messages = {
-        'too_few': 'Your password must be longer than %(min)i '
-                  'characters long',
-        'non_letter': 'You must include at least %(non_letter)i '
-                     'characters in your password',
-        }
-
-    def _to_python(self, value, state):
-        # _to_python gets run before validate_python.  Here we
-        # strip whitespace off the password, because leading and
-        # trailing whitespace in a password is too elite.
-        return value.strip()
-
-    def validate_python(self, value, state):
-        if len(value) < self.min:
-            raise Invalid(self.message("too_few", state,
-                                       min=self.min),
-                          value, state)
-        non_letters = self.letter_regex.sub('', value)
-        if len(non_letters) < self.non_letter:
-            raise Invalid(self.message("non_letter",
-                                        non_letter=self.non_letter),
-                          value, state)
 
 #@view_config(route_name='register',
 #             permission='view',
@@ -111,6 +51,7 @@ def user_register(request):
     N=6
     randomstring = ''.join(random.choice(string.ascii_uppercase
                                          + string.digits) for x in range(N))
+    #print " -- the random string: " + randomstring
 
     URL = "diogenes:6543"
     # ToDo XXX change this to be more generic
@@ -118,11 +59,11 @@ def user_register(request):
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
         request.session.flash('form does not validate!')
-        request.session.flash(form.data['username'])
-        request.session.flash(form.data['password'])
-        request.session.flash(form.data['surname'])
-        request.session.flash(form.data['lastname'])
-        request.session.flash(form.data['email'])
+        #request.session.flash(form.data['username'])
+        #request.session.flash(form.data['password'])
+        #request.session.flash(form.data['surname'])
+        #request.session.flash(form.data['lastname'])
+        #request.session.flash(form.data['email'])
 
     if 'form.submitted' in request.POST and form.validate():
         # ready for registration!
@@ -158,7 +99,10 @@ def user_register(request):
             )
 
         user.email_addresses = [
-            EmailAddress(email_address=form.data['email'])
+            EmailAddress(
+                email_address = form.data['email'],
+                conf_code = randomstring,
+                )
             ]
 
         user.phone_numbers.append(
@@ -193,6 +137,9 @@ def user_register(request):
             print("sending email........")
             #mailer.send(message)
             #mailer.send(msg_accountants)
+
+            # instead of sending mails, we inform in-browser
+            request.session.flash('DEBUG: not sending email. to test email confirmation view, click here: <a href="/user/confirm/' + randomstring + '/' + str(user.username) + '/' + str(form.data['email']) + '">Confirm Email</a>')
         except:
             print "could not send email. no mail configured?"
 
@@ -212,46 +159,59 @@ def user_register(request):
 @view_config(route_name='confirm_email',
              permission='view',
              renderer='../templates/user_confirm_email.pt')
-# url structure: /user/confirm/{code}/{user_name}
+# url structure: /user/confirm/{code}/{user_name}/{user_email}
 def user_confirm_email(request):
+    """
+    this view takes two arguments from the URL aka request.matchdict
+    - code
+    - user_name
+    and tries to match them to database entries.
+    if matching is possible,
+    - the email address in question is confirmed as validated
+    - the database entry is changed to reflect this
+    """
+    DEBUG = True
     # values from URL/matchdict
     conf_code = request.matchdict['code']
     user_name = request.matchdict['user_name']
     user_email = request.matchdict['user_email']
     # XXX ToDo: refactor to also check email-address belongs to user...
+    if DEBUG:
+        print " -- confirmation code: " + conf_code
+        print " -- user name: " + user_name
+        print " -- user email: " + user_email
+
+    dbsession = DBSession()
     #get matching user from db
     user = User.get_by_username(user_name)
-    print "--- in users.py:confirm_email: type(user): " + str(type(user))
+    if DEBUG: print "--- in users.py:user_confirm_email: type(user): " + str(type(user))
 
-    # if database says already confirmed:
-    if user.email_conf == True:
-        #request.session.flash('Your email address is confirmed already!')
-        return { 'result_msg': "Your email is verified already!" }
+    # check if the information in the matchdict makes sense
+    #  - user
+    #  -
+    from types import NoneType
+    if isinstance(user, NoneType):
+        print "user is of type NoneType"
+        return {'result_msg': "Something didn't work. Please check whether you tried the right URL."}
 
-    #request.session.flash("code from db: " + user.user_email_conf_code)
-    #request.session.flash("is already conf'ed: " + str(user.user_email_conf))
+    # get all email addresses of that user into a list
+    for item in user.email_addresses:
 
-    result = (conf_code == user.user_email_conf_code)
-    if (result == True):
-        #request.session.flash("result is True")
-        result_msg = "your email has been successfully verified!"
-        # now set confirmed to True in db
-        user.user_email_conf = True
-        
-    else:
-        #request.session.flash("result is False")
-        result_msg = "Verification has failed. Bummer!"
+        if (item.email_address == user_email):
+            print "this one matched!"
 
-    return {
-        'result_msg': result_msg,
-        }
+            if (item.is_confirmed):
+                return {'result_msg': "Your email address was confirmed already." }
+
+            if (item.confirm_code == conf_code):
+                print " -- found the right confirmation code in db"
+                item.is_confirmed = True
+                print " -- set this email address as confirmed."
+                return {'result_msg': "Thanks! You email address has been confirmed." }
+    # else
+    return {'result_msg': "Verification has failed. Bummer!"}
 
 ######################################################## user_login
-class LoginSchema(formencode.Schema):
-    allow_extra_fields = True
-    username = formencode.validators.PlainText(not_empty=True)
-    password = formencode.validators.PlainText(not_empty=True)
-    
 
 #@view_config(route_name='login',
 #             permission='view',
@@ -268,7 +228,7 @@ def login_view(request):
     # test for csrf token
     #request.session.flash('token?: ' + str(request.POST.get("_csrf")))
     # results in message: ['token?: d593dc44ff2012385df0abc5e371b4a5503b0c46'
-    
+
     if logged_in is None:
         request.session.pop_flash()
 
@@ -344,7 +304,8 @@ def logout_view(request):
              renderer='../templates/user_list.pt')
 def user_list(request):
     users = User.user_listing(User.id.desc())
-    return {'users': users}    
+    return {'users': users}
+
 
 #################################################################### user_view
 @view_config(route_name='user_view',
@@ -399,28 +360,14 @@ def user_profile(request):
         'next_id': next_id,
         }
 
-# formencode schema for user settings ####################################
-class UserSettingsSchema(formencode.Schema):
-    allow_extra_fields = True
-    filter_extra_fields = True
-#    username = formencode.All(validators.PlainText(not_empty = True),
-#                              UniqueUsername())
-#    new_password = formencode.validators.PlainText(not_empty = True)
-#    confirm_password =  formencode.validators.String(not_empty = True)
-#    user_email = formencode.validators.Email(resolve_domain = False, not_empty=True)
-    surname =  formencode.validators.String(not_empty = True)
-    lastname =  formencode.validators.String(not_empty = True)
-#    password =  formencode.validators.String(not_empty = True)
-#    chained_validators = [
-#        formencode.validators.FieldsMatch('new_password', 'confirm_password')
-#        ]
 
 
 # #################################################################### user_edit
 # #from formencode import htmlfill
 # from c3sregistration.security import UserContainer
 
-@view_config(route_name='user_edit', 
+
+@view_config(route_name='user_edit',
              #permission='view',
              permission='editUser',
 #             context=UserContainer,
@@ -508,14 +455,9 @@ def user_edit(request):
 
 
 
-## formencode schema for user default license 
-class UserDefaultLicenseSchema(formencode.Schema):
-    allow_extra_fields = True
-    filter_extra_fields = True
-
 
 ## default license
-@view_config(route_name='user_set_default_license', 
+@view_config(route_name='user_set_default_license',
              #permission='view',
              permission='editUser',
 #             context=UserContainer,
@@ -587,20 +529,19 @@ def user_set_default_license(request):
 
 def generate_contract_de_blank():
     print "===== user is not logged in, so we will give her a contract without any data"
-    
+
     # return a pdf file with a blank contract
     from pyramid.response import Response
     response = Response(content_type='application/pdf')
     response.app_iter = open("pdftk/berechtigungsvertrag-2.2_outlined.pdf" , "r")
-    
-    return response
-    
+
 
 def generate_contract_de(userid):
     # stub
     pass
 
-@view_config(route_name='user_contract_de', 
+
+@view_config(route_name='user_contract_de',
              permission='view',
              #permission='editUser'
              )
@@ -668,7 +609,7 @@ def user_contract_de(request):
 
 
 
-@view_config(route_name='user_contract_de_username', 
+@view_config(route_name='user_contract_de_username',
              permission='view',
              #permission='editUser'
              )
@@ -684,12 +625,11 @@ def user_contract_de_username(request):
     # check if user is not logged in
     if user_id == 'blank':
         print "===== user is not logged in"
-        
+
         # return a pdf file
         from pyramid.response import Response
         response = Response(content_type='application/pdf')
         response.app_iter = open("pdftk/berechtigungsvertrag-2.2_outlined.pdf" , "r")
-        
         return response
 
     user = User.get_by_user_id(user_id)

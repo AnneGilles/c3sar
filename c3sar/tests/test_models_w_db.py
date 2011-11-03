@@ -52,14 +52,16 @@ class LicenseModelTests(unittest.TestCase):
     def _makeOne(self,
                  name=u'Some Licensename',
                  url=u'http://creativecommons.org/licenses/by-nc-sa/3.0/',
+                 img='http://i.creativecommons.org/l/by/3.0/88x31.png',
                  author=u'Some Name',
                  ):
-        return self._getTargetClass()(name,url,author)
+        return self._getTargetClass()(name,url,img,author)
 
     def test_constructor(self):
         instance = self._makeOne()
         self.assertEqual(instance.name, 'Some Licensename', "No match!")
-        self.assertEqual(instance.url, 'http://creativecommons.org/licenses/by-nc-sa/3.0/', "No match!")
+        self.assertEqual(instance.uri, 'http://creativecommons.org/licenses/by-nc-sa/3.0/', "No match!")
+        self.assertEqual(instance.img, 'http://i.creativecommons.org/l/by/3.0/88x31.png', 'No match!')
         self.assertEqual(instance.author, 'Some Name', "No match!")
 
     def test_get_by_license_id(self):
