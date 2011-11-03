@@ -8,3 +8,4 @@ bin/
 lib/
 include/
 env/
+s3.ini
