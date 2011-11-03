@@ -22,6 +22,15 @@ class BandSchema(formencode.Schema):
     band_homepage = formencode.validators.String(not_empty = False)
     band_email = formencode.validators.Email(not_empty = True,
                                              resolve_domain = False)
+class BandEditSchema(formencode.Schema):
+    allow_extra_fields = True  # needed for registrar_is_member checkbox,
+    # see ../templates/band_add.pt
+    #
+    #filter_extra_fields = False
+    name = formencode.validators.String(not_empty = True)
+    homepage = formencode.validators.String(not_empty = False)
+    email = formencode.validators.Email(not_empty = True,
+                                             resolve_domain = False)
     
 
 ##################################################################### band_add
@@ -44,13 +53,7 @@ def band_add(request):
         request.session.flash('form validated!')
         dbsession = DBSession()
         
-#        band_registrar = authenticated_userid(request)
         band_registrar = request.user
-        # request.session.flash("band_registrar: " + str(band_registrar)) # yields username
-        #registrar = User.get_by_username(band_registrar)
-        # request.session.flash("registrar: " + str(registrar)) # yields object
-        #request.session.flash("registrar.user_id: " + str(registrar.user_id))
-
         
         request.session.flash("reg_is_member: " + form.data['registrar_is_member'])
         is_member = form.data['registrar_is_member']
@@ -89,41 +92,40 @@ def band_add(request):
              permission='view',
              renderer='../templates/band_edit.pt')
 def band_edit(request):
-    
+
     band_id = request.matchdict['band_id']
     band = Band.get_by_band_id(band_id)
 
     # no change through form, so reuse old value (for now)
-    band_registrar = band.band_registrar
-    band_registrar_id = band.band_registrar_id
+    band_registrar = band.registrar
+    band_registrar_id = band.registrar_id
 
-    form = Form(request, BandSchema, obj = band)
+    form = Form(request, schema = BandEditSchema, obj = band)
 
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
         request.session.flash('form does not validate!')
-        request.session.flash(form.data['band_name'])
-        request.session.flash(form.data['band_homepage'])
-        request.session.flash(form.data['band_email'])
+        #request.session.flash(form.data['name'])
+        #request.session.flash(form.data['homepage'])
+        #request.session.flash(form.data['email'])
         
 
     if 'form.submitted' in request.POST and form.validate():
-        request.session.flash('form validated!')
+        #request.session.flash('form validated!')
         dbsession = DBSession()
  
-        band = Band(
-            band_name = form.data['band_name'],
-            band_homepage = form.data['band_homepage'],
-            band_email = form.data['band_email'],
-            band_registrar = band_registrar,
-            band_registrar_id = band_registrar_id
-            )
+        if form.data['name'] != band.name:
+            band.name=form.data['name']
+            #request.session.flash('changing band name')
+        if form.data['homepage'] != band.homepage:
+            band.homepage=form.data['homepage']
+            #request.session.flash('changing band homepage')
+        if form.data['email'] != band.email:
+            band.email=form.data['email']
+            #request.session.flash('changing band email')
 
-        dbsession.add(band)
-        request.session.flash(u'writing to database ...')
-
+        #request.session.flash(u'writing to database ...')
         dbsession.flush()
-        # ToDo: https://redmine.local/issues/5
 
     return {
         'viewer_username': authenticated_userid(request),
