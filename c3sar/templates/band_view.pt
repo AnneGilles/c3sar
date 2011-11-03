@@ -10,14 +10,14 @@
       <a href="${prev_id}">previous</a> | 
       <a href="/band/list">all</a> |
       <a href="${next_id}">next</a> |
-      <a href="/band/edit">edit</a> |
-      <a href="/band/rm">delete</a> 
+      <a href="/band/edit/${band.id}">edit</a> |
+      <a href="/band/rm/${band.id}">delete</a> 
     </p>
 
-    <h1>Information about band "${band.band_name}"</h1>
-    <p>Homepage: <b class="hits">${band.band_homepage}</b>.</p>
-    <p>Email: <b class="hits">${band.band_email}</b>.</p>
-    <p>Registrar: <b class="hits">${band.band_registrar}</b>.</p>
+    <h1>Information about band "${band.name}"</h1>
+    <p>Homepage: <b class="hits">${band.homepage}</b>.</p>
+    <p>Email: <b class="hits">${band.email}</b>.</p>
+    <p>Registrar: <b class="hits">${band.registrar}</b>.</p>
 
 </tal:block>
 

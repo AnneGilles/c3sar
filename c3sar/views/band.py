@@ -58,30 +58,21 @@ def band_add(request):
         #if is_member == 1:
  
         band = Band(
-            band_name = form.data['band_name'],
-            band_homepage = form.data['band_homepage'],
-            band_email = form.data['band_email'],
-            band_registrar = request.user.username,
-            band_registrar_id = request.user.user_id,
+            name = form.data['band_name'],
+            homepage = form.data['band_homepage'],
+            email = form.data['band_email'],
+            registrar = request.user.username,
+            registrar_id = request.user.id,
             )
 
-        session.add(band)
+        dbsession.add(band)
         request.session.flash(u'writing to database ...')
 
         # request.session.flash('id' + str(band.band_id)) # is None
 
-        session.flush()
+        dbsession.flush()
 
-        # request.session.flash('id' + str(band.band_id)) # works!
-        # session.refresh(band)
-        # request.session.flash('id' + str(band.band_id))
-
-        # ToDo: https://redmine.local/issues/5
-        #
-        #from pyramid.url import route_url
-        #redirect_url = route_url('band_view', request).join(band.band_id)
-        redirect_url = "/band/view/" + str(band.band_id)
-        # ToDo: make this more beautiful..., see above
+        redirect_url = "/band/view/" + str(band.id)
 
         request.session.flash( redirect_url)
 
