@@ -1,0 +1,7 @@
+; this must be renamed to s3.ini and modified
+
+[i2]
+access_key_id = ChangeMe
+access_key_secret = ChangeMe
+i2_host = storage.i2.io
+is_secure = False
