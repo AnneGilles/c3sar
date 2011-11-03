@@ -8,5 +8,6 @@ bin/
 lib/
 include/
 env/
+data/sessions/
 # s3.ini has to be copied (and changed) from s3.ini.example
 s3.ini
