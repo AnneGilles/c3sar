@@ -108,3 +108,13 @@ _fi_response = Response(content_type='image/x-icon',
 @view_config(name='favicon.ico')
 def favicon_view(context, request):
     return _fi_response
+
+
+@view_config(route_name='not_implemented',
+             permission='view',
+             renderer='../templates/not_implemented.pt')
+def not_implemented_view(request):
+    return dict (
+        msg = 'not implemented'
+)
+
