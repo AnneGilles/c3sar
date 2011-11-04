@@ -74,6 +74,15 @@ def main(global_config, **settings):
                     route_name='listen',
                     renderer='templates/listen.pt'
                     )
+
+    # not implemented
+    config.add_route('not_implemented', '/not_implemented')
+    config.add_view('c3sar.views.basic.not_implemented_view',
+                    route_name='not_implemented',
+                    renderer='templates/not_implemented.pt'
+                    )
+
+
     # prepare to use the base template
     config.add_subscriber('c3sar.subscribers.add_base_template',
                           'pyramid.events.BeforeRender')
