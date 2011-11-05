@@ -82,6 +82,13 @@ def main(global_config, **settings):
                     renderer='templates/not_implemented.pt'
                     )
 
+    # not found
+    config.add_route('not_found', '/not_found')
+    config.add_view('c3sar.views.basic.not_found_view',
+                    route_name='not_found',
+                    renderer='templates/not_found.pt'
+                    )
+
 
     # prepare to use the base template
     config.add_subscriber('c3sar.subscribers.add_base_template',
