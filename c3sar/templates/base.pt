@@ -8,6 +8,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
     <meta name="keywords" content="creative commons collecting society" />
     <meta name="description" content="creative commons collecting society" />
+    <tal:block metal:define-slot="head-meta"></tal:block>
     <link rel="shortcut icon" href="${request.static_url('c3sar:static/favicon.ico')}" />
     <link rel="stylesheet" href="${request.static_url('c3sar:static/pylons_off.css')}" type="text/css" media="screen" charset="utf-8" />
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton|Nobile:regular,i,b,bi&amp;subset=latin"
@@ -45,11 +46,11 @@
       </div>
       <span tal:condition="python:not False">
 	<!-- get flash messages across to the user (in base.pt) -->
-	message: ${request.session.pop_flash()}
+	${request.session.pop_flash()}
 	<!-- end flash messages -->
-	<br />
+	<!-- <br />
 	debugging request.user: ${request.user.username | 'anonymous/None'} <br />
-	debugging request.user.groups: ${str(request.user.get_group_list()) | "None"} <hr />
+	debugging request.user.groups: ${str(request.user.get_group_list()) | "None"} <hr /> -->
       </span>
       <div style="margin-left: 10px">
 	<tal:block metal:define-slot="content"></tal:block>
