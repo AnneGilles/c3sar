@@ -131,7 +131,8 @@ def main(global_config, **settings):
                     renderer='templates/user_edit_table.pt')
 
     config.add_route('user_edit', '/user/edit/{user_id}')
-#    config.add_route('user_edit', '/user/edit/{user_id}', traverse='/{user_id}')
+    #config.add_route('user_edit', '/user/edit/{user_id}', 
+    #                 traverse='/{user_id}')
     #config.add_route('user_edit', '/user/edit/{user_id}',
     #                 factory=UserContainer,
     #                 )
@@ -156,7 +157,7 @@ def main(global_config, **settings):
                     renderer='templates/user_login.pt')
     # user set default license
     config.add_route('user_set_default_license', '/user/set_default_license/{user_id}')
-#    config.add_route('user_edit', '/user/edit/{user_id}', traverse='/{user_id}')
+    # config.add_route('user_edit', '/user/edit/{user_id}', traverse='/{user_id}')
     #config.add_route('user_edit', '/user/edit/{user_id}',
     #                 factory=UserContainer,
     #                 )
@@ -175,17 +176,16 @@ def main(global_config, **settings):
                     route_name='user_contract_de_username')
 
     # user get contract
-#    config.add_route('user_get_bv', '/user/bv/{user_id}')
-#    config.add_view('c3sar.views.user.user_get_bv',
-#                    route_name='user_get_bv')
+    #    config.add_route('user_get_bv', '/user/bv/{user_id}')
+    #    config.add_view('c3sar.views.user.user_get_bv',
+    #                    route_name='user_get_bv')
     
 
     config.add_route('user_login_first',
-                     'user/loginfirst')
+                     '/sign_in_first')
     config.add_view('c3sar.views.user.user_login_first',
-                    route_name='user_login_first')
-
-
+                    route_name='user_login_first',
+                    renderer='templates/have_to_login.pt')
 
     ## routes for bands ##
     # band create
