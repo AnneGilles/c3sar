@@ -10,6 +10,12 @@
     
     <h1>Account settings for ${the_username}</h1>
     
+
+    <ul>
+      <li><a href="/user/edit_email/">change your email address</a></li>
+    </ul>
+
+
     <!-- $ disabled {form.begin(request.route_url('user_edit'))} -->
     ${form.begin(request.url)}
             ${form.csrf_token()}
@@ -38,7 +44,7 @@
             ${form.errorlist('lastname')}
 	  </td>
 	</tr>
-	<tr>
+<!--	<tr>
 	  <td>
             ${form.label('user_email', 'Email:')}
 	  </td>
@@ -59,26 +65,27 @@
 	  <td>
 	  </td>
 	</tr>
+-->
 	<tr>
 	  <td>
-            ${form.label('user_telephone', 'Telephone:')}
+            ${form.label('phone', 'Telephone:')}
 	  </td>
 	  <td>
-            ${form.text('user_telephone')}
+            ${form.text('phone')}
           </td>
 	  <td>
-            ${form.errorlist('user_telephone')}
+            ${form.errorlist('phone')}
 	  </td>
 	</tr>
 	<tr>
 	  <td>
-            ${form.label('user_telefax', 'Telefax:')}
+            ${form.label('fax', 'Telefax:')}
 	  </td>
 	  <td>
-            ${form.text('user_telefax')}
+            ${form.text('fax')}
           </td>
 	  <td>
-            ${form.errorlist('user_telefax')}
+            ${form.errorlist('fax')}
 	  </td>
 	</tr>
 	<tr>
