@@ -4,30 +4,52 @@
       metal:use-macro="base">
 
   <tal:block metal:fill-slot="content">
-        
-    <h1> the login template!</h1>
-    
+    <h1>Sign in</h1>
     <div id="login_form">
+      <p>
+	To login successfully,
+	you have to be
+	<a href="${request.route_url('register')}">registered</a> already.
+      </p>
 
-      To login successfully, you have to be <a href="${request.route_url('register')}">registered</a> already.
-
-    ${form.begin(request.route_url('login'))}
-    <fieldset>
+      ${form.begin(request.route_url('login'))}
       ${form.csrf_token()}
-      ${form.errorlist('username')}
-      ${form.label('username', 'Username:')}
-      ${form.text('username')}
-      <br />
-      ${form.errorlist('password')}
-      ${form.label('password', 'Password:')}
-      ${form.password('password')}
-      <br />
-      ${form.submit('submit', 'Login', class_='submit')}
-    </fieldset>
-    ${form.end()}  
-
+      <fieldset>
+	<table>
+	  <tr>
+	    <td>
+	      ${form.label('username', 'Username:')}
+	    </td>
+	    <td>
+	      ${form.text('username')}
+	    </td>
+	    <td>
+	      ${form.errorlist('username')}
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>
+	      ${form.label('password', 'Password:')}
+	    </td>
+	    <td>
+	      ${form.password('password')}
+	    </td>
+	    <td>
+	      ${form.errorlist('password')}
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>
+	    </td>
+	    <td>
+	    </td>
+	    <td>
+	      ${form.submit('submit', 'Login', class_='submit')}
+	     </td>
+	  </tr>
+	</table>
+      </fieldset>
+      ${form.end()}
     </div>
-    
   </tal:block>
-  
 </html>
