@@ -26,7 +26,7 @@ if sys.version_info[:3] < (2,5,0):
     requires.append('pysqlite')
 
 setup(name='c3sar',
-      version='0.0',
+      version='0.1',
       description='c3sar',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
@@ -35,8 +35,8 @@ setup(name='c3sar',
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
-      author='',
-      author_email='',
+      author='Christoph Scheid',
+      author_email='c@openmusiccontest.org',
       url='',
       keywords='web wsgi bfg pylons pyramid',
       packages=find_packages(),
