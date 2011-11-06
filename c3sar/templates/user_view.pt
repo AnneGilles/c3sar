@@ -29,10 +29,10 @@
 
     <h3>contact</h3>
     <ul>
-      <li>Email: <b>${user.email_addresses[0].email_address}</b>.</li>
-      <li>Email confirmed?: <b> ${str(user.email_addresses[0].is_confirmed)}</b>.</li>
-      <li>Telephone: <b> ${str(user.phone_numbers[0].phone_number) | 'None'}</b>.</li>
-      <li>Telefax: <b> ${user.telefax | 'None'}</b>.</li>
+      <li>Email: <b>${user.email}</b>.</li>
+      <li>Email confirmed?: <b> ${user.email_is_confirmed}</b>.</li>
+      <li>Telephone: <b> ${str(user.phone) | 'None'}</b>.</li>
+      <li>Telefax: <b> ${user.fax | 'None'}</b>.</li>
     </ul>
 
     <h3>meta</h3>
