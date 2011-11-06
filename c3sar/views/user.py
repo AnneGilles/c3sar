@@ -16,13 +16,12 @@ from pyramid.view import view_config
 from c3sar.models import (
     DBSession,
     User,
-    EmailAddress,
-    PhoneNumber,
     )
 
 import os
 import random
 import string
+from types import NoneType
 
 from c3sar.views.validators import (
     UniqueUsername,
@@ -97,17 +96,11 @@ def user_register(request):
             surname = form.data['surname'],
             lastname = form.data['lastname'],
             )
+        user.email = form.data['email']
+        user.email_is_confirmed = False
+        user.email_confirmation_code = randomstring
 
-        user.email_addresses = [
-            EmailAddress(
-                email_address = form.data['email'],
-                conf_code = randomstring,
-                )
-            ]
-
-        user.phone_numbers.append(
-            PhoneNumber(phone_number=form.data['phone'])
-            )
+        user.phone = form.data['phone']
 
         user.set_address(street=form.data['street'],
                          number=form.data['number'],
@@ -189,7 +182,7 @@ def user_confirm_email(request):
     # check if the information in the matchdict makes sense
     #  - user
     #  -
-    from types import NoneType
+
     if isinstance(user, NoneType):
         print "user is of type NoneType"
         return {'result_msg': "Something didn't work. Please check whether you tried the right URL."}
@@ -307,13 +300,16 @@ def user_list(request):
     return {'users': users}
 
 
-#################################################################### user_view
-@view_config(route_name='user_view',
-             permission='view',
-             renderer='../templates/user_view.pt')
+
+#@view_config(route_name='user_view',
+#             permission='view',
+#             renderer='../templates/user_view.pt')
 def user_view(request):
     user_id = request.matchdict['user_id']
     user = User.get_by_user_id(user_id)
+
+    if isinstance(user, NoneType):
+        return HTTPFound(location = route_url('not_found', request))
 
     # calculate for next/previous navigation
     prev_id = int(user_id) - 1
@@ -396,6 +392,13 @@ def user_edit(request):
 
     form = Form(request, schema = UserSettingsSchema, obj = user)
 
+    print (" -------- telefax: " + str(user.fax))
+    request.session.flash("telefax: " + str(user.fax))
+    print (" -------- password: " + str(user.password))
+    request.session.flash("password: " + user.password)
+    print (" -------- phone: " + str(user.phone))
+    request.session.flash("phone: " + user.phone)
+
 
     if form.validate():
         request.session.flash("Yes! form.validate() !!!")
@@ -409,17 +412,8 @@ def user_edit(request):
         request.session.flash(form.data['user_email'])
 
     if 'form.submitted' in request.POST and form.validate():
-        # ready for registration!
+        # ready for changing database entries!
         request.session.flash('form validated!')
-        #username = form.data['username']
-
-        # user = User(
-        #     username = user.username,
-        #     #password = form.data['password'],
-        #     user_surname = form.data['user_surname'],
-        #     user_lastname = form.data['user_lastname'],
-        #     user_email = form.data['user_email']
-        #     )
 
         if form.data['surname'] !=  user.surname:
             request.session.flash('surname was not same --> changing')
@@ -429,20 +423,17 @@ def user_edit(request):
             request.session.flash('lastname was not same --> changing')
             user.lastname = form.data['lastname']
 
-#        if form.data['user_email'] !=  user.email:
-#            request.session.flash('email was not same --> changing')
-#            user.user_email = form.data['user_email']
+        if form.data['email'] !=  user.email_address:
+            request.session.flash('email was not same --> changing')
+            user.email = form.data['user_email']
 
-# ToDo
-        # if form.data['user_telephone'] !=  user.user_telephone:
-        #     request.session.flash('telephone was not same --> changing')
-        #     user.user_telephone = form.data['user_telephone']
+        if form.data['telephone'] !=  user.phone:
+            request.session.flash('telephone was not same --> changing')
+            user.phone = form.data['telephone']
 
-        # if form.data['user_telefax'] !=  user.user_telefax:
-        #     request.session.flash('telefax was not same --> changing')
-        #     user.user_telefax = form.data['user_telefax']
-
-
+        if form.data['telefax'] !=  user.fax:
+            request.session.flash('telefax was not same --> changing')
+            user.fax = form.data['telefax']
 
         #redirect_url = route_url('user_view', request)
 
@@ -485,51 +476,10 @@ def user_set_default_license(request):
         # ready for registration!
         request.session.flash('form validated!')
 
-# ToDo XXX
-        # user = User(
-        #     username = user.username,
-        #     #password = form.data['password'],
-        #     user_surname = form.data['user_surname'],
-        #     user_lastname = form.data['user_lastname'],
-        #     user_email = form.data['user_email']
-        #     )
-
-        # if form.data['surname'] !=  user.surname:
-        #     request.session.flash('surname was not same --> changing')
-        #     user.surname = form.data['surname']
-
-        # if form.data['lastname'] !=  user.lastname:
-        #     request.session.flash('lastname was not same --> changing')
-        #     user.lastname = form.data['lastname']
-
-#        if form.data['user_email'] !=  user.email:
-#            request.session.flash('email was not same --> changing')
-#            user.user_email = form.data['user_email']
-
-# ToDo
-        # if form.data['user_telephone'] !=  user.user_telephone:
-        #     request.session.flash('telephone was not same --> changing')
-        #     user.user_telephone = form.data['user_telephone']
-
-        # if form.data['user_telefax'] !=  user.user_telefax:
-        #     request.session.flash('telefax was not same --> changing')
-        #     user.user_telefax = form.data['user_telefax']
-
-
-
-        #redirect_url = route_url('user_view', request)
-
-
-#       return HTTPFound(location = redirect_url, headers=headers)
-       # return dict (
-       #     message = 'You won!'
-       #     )
-
 
     return {
         'the_user_id': user_id,
         'the_username': user.username,
- #       'email_is_confirmed': email_is_confirmed,
         'form': FormRenderer(form),
         }
 
