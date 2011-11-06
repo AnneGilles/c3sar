@@ -118,3 +118,11 @@ def not_implemented_view(request):
         msg = 'not implemented'
 )
 
+@view_config(route_name='not_found',
+             permission='view',
+             renderer='../templates/not_found.pt')
+def not_found_view(request):
+    return dict (
+        msg = 'not found'
+)
+
