@@ -47,40 +47,7 @@ def hash_password(password):
     return unicode(crypt.encode(password))
 
 
-class EmailAddress(Base):
-    __tablename__ = 'email_addresses'
-    id = Column((Integer), primary_key=True)
-    email_address = Column(Unicode, nullable = False)
-    confirm_code = Column(Unicode(10))
-    is_confirmed = Column(Boolean)
-    user_id = Column(Integer, ForeignKey('users.id'))
-
-#    user = relationship("User", backref=backref('addresses', order_by=id))
-
-    def __init__(self, email_address, conf_code, is_confirmed=False):
-        self.email_address = email_address
-        self.confirm_code = conf_code
-        #self.is_confirmed = False
-        self.is_confirmed = is_confirmed
-
-    def __repr__(self):
-        return "<Address('%s')>" % self.email_address
-
-class PhoneNumber(Base):
-    __tablename__ = 'phone_numbers'
-    id = Column((Integer), primary_key=True)
-    phone_number = Column(Unicode, nullable = False)
-    user_id = Column(Integer, ForeignKey('users.id'))
-
-#    user = relationship("User", backref=backref('phone_numbers', order_by=id))
-
-    def __init__(self, phone_number):
-        self.phone_number = phone_number
-
-    def __repr__(self):
-        return "<PhoneNumber('%s')>" % self.phone_number
-
-class User(Base): # ===========================================================
+class User(Base): 
     """
     applications user model
     """
@@ -89,23 +56,28 @@ class User(Base): # ===========================================================
     username = Column(Unicode(255), unique=True)
     surname = Column(Unicode(255))
     lastname = Column(Unicode(255))
+
     # address
     street =  Column(Unicode(255))
     number =  Column(Unicode(255))
     postcode =  Column(Unicode(255))
     city =  Column(Unicode(255))
     country =  Column(Unicode(255))
+
     # contact
-    telefax = Column(Unicode(255))
-    phone_numbers = relationship(u"PhoneNumber", order_by="PhoneNumber.id")
-    email_addresses = relationship(u"EmailAddress", order_by="EmailAddress.id")
+    fax = Column(Unicode(255))
+    phone = Column(Unicode(255))
+    email = Column(Unicode(255))
+    email_is_confirmed = Column(Boolean, default=False)
+    email_confirm_code = Column(Unicode(255))
+
     # account meta
     date_registered = Column(DateTime(), nullable=False)
     last_login = Column(DateTime(), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     last_password_change = Column(DateTime,
                                   default = func.current_timestamp())
-
+    
     _password = Column('password', Unicode(60))
 
     # groups = relationship(Group,
@@ -133,11 +105,15 @@ class User(Base): # ===========================================================
 #    def get_group_list(self):
 #        return [ str(group.name) for group in self.groups ]
 
-    def __init__(self, username, password, surname, lastname):
+    def __init__(self, username, password, surname, lastname, 
+                 email, email_is_confirmed, email_confirmation_code):
         self.username = username
         self.surname = surname
         self.lastname = lastname
         self.password = password
+        self.email = email
+        self.email_is_confirmed = email_is_confirmed
+        self.email_confirmation_code = email_confirmation_code
         self.date_registered = datetime.now()
         self.last_login = datetime.now()
 
@@ -400,24 +376,22 @@ def populate():
 #    transaction.commit()
 
     user1 = User(username=u'firstUsername', surname=u'firstSurname',
-                 lastname=u'firstSurname',password=u'password')
-    user1.email_addresses = [
-        EmailAddress(email_address=u'first1@shri.de',conf_code=u'barfbarf',is_confirmed=True),
-        EmailAddress(email_address=u'first2@shri.de',conf_code=u'barfbarf'), ]
-    user1.phone_numbers.append(
-        PhoneNumber(phone_number = u'+49 6421 968300422')
-        )
-    user1.telefax = u'+49 6421 690 6996'
+                 lastname=u'firstLastname',password=u'password',
+                 email = u'first1@shri.de', email_confirmation_code = u'barfbarf',
+                 email_is_confirmed=True)
+    user1.phone = u'+49 6421 968300422'
+    user1.fax = u'+49 6421 690 6996'
     user1.set_address(street=u'Teststraße', number=u'1234a',
                       postcode=u'35039', city=u'Marburg Mitte',
                       country=u'Deutschland')
     dbsession.add(user1)
 
     user2 = User(username=u'secondUsername', surname=u'secondSurname',
-                 lastname=u'secondSurname',password=u'password')
-    user2.email_addresses = [
-        EmailAddress(email_address=u'second1@shri.de',conf_code=u'möökmöök',is_confirmed=True),
-        EmailAddress(email_address=u'second2@shri.de',conf_code=u'möökmöök'), ]
+                 lastname=u'secondSurname',password=u'password',
+                 email = u'second1@shri.de', email_confirmation_code = u'möökmöök',
+                 email_is_confirmed=False)
+
+    user2.phone = u'+49 6421 968300421'
     dbsession.add(user2)
 
     band1 = Band(name=u"TestBand1", email=u"testband1@shri.de",
