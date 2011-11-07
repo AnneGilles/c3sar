@@ -116,7 +116,7 @@ def favicon_view(context, request):
 def not_implemented_view(request):
     return dict (
         msg = 'not implemented'
-)
+        )
 
 @view_config(route_name='not_found',
              permission='view',
