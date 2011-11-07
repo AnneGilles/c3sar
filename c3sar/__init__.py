@@ -311,8 +311,20 @@ def main(global_config, **settings):
 
     ## routes for RESTful interface ##
     config.add_route('api_get_user', '/api/get/user/{id}')
+    config.add_view('c3sar.views.rest.show_user_view',
+                    route_name='api_get_user',
+                    renderer='json',
+                    )
 
-    ##
+    config.add_route('api_report_single_airplay',
+                     '/api/report/v1/air/single/{the_report}')
+    config.add_view('c3sar.views.reporting_api.reporting_single_airplays_view',
+                    route_name='api_report_single_airplay',
+                    renderer='json',
+                    )
+
+
+    ## 
     config.add_route('url_param_test', '/url_param_test')
     config.add_view('c3sar.views.license.url_param_test',
                     route_name='url_param_test',
