@@ -33,6 +33,8 @@ from c3sar.views.validators import (
     )
 
 
+DEBUG = False
+
 #@view_config(route_name='register',
 #             permission='view',
 #             renderer='templates/user_add.pt')
@@ -163,7 +165,6 @@ def user_confirm_email(request):
     - the email address in question is confirmed as validated
     - the database entry is changed to reflect this
     """
-    DEBUG = True
     # values from URL/matchdict
     conf_code = request.matchdict['code']
     user_name = request.matchdict['user_name']
@@ -184,7 +185,8 @@ def user_confirm_email(request):
     #  -
 
     if isinstance(user, NoneType):
-        print "user is of type NoneType"
+        if DEBUG:
+            print "user is of type NoneType"
         return {'result_msg': "Something didn't work. Please check whether you tried the right URL."}
 
     # get all email addresses of that user into a list
@@ -197,9 +199,10 @@ def user_confirm_email(request):
                 return {'result_msg': "Your email address was confirmed already." }
 
             if (item.confirm_code == conf_code):
-                print " -- found the right confirmation code in db"
+                if DEBUG:
+                    print " -- found the right confirmation code in db"
+                    print " -- set this email address as confirmed."
                 item.is_confirmed = True
-                print " -- set this email address as confirmed."
                 return {'result_msg': "Thanks! You email address has been confirmed." }
     # else
     return {'result_msg': "Verification has failed. Bummer!"}
@@ -265,10 +268,12 @@ def login_view(request):
         request.session.flash(password)
 
         if User.check_password(login, password):
-            request.session.flash(u'User.check_password was True!')
-            request.session.flash(u'login: ' + login)
+            if DEBUG:
+                request.session.flash(u'User.check_password was True!')
+                request.session.flash(u'login: ' + login)
             headers = remember(request, login)
-            request.session.flash(u'Logged in successfully.')
+            if DEBUG:
+                request.session.flash(u'Logged in successfully.')
             return HTTPFound(location = came_from, headers=headers)
 
         else:
@@ -392,13 +397,18 @@ def user_edit(request):
 
     form = Form(request, schema = UserSettingsSchema, obj = user)
 
-    print (" -------- telefax: " + str(user.fax))
-    request.session.flash("telefax: " + str(user.fax))
-    print (" -------- password: " + str(user.password))
-    request.session.flash("password: " + user.password)
-    print (" -------- phone: " + str(user.phone))
-    request.session.flash("phone: " + user.phone)
+    DEBUG = True
 
+    if DEBUG:
+        print (" -------- telefax: " + str(user.fax))
+        request.session.flash("telefax: " + str(user.fax))
+        print (" -------- password: " + str(user.password))
+        request.session.flash("password: " + user.password)
+        print (" -------- phone: " + str(user.phone))
+        request.session.flash("phone: " + user.phone)
+        request.session.flash("email_is_confirmed: " + str(user.email_is_confirmed))
+
+        
 
     if form.validate():
         request.session.flash("Yes! form.validate() !!!")
@@ -407,9 +417,9 @@ def user_edit(request):
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
         request.session.flash('form does not validate!')
-        request.session.flash(form.data['user_surname'])
-        request.session.flash(form.data['user_lastname'])
-        request.session.flash(form.data['user_email'])
+        #request.session.flash(form.data['user_surname'])
+        #request.session.flash(form.data['user_lastname'])
+        #request.session.flash(form.data['user_email'])
 
     if 'form.submitted' in request.POST and form.validate():
         # ready for changing database entries!
@@ -418,22 +428,33 @@ def user_edit(request):
         if form.data['surname'] !=  user.surname:
             request.session.flash('surname was not same --> changing')
             user.surname = form.data['surname']
-
         if form.data['lastname'] !=  user.lastname:
             request.session.flash('lastname was not same --> changing')
             user.lastname = form.data['lastname']
-
-        if form.data['email'] !=  user.email_address:
+        if form.data['email'] !=  user.email:
             request.session.flash('email was not same --> changing')
-            user.email = form.data['user_email']
-
-        if form.data['telephone'] !=  user.phone:
-            request.session.flash('telephone was not same --> changing')
-            user.phone = form.data['telephone']
-
-        if form.data['telefax'] !=  user.fax:
-            request.session.flash('telefax was not same --> changing')
-            user.fax = form.data['telefax']
+            user.email = form.data['email']
+        if form.data['phone'] !=  user.phone:
+            request.session.flash('phone was not same --> changing')
+            user.phone = form.data['phone']
+        if form.data['fax'] !=  user.fax:
+            request.session.flash('fax was not same --> changing')
+            user.fax = form.data['fax']
+        if form.data['street'] !=  user.street:
+            request.session.flash('street was not same --> changing')
+            user.street = form.data['street']
+        if form.data['number'] !=  user.number:
+            request.session.flash('number was not same --> changing')
+            user.number = form.data['number']
+        if form.data['city'] !=  user.city:
+            request.session.flash('city was not same --> changing')
+            user.city = form.data['city']
+        if form.data['postcode'] !=  user.postcode:
+            request.session.flash('postcode was not same --> changing')
+            user.postcode = form.data['postcode']
+        if form.data['country'] !=  user.country:
+            request.session.flash('country was not same --> changing')
+            user.country = form.data['country']
 
         #redirect_url = route_url('user_view', request)
 
@@ -511,10 +532,10 @@ def user_contract_de(request):
     from fdfgen import forge_fdf
     user_id = request.matchdict['user_id']
 
-    print "user_id = " + str(user_id)
+    if DEBUG: print "user_id = " + str(user_id)
     # check if user is not logged in, then return blank contract
     if user_id == 'blank' or not hasattr(request.user, 'id'):
-        print "user_id equalled blank"
+        if DEBUG: print "user_id equalled blank"
         return generate_contract_de_blank()
 
 
@@ -636,11 +657,10 @@ def user_contract_de_username(request):
     return response
 
 
-from pyramid.response import Response
-@view_config(route_name='user_login_first',
-             permission='view',
-             renderer='../templates/have_to_login.pt')
-def user_login_first(request):
-    the_message = "Please login first."
-    return Response(the_message)
 
+#@view_config(route_name='user_login_first',
+#             permission='view',
+#             renderer='../templates/have_to_login.pt')
+# this ^ view config ^ is unnecessary/invalid, config done in __init__.py
+def user_login_first(request):
+    return dict(msg = 'log in first')
