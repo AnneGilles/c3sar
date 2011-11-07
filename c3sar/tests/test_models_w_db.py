@@ -4,11 +4,14 @@ from pyramid import testing
 import os
 
 # debugging
-DEBUG = True
-#DEBUG = False
+#DEBUG = True
+DEBUG = False
+
+if DEBUG:
+    print "== test_models_w_db.py =="
 
 def _initTestingDB():
-    #if DEBUG: print "this is _initTestingDB()"
+    if DEBUG: print "this is _initTestingDB()"
     from sqlalchemy import create_engine
     from c3sar.models import DBSession
     from c3sar.models import Base
@@ -19,7 +22,7 @@ def _initTestingDB():
     if os.path.isfile('testing.db'):
         # delete existing db
         os.unlink('testing.db')
-        #print "deleted old database."
+        #print "deleted old database *testing.db*."
     engine = create_engine('sqlite:///testing.db')
 #    session = initialize_sql(create_engine('sqlite://'))
 #    DBSession.configure(bind=engine)
@@ -197,8 +200,12 @@ class UserModelTests(unittest.TestCase):
                  password=u'password',
                  surname=u'SomeSurname',
                  lastname=u'SomeLastname',
+                 email=u'example@example.com',
+                 email_is_confirmed=False,
+                 email_confirmation_code=u'SomeTestCode'
                  ):
-        return self._getTargetClass()(username,password,surname,lastname,)
+        return self._getTargetClass()(username,password,surname,lastname,
+                                      email,email_is_confirmed,email_confirmation_code)
 
 
     def test_constructor(self):
@@ -318,58 +325,58 @@ class UserModelTests(unittest.TestCase):
         self.assertEquals(result, None, "result was not None")
 
 
-class EmailAddressModelTests(unittest.TestCase):
-    if DEBUG: print "----- this is class EmailAddressModelTests "
-    def setUp(self):
-        self.session = _initTestingDB()
+# class EmailAddressModelTests(unittest.TestCase):
+#     if DEBUG: print "----- this is class EmailAddressModelTests "
+#     def setUp(self):
+#         self.session = _initTestingDB()
 
-    def tearDown(self):
-        #print dir(self.session)
-        #self.session.remove()
-        pass
+#     def tearDown(self):
+#         #print dir(self.session)
+#         #self.session.remove()
+#         pass
 
-    def _getTargetClass(self):
-        from c3sar.models import EmailAddress
-        return EmailAddress
+#     def _getTargetClass(self):
+#         from c3sar.models import EmailAddress
+#         return EmailAddress
 
-    def _makeOne(self,
-                 email_address=u'test@shri.de'):
-        return self._getTargetClass()(email_address)
-
-
-    def test_constructor(self):
-        if DEBUG: print "----- this is EmailAddressModelTests.test_constructor"
-        instance = self._makeOne()
-        self.assertEqual(instance.email_address, 'test@shri.de')
-        self.assertEqual(instance.__repr__(), "<Address('test@shri.de')>")
-        #print "repr: " + instance.__repr__()
+#     def _makeOne(self,
+#                  email_address=u'test@shri.de'):
+#         return self._getTargetClass()(email_address)
 
 
-class PhoneNumberModelTests(unittest.TestCase):
-    if DEBUG: print "----- this is class PhoneNumberModelTests "
-    def setUp(self):
-        self.session = _initTestingDB()
-
-    def tearDown(self):
-        #print dir(self.session)
-        #self.session.remove()
-        pass
-
-    def _getTargetClass(self):
-        from c3sar.models import PhoneNumber
-        return PhoneNumber
-
-    def _makeOne(self,
-                 phone_number='06421-98300422'):
-        return self._getTargetClass()(phone_number)
+#     def test_constructor(self):
+#         if DEBUG: print "----- this is EmailAddressModelTests.test_constructor"
+#         instance = self._makeOne()
+#         self.assertEqual(instance.email_address, 'test@shri.de')
+#         self.assertEqual(instance.__repr__(), "<Address('test@shri.de')>")
+#         #print "repr: " + instance.__repr__()
 
 
-    def test_constructor(self):
-        if DEBUG: print "----- this is PhoneNumberModelTests.test_constructor "
-        instance = self._makeOne()
-        self.assertEqual(instance.phone_number, '06421-98300422', "Got unecpected value from constructor!")
-        self.assertEqual(instance.__repr__(), "<PhoneNumber('06421-98300422')>", "Got unecpected value from constructor!")
-        #print "repr: " + instance.__repr__()
+# class PhoneNumberModelTests(unittest.TestCase):
+#     if DEBUG: print "----- this is class PhoneNumberModelTests "
+#     def setUp(self):
+#         self.session = _initTestingDB()
+
+#     def tearDown(self):
+#         #print dir(self.session)
+#         #self.session.remove()
+#         pass
+
+#     def _getTargetClass(self):
+#         from c3sar.models import PhoneNumber
+#         return PhoneNumber
+
+#     def _makeOne(self,
+#                  phone_number='06421-98300422'):
+#         return self._getTargetClass()(phone_number)
+
+
+#     def test_constructor(self):
+#         if DEBUG: print "----- this is PhoneNumberModelTests.test_constructor "
+#         instance = self._makeOne()
+#         self.assertEqual(instance.phone_number, '06421-98300422', "Got unecpected value from constructor!")
+#         self.assertEqual(instance.__repr__(), "<PhoneNumber('06421-98300422')>", "Got unecpected value from constructor!")
+#         #print "repr: " + instance.__repr__()
 
 class BandModelTests(unittest.TestCase):
     if DEBUG: print "----- this is class BandModelTests "
@@ -442,7 +449,8 @@ class BandModelTests(unittest.TestCase):
         self.session.add(instance)
         myBandClass = self._getTargetClass()
         fooBandList = myBandClass.get_by_registrar_name(instance.registrar)
-        print "BandModelTests.test_get_by_registrar_name: fooBandList: " + str(fooBandList)
+        if DEBUG:
+            print "BandModelTests.test_get_by_registrar_name: fooBandList: " + str(fooBandList)
         #self.assertEqual(instance.registrar, fooBand.registrar)
         bandnames = []
         for band in fooBandList:

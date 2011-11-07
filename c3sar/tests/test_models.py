@@ -2,6 +2,8 @@ import unittest
 from pyramid.config import Configurator
 from pyramid import testing
 
+DEBUG = False
+
 def _initTestingDB():
     from sqlalchemy import create_engine
     from c3sar.models import DBSession
@@ -69,13 +71,13 @@ class UserModelTests(unittest.TestCase):
                  password=u'p4ssw0rd',
                  surname=u'SomeSurname',
                  lastname=u'SomeLastname',
-                 #email=u'some@email.de',
-                 #email_conf=False,
-                 #email_conf_code=u'ABCDEFG'
+                 email=u'some@email.de',
+                 email_is_confirmed=False,
+                 email_confirmation_code=u'ABCDEFG'
                  ):
-        print "type(self.session): " + str(type(self.session))
+        #print "type(self.session): " + str(type(self.session))
         return self._getTargetClass()(username,password,surname,lastname,
-                                      #email,email_conf,email_conf_code
+                                      email,email_is_confirmed,email_confirmation_code
                                       )
     
 
@@ -89,10 +91,10 @@ class UserModelTests(unittest.TestCase):
         # password hash is not empty
         self.assertNotEqual(instance._get_password(), '', "No match!")
         # XXX ToDo: how to test the password !?
-        print "result of instance.get_password: " + instance._get_password()
-#        self.assertEqual(instance.email, 'some@email.de', "No match!")
-#        self.assertEqual(instance.email_conf_code, 'ABCDEFG', "No match!")
-#        self.assertEqual(instance.email_conf, False, "expected False")
+        #print "result of instance.get_password: " + instance._get_password()
+        self.assertEqual(instance.email, 'some@email.de', "No match!")
+        self.assertEqual(instance.email_confirmation_code, 'ABCDEFG', "No match!")
+        self.assertEqual(instance.email_is_confirmed, False, "expected False")
 
         #     # def test_acl(self):
         #     #     instance = self._makeOne()
@@ -115,7 +117,8 @@ class UserModelTests(unittest.TestCase):
         instance = self._makeOne()
         user_cls = self._getTargetClass()
         result = user_cls.user_listing('foo')
-        print "user_cls.user_listing('foo')" + repr(result)
+        if DEBUG:
+            print "user_cls.user_listing('foo')" + repr(result)
 
         #result =
 #        print help(user_cls.user_listing('foo'))
@@ -126,7 +129,8 @@ class UserModelTests(unittest.TestCase):
         instance = self._makeOne()
         #from c3sar.models import User
         myUserClass = self._getTargetClass()
-        print "myUserClass: " +str(myUserClass)
+        if DEBUG:
+            print "myUserClass: " +str(myUserClass)
 #        print "str(myUserClass.get_by_username('SomeUsername')): " + str(myUserClass.get_by_username('SomeUsername'))
 #        foo = myUserClass.get_by_username(instance.username)
 #        print "test_get_by_username: type(foo): " + str(type(foo))
@@ -148,56 +152,56 @@ class UserModelTests(unittest.TestCase):
 
 
 
-class EmailAddressModelTests(unittest.TestCase):
+# class EmailAddressModelTests(unittest.TestCase):
     
-    def setUp(self):
-        self.session = _initTestingDB()
+#     def setUp(self):
+#         self.session = _initTestingDB()
 
-    def tearDown(self):
-        #print dir(self.session)
-        #self.session.remove()
-        pass
+#     def tearDown(self):
+#         #print dir(self.session)
+#         #self.session.remove()
+#         pass
 
-    def _getTargetClass(self):
-        from c3sar.models import EmailAddress
-        return EmailAddress
+#     def _getTargetClass(self):
+#         from c3sar.models import EmailAddress
+#         return EmailAddress
 
-    def _makeOne(self, 
-                 email_address='test@shri.de'):
-        return self._getTargetClass()(email_address)
-    
-
-    def test_constructor(self):
-        instance = self._makeOne()
-        self.assertEqual(instance.email_address, 'test@shri.de')
-        self.assertEqual(instance.__repr__(), "<Address('test@shri.de')>")
-        #print "repr: " + instance.__repr__()
-
-
-class PhoneNumberModelTests(unittest.TestCase):
-    
-    def setUp(self):
-        self.session = _initTestingDB()
-
-    def tearDown(self):
-        #print dir(self.session)
-        #self.session.remove()
-        pass
-
-    def _getTargetClass(self):
-        from c3sar.models import PhoneNumber
-        return PhoneNumber
-
-    def _makeOne(self, 
-                 phone_number='06421-98300422'):
-        return self._getTargetClass()(phone_number)
+#     def _makeOne(self, 
+#                  email_address='test@shri.de'):
+#         return self._getTargetClass()(email_address)
     
 
-    def test_constructor(self):
-        instance = self._makeOne()
-        self.assertEqual(instance.phone_number, '06421-98300422')
-        self.assertEqual(instance.__repr__(), "<PhoneNumber('06421-98300422')>")
-        #print "repr: " + instance.__repr__()
+#     def test_constructor(self):
+#         instance = self._makeOne()
+#         self.assertEqual(instance.email_address, 'test@shri.de')
+#         self.assertEqual(instance.__repr__(), "<Address('test@shri.de')>")
+#         #print "repr: " + instance.__repr__()
+
+
+# class PhoneNumberModelTests(unittest.TestCase):
+    
+#     def setUp(self):
+#         self.session = _initTestingDB()
+
+#     def tearDown(self):
+#         #print dir(self.session)
+#         #self.session.remove()
+#         pass
+
+#     def _getTargetClass(self):
+#         from c3sar.models import PhoneNumber
+#         return PhoneNumber
+
+#     def _makeOne(self, 
+#                  phone_number='06421-98300422'):
+#         return self._getTargetClass()(phone_number)
+    
+
+#     def test_constructor(self):
+#         instance = self._makeOne()
+#         self.assertEqual(instance.phone_number, '06421-98300422')
+#         self.assertEqual(instance.__repr__(), "<PhoneNumber('06421-98300422')>")
+#         #print "repr: " + instance.__repr__()
 
 
 
