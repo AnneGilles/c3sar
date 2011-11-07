@@ -80,26 +80,36 @@ class LoginSchema(formencode.Schema):
     allow_extra_fields = True
     username = formencode.validators.PlainText(not_empty=True)
     password = formencode.validators.PlainText(not_empty=True)
-    
+
 
 # formencode schema for user settings ####################################
 class UserSettingsSchema(formencode.Schema):
     allow_extra_fields = True
     filter_extra_fields = True
-#    username = formencode.All(validators.PlainText(not_empty = True),
-#                              UniqueUsername())
-#    new_password = formencode.validators.PlainText(not_empty = True)
-#    confirm_password =  formencode.validators.String(not_empty = True)
-#    user_email = formencode.validators.Email(resolve_domain = False, not_empty=True)
     surname =  formencode.validators.String(not_empty = True)
     lastname =  formencode.validators.String(not_empty = True)
-#    password =  formencode.validators.String(not_empty = True)
-#    chained_validators = [
-#        formencode.validators.FieldsMatch('new_password', 'confirm_password')
-#        ]
+    email = formencode.validators.Email(resolve_domain=False,
+                                        not_empty = True)
+    phone = formencode.validators.String(not_empty = True)
+    fax = formencode.validators.String(not_empty = False)
+    street = formencode.validators.String(not_empty = False)
+    number = formencode.validators.String(not_empty = False)
+    city = formencode.validators.String(not_empty = False)
+    postcode = formencode.validators.String(not_empty = False)
+    country = formencode.validators.String(not_empty = False)
+    
 
 
-## formencode schema for user default license 
+
+class UserPasswordSchema(formencode.Schema):
+    allow_extra_fields = True
+    filter_extra_fields = True
+
+    new_password = formencode.validators.PlainText(not_empty = True)
+    confirm_password =  formencode.validators.String(not_empty = True)
+
+
+## formencode schema for user default license
 class UserDefaultLicenseSchema(formencode.Schema):
     allow_extra_fields = True
     filter_extra_fields = True
