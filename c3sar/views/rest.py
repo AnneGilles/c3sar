@@ -1,12 +1,21 @@
+from types import NoneType
 
 from pyramid.view import view_config
 from pyramid.request import Request
 from pyramid.response import Response
 
-@view_config(route_name = 'api_get_user',
-             request_method = 'GET')
+from c3sar.models import (
+    DBSession,
+    User,
+    )
+
+#@view_config(route_name = 'api_get_user',
+#             request_method = 'GET')
 def show_user_view(request):
-    return Response("GET user %s" % request.matchdict['id'])
+    user = User.get_by_user_id(request.matchdict['id'])
+    if isinstance(user, NoneType):
+        return Response('null')
+    return Response("%s : %s" % (user.id, user.username) )
 
 @view_config(route_name = 'post',
              request_method = 'DELETE')
