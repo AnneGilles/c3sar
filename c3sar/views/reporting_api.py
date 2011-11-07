@@ -18,6 +18,8 @@ def reporting_single_airplays_view(request):
     the_report = from_matchdict.encode('base64')
 
 #    dbsession = DBSession
-    print "got a new report! " +  str(the_report)
+    print "------------- got a new report! -----------------" 
+    print "base64 encoded: " +   str(the_report)
+    print "base64 decoded: " +   str(the_report.decode('base64'))
     
     return Response("Thanks! got: %s" % the_report.decode('base64'))
