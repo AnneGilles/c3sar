@@ -10,16 +10,11 @@
     
     <h1>Account settings for ${the_username}</h1>
     
-
-    <ul>
-      <li><a href="/user/edit_email/">change your email address</a></li>
-    </ul>
-
-
+    
     <!-- $ disabled {form.begin(request.route_url('user_edit'))} -->
     ${form.begin(request.url)}
-            ${form.csrf_token()}
-
+    ${form.csrf_token()}
+    
     <fieldset>
       <table>
 	<tr>
@@ -44,28 +39,21 @@
             ${form.errorlist('lastname')}
 	  </td>
 	</tr>
-<!--	<tr>
-	  <td>
-            ${form.label('user_email', 'Email:')}
-	  </td>
-	  <td>
-            ${form.text('user_email')} 
-          </td>
-	  <td>
-            ${form.errorlist('user_email')}
-	  </td>
-	</tr>
+      </table>
+      
+      <h3>contact details</h3>
+      <table>
 	<tr>
 	  <td>
-            Email confirmed?:
+            ${form.label('email', 'Email:')}
 	  </td>
 	  <td>
-            $ off {email_is_confirmed}
+            ${form.text('email')} 
           </td>
 	  <td>
+            ${form.errorlist('email')}
 	  </td>
 	</tr>
--->
 	<tr>
 	  <td>
             ${form.label('phone', 'Telephone:')}
@@ -88,6 +76,66 @@
             ${form.errorlist('fax')}
 	  </td>
 	</tr>
+      </table>
+      
+      <h3>address details</h3>
+      <table>
+	<tr>
+	  <td>
+            ${form.label('street', 'Street:')}
+	  </td>
+	  <td>
+            ${form.text('street')} 
+          </td>
+	  <td>
+            ${form.errorlist('street')}
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+            ${form.label('number', 'Number:')}
+	  </td>
+	  <td>
+            ${form.text('number')}
+          </td>
+	  <td>
+            ${form.errorlist('number')}
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+            ${form.label('city', 'City:')}
+	  </td>
+	  <td>
+            ${form.text('city')}
+          </td>
+	  <td>
+            ${form.errorlist('city')}
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+            ${form.label('postcode', 'post code:')}
+	  </td>
+	  <td>
+            ${form.text('postcode')}
+          </td>
+	  <td>
+            ${form.errorlist('postcode')}
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+            ${form.label('country', 'Country:')}
+	  </td>
+	  <td>
+            ${form.text('country')}
+          </td>
+	  <td>
+            ${form.errorlist('country')}
+	  </td>
+	</tr>
+	
 	<tr>
 	  <td>
 	  </td>
@@ -98,7 +146,7 @@
       </table>
     </fieldset>
     ${form.end()}
-
+    
 
     <h2>Other Settings</h2>
 
