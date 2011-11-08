@@ -14,6 +14,7 @@ requires = [
     'pyramid_tm',
     'pyramid_debugtoolbar',
     'zope.sqlalchemy',
+    'WebTest',
     'cryptacular',
     'pyramid_beaker',
     'pyramid_simpleform',
