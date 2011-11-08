@@ -46,7 +46,9 @@
       </div>
       <span tal:condition="python:not False">
 	<!-- get flash messages across to the user (in base.pt) -->
-	${request.session.pop_flash()}
+	<strong tal:repeat="usermessage request.session.pop_flash()">
+	  ${usermessage}
+	</strong>
 	<!-- end flash messages -->
 	<!-- <br />
 	debugging request.user: ${request.user.username | 'anonymous/None'} <br />
