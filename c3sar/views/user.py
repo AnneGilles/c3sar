@@ -254,18 +254,18 @@ def login_view(request):
     #request.session.flash(post_data)
 
     if not 'submit' in post_data:
-        request.session.flash('not submitted!')
+        if DEBUG: request.session.flash('not submitted!')
 
     if 'submit' in post_data and not form.validate():
-        request.session.flash(u'-- form didnt validate')
+        request.session.flash(u'form didnt validate')
 
     if 'submit' in post_data and form.validate():
 
         login = post_data['username']
-        request.session.flash(u'username: ' + login)
+        if DEBUG: request.session.flash(u'username: ' + login)
 
         password = post_data['password']
-        request.session.flash(password)
+        if DEBUG: request.session.flash(password)
 
         if User.check_password(login, password):
             if DEBUG:
@@ -277,10 +277,15 @@ def login_view(request):
             return HTTPFound(location = came_from, headers=headers)
 
         else:
-            request.session.flash(u'User.check_password was NOT True!')
-            request.session.flash(u'account not found or passwords didnt match')
+            request.session.flash(
+                u"username and password didn't match!", # message
+                'passwordcheck')                        # to queue
+            if DEBUG:
+                request.session.flash(u'User.check_password was NOT True!')
+                request.session.flash(u'account not found or passwords didnt match')
 
-    request.session.flash(u'Failed to login. Musta been errors!')
+    if DEBUG:
+        request.session.flash(u'Failed to login. Musta been errors!')
     return {
         'form': FormRenderer(form),
         }
@@ -416,7 +421,7 @@ def user_edit(request):
 
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
-        request.session.flash('form does not validate!')
+        request.session.flash('Please check the form below for errors!')
         #request.session.flash(form.data['user_surname'])
         #request.session.flash(form.data['user_lastname'])
         #request.session.flash(form.data['user_email'])
