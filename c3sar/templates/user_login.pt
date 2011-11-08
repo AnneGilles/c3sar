@@ -36,15 +36,18 @@
 	    </td>
 	    <td>
 	      ${form.errorlist('password')}
+	      <strong tal:repeat="passwordmessage request.session.pop_flash(queue='passwordcheck')">
+		${passwordmessage}
+	      </strong>
 	    </td>
 	  </tr>
 	  <tr>
 	    <td>
 	    </td>
 	    <td>
+	      ${form.submit('submit', 'Login', class_='submit')}
 	    </td>
 	    <td>
-	      ${form.submit('submit', 'Login', class_='submit')}
 	     </td>
 	  </tr>
 	</table>
