@@ -8,6 +8,9 @@ from c3sar.models import (
 class UniqueUsername(validators.FancyValidator):
     """
     check if username already exists in database
+    and make sure it is unique / does not exist in db
+
+    if not unique, raise error
     """
     def _to_python(self, username, state):
         if User.get_by_username(username):
@@ -76,9 +79,24 @@ class SecurePassword(validators.FancyValidator):
                                         non_letter=self.non_letter),
                           value, state)
 
+
+class UsernameExists(validators.FancyValidator):
+    """
+    check if username exists in database
+    if not, raise error
+    """
+    def _to_python(self, username, state):
+        if not User.get_by_username(username):
+            raise formencode.Invalid(
+                'That username does not exist', username, state)
+        return username
+
+
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
     username = formencode.validators.PlainText(not_empty=True)
+    username = formencode.All(validators.PlainText(not_empty = True),
+                              UsernameExists())
     password = formencode.validators.PlainText(not_empty=True)
 
 
