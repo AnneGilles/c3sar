@@ -2,6 +2,8 @@ import unittest
 import pprint
 from pyramid import testing
 
+DEBUG = True
+
 def _initTestingDB():
     from c3sar.models import DBSession
     from c3sar.models import Base
@@ -24,6 +26,8 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp()
         #self.config.include('pyramid_mailer.testing')
         self.config.include('c3sar')
+        from c3sar.models import DBSession, User
+        DBSession.remove()
 
     def tearDown(self):
         #self.session.remove()
@@ -52,10 +56,13 @@ class UserViewIntegrationTests(unittest.TestCase):
         #for item in result:
         #    print item
         #self.assertEqual(result.status, '200 OK')
+
         self.assertTrue('form' in result.viewkeys(), 'form was not seen.')
 
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(result)
+        if DEBUG:
+            print "--- in c3sar.tests.test_user_views.UserViewIntegrationTests.test_home_view()"
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(result)
         
         
     def test_user_add_view(self):
@@ -76,8 +83,10 @@ class UserViewIntegrationTests(unittest.TestCase):
         #self.assertEqual(result.status, '200 OK')
         self.assertTrue('form' in result.viewkeys(), 'form was not seen.')
 
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(result)
+        if DEBUG:
+            print "--- in c3sar.tests.test_user_views.UserViewIntegrationTests.test_user_add_view()"
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(result)
 
     def test_user_confirm_email_view(self):
         """
@@ -109,11 +118,15 @@ class UserViewIntegrationTests(unittest.TestCase):
         #self.assertEqual(result.status, '200 OK')
 #        self.assertTrue('form' in result.viewkeys(), 'form was not seen.')
 
-        pp = pprint.PrettyPrinter(indent=4)
 
-        print "=============== results for test_user_confirm_email_view ======"
-        pp.pprint(result)
-        print "=============== results for test_user_confirm_email_view /end ======"
+        if DEBUG:
+            print "--- in c3sar.tests.test_user_views.UserViewIntegrationTests.test_user_confirm_email_view()"
+
+            pp = pprint.PrettyPrinter(indent=4)
+            
+            print "=============== results for test_user_confirm_email_view ======"
+            pp.pprint(result)
+            print "=============== results for test_user_confirm_email_view /end ======"
 
 
 class BasicViewIntegrationTests(unittest.TestCase):
@@ -124,6 +137,8 @@ class BasicViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp()
         #self.config.include('pyramid_mailer.testing')
         self.config.include('c3sar')
+        from c3sar.models import DBSession, User
+        DBSession.remove()
 
     def tearDown(self):
         #self.session.remove()
@@ -136,7 +151,7 @@ class BasicViewIntegrationTests(unittest.TestCase):
     # def _makeOne(self, name
 
 
-    def off_test_home_view(self):
+    def test_home_view(self):
         from c3sar.views.basic import home_view
         from c3sar.models import DBSession
         dbsession = DBSession()
@@ -152,9 +167,11 @@ class BasicViewIntegrationTests(unittest.TestCase):
         # print "help(result.viewkeys()): " + str(help(result.viewkeys()))
         #for item in result:
         #    print item
-        #self.assertEqual(result.status, '200 OK')
+        self.assertEqual(result.status, '200 OK', "not 200 OK")
         #        self.assertTrue('form' in result.viewkeys(), 'form was not seen.')
+        if DEBUG:
+            print "--- in c3sar.tests.test_user_views.BasicViewIntegrationTests.test_home_view()"
         
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(result)
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(result)
         

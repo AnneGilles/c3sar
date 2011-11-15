@@ -30,6 +30,10 @@ class InitializeSqlTests(unittest.TestCase):
         #    self.session.remove()
             
     def _callFUT(self, engine):
+        """
+        call the function under test,
+        namely initialize_sql
+        """
         from c3sar.models import initialize_sql
         return initialize_sql(engine)
 
@@ -43,5 +47,5 @@ class InitializeSqlTests(unittest.TestCase):
             print str(DBSession.query(User).first())
             print str(DBSession.query(User).first().username)
 
-        self.assertEqual(DBSession.query(User).first().username,
-                         'firstUsername')
+        self.assertEqual(
+            DBSession.query(User).first().username,'firstUsername')
