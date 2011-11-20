@@ -15,8 +15,9 @@ def _initTestingDB():
     Base.metadata.create_all(engine)
     return DBSession
 
-def _registerRoutes(config):
-    config.add_route('register', '/register')
+#def _registerRoutes(config):
+#    config.add_route('register', '/register')
+#    config.add_route('home', '/')
 
 
 class UserViewIntegrationTests(unittest.TestCase):
@@ -95,6 +96,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         """
         from c3sar.views.user import user_confirm_email
         request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
         # mock values
         request.matchdict['code'] = 'IDoExist'
         request.matchdict['user_name'] = 'firstUsername'
