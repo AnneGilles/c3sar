@@ -395,12 +395,12 @@ def populate():
     dbsession.add(user2)
 
     band1 = Band(name=u"TestBand1", email=u"testband1@shri.de",
-                 homepage=u"http://testband.io", registrar="hans",
+                 homepage=u"http://testband.io", registrar=u"hans",
                  registrar_id=1)
     dbsession.add(band1)
 
     band2 = Band(name=u"TestBand2", email=u"testband2@shri.de",
-                 homepage=u"http://testband.com", registrar="paul",
+                 homepage=u"http://testband.com", registrar=u"paul",
                  registrar_id=2)
     dbsession.add(band2)
         
@@ -417,7 +417,7 @@ def populate():
         License(
             name=u"Creative Commons Attribution 3.0 Unported", 
             uri=u"http://creativecommons.org/licenses/by/3.0/",
-            img="http://i.creativecommons.org/l/by/3.0/88x31.png",
+            img=u"http://i.creativecommons.org/l/by/3.0/88x31.png",
             author=u"Somebody"
             )
         ]
@@ -432,13 +432,13 @@ def populate():
 #     Creative Commons Attribution 3.0 Unported License</a>.
     license1 = License(name=u"Creative Commons Attribution 3.0 Unported", 
                        uri=u"http://creativecommons.org/licenses/by/3.0/",
-                       img="http://i.creativecommons.org/l/by/3.0/88x31.png",
+                       img=u"http://i.creativecommons.org/l/by/3.0/88x31.png",
                        author=u"Somebody")
     dbsession.add(license1)
 
     license2 = License(name=u"All Rights reserved", 
                        uri=u"",
-                       img="",
+                       img=u"",
                        author=u"Somebody")
     dbsession.add(license2)
 
