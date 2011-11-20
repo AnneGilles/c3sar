@@ -23,6 +23,11 @@ requires = [
     'fdfgen',
     ]
 
+test_requirements = [
+    'WebTest',
+    'nose'
+    ]
+
 if sys.version_info[:3] < (2,5,0):
     requires.append('pysqlite')
 
@@ -45,6 +50,7 @@ setup(name='c3sar',
       zip_safe=False,
       test_suite='c3sar.tests',
       install_requires = requires,
+      tests_require = test_requirements,
       entry_points = """\
       [paste.app_factory]
       main = c3sar:main
