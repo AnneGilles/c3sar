@@ -55,7 +55,7 @@ class LicenseModelTests(unittest.TestCase):
     def _makeOne(self,
                  name=u'Some Licensename',
                  url=u'http://creativecommons.org/licenses/by-nc-sa/3.0/',
-                 img='http://i.creativecommons.org/l/by/3.0/88x31.png',
+                 img=u'http://i.creativecommons.org/l/by/3.0/88x31.png',
                  author=u'Some Name',
                  ):
         return self._getTargetClass()(name,url,img,author)
