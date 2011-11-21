@@ -81,18 +81,11 @@ def about_view(request):
 ########################################################## 404
 # http://docs.pylonsproject.org/projects/pyramid/1.1/narr/hooks.html
 #                                        #changing-the-notfound-view
-
-#from pyramid.exceptions import NotFound
-
-# from pyramid.view import AppendSlashNotFoundViewFactory
-
-
 from pyramid.httpexceptions import HTTPNotFound
 def notfound_view(context, request):
     return HTTPNotFound('It aint there, stop trying!')
 
 
-#################################################### favicon.ico
 # http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/static.html
 #                                    #serving-a-single-file-from-the-root
 from pyramid.response import Response

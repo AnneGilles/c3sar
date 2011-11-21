@@ -3,6 +3,9 @@ import unittest
 import pprint
 from pyramid import testing
 
+pp = pprint.PrettyPrinter(indent=4)
+
+
 DEBUG = True
 
 def _initTestingDB():
@@ -14,11 +17,6 @@ def _initTestingDB():
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
     return DBSession
-
-#def _registerRoutes(config):
-#    config.add_route('register', '/register')
-#    config.add_route('home', '/')
-
 
 class UserViewIntegrationTests(unittest.TestCase):
 
@@ -46,24 +44,13 @@ class UserViewIntegrationTests(unittest.TestCase):
         from c3sar.views.user import user_register
         request = testing.DummyRequest()
         self.config = testing.setUp(request=request)
-        # mailer = get_mailer(request)
+
         result = user_register(request)
-        # print "dir(result): " + str(dir(result))
-        # print "type(result): " + str(type(result))
-        # print "type(result.items): " + str(type(result.items))
-        # print "dir(result.items): " + str(dir(result.items))
-        # print "help(result.items): " + str(help(result.items))
-        # print "result.viewkeys(): " + str(result.viewkeys())
-        # print "help(result.viewkeys()): " + str(help(result.viewkeys()))
-        #for item in result:
-        #    print item
-        #self.assertEqual(result.status, '200 OK')
 
         self.assertTrue('form' in result.viewkeys(), 'form was not seen.')
 
         if DEBUG:
             print "--- in c3sar.tests.test_user_views.UserViewIntegrationTests.test_home_view()"
-            pp = pprint.PrettyPrinter(indent=4)
             pp.pprint(result)
         
         
@@ -73,21 +60,14 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp(request=request)
         # mailer = get_mailer(request)
         result = user_register(request)
-        # print "dir(result): " + str(dir(result))
-        # print "type(result): " + str(type(result))
-        # print "type(result.items): " + str(type(result.items))
-        # print "dir(result.items): " + str(dir(result.items))
-        # print "help(result.items): " + str(help(result.items))
-        # print "result.viewkeys(): " + str(result.viewkeys())
-        # print "help(result.viewkeys()): " + str(help(result.viewkeys()))
-        #for item in result:
-        #    print item
-        #self.assertEqual(result.status, '200 OK')
+
+        print "the result of test_user_add_view:user_register(request):"
+        pp.pprint(result)
+
         self.assertTrue('form' in result.viewkeys(), 'form was not seen.')
 
         if DEBUG:
             print "--- in c3sar.tests.test_user_views.UserViewIntegrationTests.test_user_add_view()"
-            pp = pprint.PrettyPrinter(indent=4)
             pp.pprint(result)
 
     def test_user_confirm_email_view(self):
@@ -125,8 +105,6 @@ class UserViewIntegrationTests(unittest.TestCase):
         if DEBUG:
             print "--- in c3sar.tests.test_user_views.UserViewIntegrationTests.test_user_confirm_email_view()"
 
-            pp = pprint.PrettyPrinter(indent=4)
-            
             print "=============== results for test_user_confirm_email_view ======"
             pp.pprint(result)
             print "=============== results for test_user_confirm_email_view /end ======"
@@ -172,7 +150,6 @@ class BasicViewIntegrationTests(unittest.TestCase):
         print "type(result.items): " + str(type(result.items))
         print "dir(result.items): " + str(dir(result.items))
         print "result, prettyprinted: "
-        pp = pprint.PrettyPrinter(indent=4)
         pp.pprint(result)
         # print "help(result.items): " + str(help(result.items))
         # print "result.viewkeys(): " + str(result.viewkeys())

@@ -113,12 +113,12 @@ class UserModelTests(unittest.TestCase):
         #         # Make sure the view is not visible to the public
         #         self.assertRaises(Forbidden, app.get, url)
         
-    def test_user_listing(self):
-        instance = self._makeOne()
-        user_cls = self._getTargetClass()
-        result = user_cls.user_listing('foo')
-        if DEBUG:
-            print "user_cls.user_listing('foo')" + repr(result)
+#     def test_user_listing(self):
+#         instance = self._makeOne()
+#         user_cls = self._getTargetClass()
+#         result = user_cls.user_listing('foo')
+#         if DEBUG:
+#             print "user_cls.user_listing('foo')" + repr(result)
 
         #result =
 #        print help(user_cls.user_listing('foo'))
@@ -149,59 +149,6 @@ class UserModelTests(unittest.TestCase):
 #         result = User.check_password('SomeUsername', instance.password)
 
 #         self.assertTrue(result, "result was not True")
-
-
-
-# class EmailAddressModelTests(unittest.TestCase):
-    
-#     def setUp(self):
-#         self.session = _initTestingDB()
-
-#     def tearDown(self):
-#         #print dir(self.session)
-#         #self.session.remove()
-#         pass
-
-#     def _getTargetClass(self):
-#         from c3sar.models import EmailAddress
-#         return EmailAddress
-
-#     def _makeOne(self, 
-#                  email_address='test@shri.de'):
-#         return self._getTargetClass()(email_address)
-    
-
-#     def test_constructor(self):
-#         instance = self._makeOne()
-#         self.assertEqual(instance.email_address, 'test@shri.de')
-#         self.assertEqual(instance.__repr__(), "<Address('test@shri.de')>")
-#         #print "repr: " + instance.__repr__()
-
-
-# class PhoneNumberModelTests(unittest.TestCase):
-    
-#     def setUp(self):
-#         self.session = _initTestingDB()
-
-#     def tearDown(self):
-#         #print dir(self.session)
-#         #self.session.remove()
-#         pass
-
-#     def _getTargetClass(self):
-#         from c3sar.models import PhoneNumber
-#         return PhoneNumber
-
-#     def _makeOne(self, 
-#                  phone_number='06421-98300422'):
-#         return self._getTargetClass()(phone_number)
-    
-
-#     def test_constructor(self):
-#         instance = self._makeOne()
-#         self.assertEqual(instance.phone_number, '06421-98300422')
-#         self.assertEqual(instance.__repr__(), "<PhoneNumber('06421-98300422')>")
-#         #print "repr: " + instance.__repr__()
 
 
 
