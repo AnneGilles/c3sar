@@ -16,20 +16,19 @@ from sqlalchemy.types import (
     Boolean,
     DateTime,
 )
-
-
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
     relationship,
-    backref,
     synonym,
 )
 from sqlalchemy.sql import func
 
 from zope.sqlalchemy import ZopeTransactionExtension
+
+from pyramid.security import Allow
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
@@ -106,14 +105,17 @@ class User(Base):
 #        return [ str(group.name) for group in self.groups ]
 
     def __init__(self, username, password, surname, lastname, 
-                 email, email_is_confirmed, email_confirmation_code):
+                 email, email_is_confirmed, email_confirm_code,
+                 phone, fax):
         self.username = username
         self.surname = surname
         self.lastname = lastname
         self.password = password
         self.email = email
         self.email_is_confirmed = email_is_confirmed
-        self.email_confirmation_code = email_confirmation_code
+        self.email_confirm_code = email_confirm_code
+        self.phone = phone
+        self.fax = fax
         self.date_registered = datetime.now()
         self.last_login = datetime.now()
 
@@ -377,10 +379,11 @@ def populate():
 
     user1 = User(username=u'firstUsername', surname=u'firstSurname',
                  lastname=u'firstLastname',password=u'password',
-                 email = u'first1@shri.de', email_confirmation_code = u'barfbarf',
-                 email_is_confirmed=True)
-    user1.phone = u'+49 6421 968300422'
-    user1.fax = u'+49 6421 690 6996'
+                 email = u'first1@shri.de', email_confirm_code = u'barfbarf',
+                 email_is_confirmed=True,
+                 phone = u'+49 6421 968300422',
+                 fax = u'+49 6421 690 6996',
+                 )
     user1.set_address(street=u'Teststraße', number=u'1234a',
                       postcode=u'35039', city=u'Marburg Mitte',
                       country=u'Deutschland')
@@ -388,10 +391,11 @@ def populate():
 
     user2 = User(username=u'secondUsername', surname=u'secondSurname',
                  lastname=u'secondSurname',password=u'password',
-                 email = u'second1@shri.de', email_confirmation_code = u'möökmöök',
-                 email_is_confirmed=False)
-
-    user2.phone = u'+49 6421 968300421'
+                 email = u'second1@shri.de', email_confirm_code = u'möökmöök',
+                 email_is_confirmed=False,
+                 phone = u'+49 6421 968300421',
+                 fax = u"",
+                 )
     dbsession.add(user2)
 
     band1 = Band(name=u"TestBand1", email=u"testband1@shri.de",
