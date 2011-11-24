@@ -11,7 +11,7 @@ def _initTestingDB():
     from c3sar.models import DBSession
     from c3sar.models import Base
     from sqlalchemy import create_engine
-    engine = create_engine('sqlite://testing.userviews.db')
+    engine = create_engine('sqlite:///testing.userviews.db')
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
@@ -22,15 +22,15 @@ class UserViewIntegrationTests(unittest.TestCase):
     We test the views in c3sar.views.user.py
     """
     def setUp(self):
-        #self.session = _initTestingDB()
-        #import c3sar
+        self.dbsession = _initTestingDB()
         self.config = testing.setUp()
         #self.config.include('pyramid_mailer.testing')
         self.config.include('c3sar')
-        from c3sar.models import DBSession#, User
-        DBSession.remove()
+        self.dbsession.remove()
 
     def tearDown(self):
+        import transaction
+        transaction.abort()
         #self.session.remove()
         testing.tearDown()
 
@@ -57,11 +57,8 @@ class UserViewIntegrationTests(unittest.TestCase):
         request = testing.DummyRequest()
         self.config = testing.setUp(request=request)
         result = user_register(request)
-        #print "--- in test_user_register_view()"
-        #pp.pprint(result)
-
         # test: a form exists
-        self.assertTrue('form' in result.items(), 'form was not seen.')
+        self.assertTrue('form' in result.items()[0], 'form was not seen.')
 
 
     def test_user_register_not_validating(self):
@@ -74,7 +71,10 @@ class UserViewIntegrationTests(unittest.TestCase):
         pp.pprint(result.items())
 
         # test: form exists
-        self.assertTrue('form' in result.items(), 'form was not seen.')
+        self.assertTrue('form' in result.items()[0], 'form was not seen.')
+        # test: form is not validated
+        self.assertTrue(not result['form'].form.is_validated, 
+                        'form validated unexpectedly.')
         # TODO: test that form is not validating...
         # maybe rather a functional test?
 
@@ -96,4 +96,9 @@ class UserViewIntegrationTests(unittest.TestCase):
         result = user_confirm_email(request)
         #pp.pprint(result)
         #TODO
-        self.assertTrue(result)
+        import pdb 
+        pdb.set_trace()
+        # result['result_msg']
+        self.assertEquals(
+            result['result_msg'],
+            "Something didn't work. Please check whether you tried the right URL.")
