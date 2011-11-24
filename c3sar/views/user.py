@@ -166,7 +166,7 @@ def user_confirm_email(request):
     conf_code = request.matchdict['code']
     user_name = request.matchdict['user_name']
     user_email = request.matchdict['user_email']
-    # XXX ToDo: refactor to also check email-address belongs to user...
+
     if DEBUG:
         print " -- confirmation code: " + conf_code
         print " -- user name: " + user_name

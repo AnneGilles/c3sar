@@ -23,7 +23,10 @@ def _registerCommonTemplates(config):
     config.testing_add_renderer('templates/listen.pt')
 
 
-class ViewTests(unittest.TestCase):
+class BasicViewTests(unittest.TestCase):
+    """
+    test the views in c3sar.views.basic.py
+    """
     def setUp(self):
         self.session = _initTestingDB()
         self.config = testing.setUp()
@@ -33,11 +36,16 @@ class ViewTests(unittest.TestCase):
         transaction.abort()
         testing.tearDown()
 
+
     def test_home_view(self):
         from c3sar.views.basic import home_view
         _registerCommonTemplates(self.config)
         request = testing.DummyRequest()
-        home_view(request)
+        result = home_view(request)
+        #print "ergebnis :" + str(dir(result))
+        #print "ergebnis typ:" + str(type(result))
+        #print "ergebnis.items() :" + str(result.items())
+        #self.assertTrue('Basic Functionality' in result.body, "text not found")
 
     def test_listen_view(self):
         from c3sar.views.basic import listen_view
