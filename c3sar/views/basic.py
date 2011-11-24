@@ -99,7 +99,7 @@ _fi_response = Response(content_type='image/x-icon',
                         body=_icon)
 
 @view_config(name='favicon.ico')
-def favicon_view(context, request):
+def favicon_view(request):
     return _fi_response
 
 
