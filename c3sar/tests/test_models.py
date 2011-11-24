@@ -73,12 +73,16 @@ class UserModelTests(unittest.TestCase):
                  lastname=u'SomeLastname',
                  email=u'some@email.de',
                  email_is_confirmed=False,
-                 email_confirmation_code=u'ABCDEFG'
+                 email_confirm_code=u'ABCDEFG',
+                 phone=u"09876 54321",
+                 fax=u"09876 54322"
                  ):
         #print "type(self.session): " + str(type(self.session))
-        return self._getTargetClass()(username,password,surname,lastname,
-                                      email,email_is_confirmed,email_confirmation_code
-                                      )
+        return self._getTargetClass()(
+            username,password,surname,lastname,
+            email,email_is_confirmed,email_confirm_code,
+            phone, fax,
+            )
     
 
     def test_constructor(self):
@@ -93,9 +97,10 @@ class UserModelTests(unittest.TestCase):
         # XXX ToDo: how to test the password !?
         #print "result of instance.get_password: " + instance._get_password()
         self.assertEqual(instance.email, 'some@email.de', "No match!")
-        self.assertEqual(instance.email_confirmation_code, 'ABCDEFG', "No match!")
+        self.assertEqual(instance.email_confirm_code, 'ABCDEFG', "No match!")
         self.assertEqual(instance.email_is_confirmed, False, "expected False")
-
+        self.assertEqual(instance.phone, '09876 54321', "No match!")
+        self.assertEqual(instance.fax, '09876 54322', "No match!")
         #     # def test_acl(self):
         #     #     instance = self._makeOne()
         #     #     print "ACLs: " + repr(instance.__acl__())

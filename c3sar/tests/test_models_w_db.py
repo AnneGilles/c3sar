@@ -202,10 +202,14 @@ class UserModelTests(unittest.TestCase):
                  lastname=u'SomeLastname',
                  email=u'example@example.com',
                  email_is_confirmed=False,
-                 email_confirmation_code=u'SomeTestCode'
+                 email_confirmation_code=u'SomeTestCode',
+                 phone=u"09876 54321",
+                 fax=u"09876 54322",
                  ):
-        return self._getTargetClass()(username,password,surname,lastname,
-                                      email,email_is_confirmed,email_confirmation_code)
+        return self._getTargetClass()(
+            username,password,surname,lastname,
+            email,email_is_confirmed,email_confirmation_code,
+            phone, fax)
 
 
     def test_constructor(self):
@@ -225,6 +229,8 @@ class UserModelTests(unittest.TestCase):
         self.assertNotEqual(instance._get_password(), 'password', "Password was revealed")
         # password hash is not empty
         self.assertNotEqual(instance._get_password(), '', "Password hash was empty!")
+        self.assertEqual(instance.phone, '09876 54321', "Not a match!")
+        self.assertEqual(instance.fax, '09876 54322', "Not a match!")
 
     def test_user_listing(self):
         if DEBUG: print "----- this is UserModelTests.test_user_listing"
