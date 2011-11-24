@@ -96,8 +96,8 @@ class UserViewIntegrationTests(unittest.TestCase):
         result = user_confirm_email(request)
         #pp.pprint(result)
         #TODO
-        import pdb 
-        pdb.set_trace()
+        #import pdb 
+        #pdb.set_trace()
         # result['result_msg']
         self.assertEquals(
             result['result_msg'],
