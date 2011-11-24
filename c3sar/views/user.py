@@ -33,7 +33,7 @@ from c3sar.views.validators import (
     )
 
 
-DEBUG = False
+DEBUG = True
 
 #@view_config(route_name='register',
 #             permission='view',
@@ -97,13 +97,12 @@ def user_register(request):
             password = form.data['password'],
             surname = form.data['surname'],
             lastname = form.data['lastname'],
+            email = form.data['email'],
+            email_is_confirmed = False,
+            email_confirm_code = randomstring,
+            phone = form.data['phone'],
+            fax = form.data['fax'],
             )
-        user.email = form.data['email']
-        user.email_is_confirmed = False
-        user.email_confirmation_code = randomstring
-
-        user.phone = form.data['phone']
-
         user.set_address(street=form.data['street'],
                          number=form.data['number'],
                          postcode=form.data['postcode'],
@@ -143,12 +142,9 @@ def user_register(request):
 
         redirect_url = route_url('home', request)
 
-
         return HTTPFound(location = redirect_url, headers=headers)
 
-    return {
-        'form': FormRenderer(form),
-        }
+    return {'form': FormRenderer(form),}
 
 
 @view_config(route_name='confirm_email',
@@ -165,6 +161,7 @@ def user_confirm_email(request):
     - the email address in question is confirmed as validated
     - the database entry is changed to reflect this
     """
+    DEBUG = False
     # values from URL/matchdict
     conf_code = request.matchdict['code']
     user_name = request.matchdict['user_name']
@@ -175,11 +172,11 @@ def user_confirm_email(request):
         print " -- user name: " + user_name
         print " -- user email: " + user_email
 
-    dbsession = DBSession()
     #get matching user from db
     user = User.get_by_username(user_name)
-    if DEBUG: print "--- in users.py:user_confirm_email: type(user): " + str(type(user))
-
+    if DEBUG: 
+        print "--- in users.py:user_confirm_email: type(user): " + str(type(user))
+        print "users attributes: " + str(dir(user))
     # check if the information in the matchdict makes sense
     #  - user
     #  -
@@ -189,21 +186,23 @@ def user_confirm_email(request):
             print "user is of type NoneType"
         return {'result_msg': "Something didn't work. Please check whether you tried the right URL."}
 
-    # get all email addresses of that user into a list
-    for item in user.email_addresses:
+    if (user.email == user_email):
+        print "this one matched! " + str(user_email)
 
-        if (item.email_address == user_email):
-            print "this one matched!"
+        if (user.email_is_confirmed):
+            print "confirmed already"
+            return {'result_msg': "Your email address was confirmed already." }
 
-            if (item.is_confirmed):
-                return {'result_msg': "Your email address was confirmed already." }
+        print "checking confirmation code..."
+        if (user.email_confirm_code == conf_code):
+            print "conf code " + str(conf_code)
+            print "user.conf code " + str(user.email_confirm_code)
 
-            if (item.confirm_code == conf_code):
-                if DEBUG:
-                    print " -- found the right confirmation code in db"
-                    print " -- set this email address as confirmed."
-                item.is_confirmed = True
-                return {'result_msg': "Thanks! You email address has been confirmed." }
+            if DEBUG:
+                print " -- found the right confirmation code in db"
+                print " -- set this email address as confirmed."
+            user.email_is_confirmed = True
+            return {'result_msg': "Thanks! Your email address has been confirmed." }
     # else
     return {'result_msg': "Verification has failed. Bummer!"}
 
