@@ -16,8 +16,6 @@
     <!--[if lte IE 6]>
 	<link rel="stylesheet" href="${request.static_url('c3sar:static/ie6.css')}" type="text/css" media="screen" charset="utf-8" />
 	<![endif]-->
-
-    <script type="text/javascript" src="static/jaraoke.js"></script>
   </head>
   <body>
     <div id="wrap">
