@@ -8,8 +8,6 @@ from c3sar.security.request import RequestWithUserAttribute
 # for user sessioning
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
-from pyramid.security import unauthenticated_userid
-#from pyramid.session import UnencryptedCookieSessionFactoryConfig
 # user sessioning with pyramid_beaker
 from pyramid_beaker import session_factory_from_settings
 
@@ -36,7 +34,6 @@ def main(global_config, **settings):
     #initialize_s3()
 
     # user sessioning
-    #session_factory = UnencryptedCookieSessionFactoryConfig('secret')
     session_factory = session_factory_from_settings(settings)
     authn_policy = AuthTktAuthenticationPolicy('s0secret!!')
     authz_policy = ACLAuthorizationPolicy()
@@ -57,6 +54,9 @@ def main(global_config, **settings):
                     route_name='home',
                     renderer='templates/main.pt'
                     )
+    config.add_route('favicon.ico', '/favicon.ico')
+    config.add_view('c3sar.views.basic.favicon_view', 
+                    route_name='favicon.ico')
     # config.add_view('c3sar.views.my_view.my_view',
     #                 route_name='home',
     #                 renderer='templates/mytemplate.pt'
@@ -82,13 +82,17 @@ def main(global_config, **settings):
                     renderer='templates/not_implemented.pt'
                     )
 
-    # not found
+    # general 404: catchall if not found / wrong URL 
+    from pyramid.httpexceptions import HTTPNotFound
+    from c3sar.views.basic import notfound_view
+    config.add_view(notfound_view, context=HTTPNotFound)
+
+    # special 404: not found view to redirect to 
     config.add_route('not_found', '/not_found')
     config.add_view('c3sar.views.basic.not_found_view',
                     route_name='not_found',
                     renderer='templates/not_found.pt'
                     )
-
 
     # prepare to use the base template
     config.add_subscriber('c3sar.subscribers.add_base_template',
