@@ -81,13 +81,14 @@ class UserViewIntegrationTests(unittest.TestCase):
 
 
     def test_user_register_not_validating(self):
+        """
+        test the register view
+        """
         from c3sar.views.user import user_register
         request = testing.DummyRequest()
         request.POST = {'username': "foo"}
         self.config = testing.setUp(request=request)
         result = user_register(request)
-        #print "--- test_user_register_not_validating()"
-        #pp.pprint(result.items())
 
         # test: form exists
         self.assertTrue('form' in result.items()[0], 'form was not seen.')
@@ -129,28 +130,116 @@ class UserViewIntegrationTests(unittest.TestCase):
         result = login_view(request)
         self.assertTrue('form' in result.items()[0], 'form was not seen.')
         
-    def test_user_login_view_login(self):
+    def test_user_login_view_wrong_username(self):
         """
-        testing the login view AND try to log in
+        testing the login view AND try to log in with a wrong username
         """
         from c3sar.views.user import login_view
-        #from pyramid.request import Request
-        #request = Request()
         request = testing.DummyRequest(
-            post={'username':u'paul', 'password':u'pass'})
+            post={'submit':True,
+                  'username':u'paul',
+                  'password':u'pass'})
         self.config = testing.setUp(request=request)
 
-        self.assertEquals(request.POST,
-                          {'password': 'pass', 'username': 'paul'})
-
+        self.assertEquals(request.POST,{'submit': True,
+                                        'password': 'pass',
+                                        'username': 'paul'})
         result = login_view(request)
-        
+
         # test: form exists
         self.assertTrue('form' in result.items()[0], 'form was not seen.')
         # test: form does not validate
         self.assertTrue(not result['form'].form.validate())
+        # test: unknown username
+        self.assertEquals(result['form'].form.errors,
+                          {'username': 'That username does not exist'},
+                          "expected error message not found")
 
-    
+    def test_user_login_view_valid_user_invalidChar_pw(self):
+        """
+        login view - try login with valid user but invalid characters in password
+        """
+        from c3sar.views.user import login_view
+        my_user = self._makeUser()
+        self.dbsession.add(my_user)
+        request = testing.DummyRequest(
+            post={'submit': True,
+                  'username': my_user.username,
+                  'password': 'schmööp schmööp'})
+        self.config = testing.setUp(request=request)
+        result = login_view(request)
+
+        #pp.pprint( result)
+        #import pdb
+        #pdb.set_trace()
+
+        # test: form exists
+        self.assertTrue('form' in result.items()[0], 'form was not seen.')
+        # test: form does not validate
+        self.assertTrue(not result['form'].form.validate(),
+                        "the form should not validate,"
+                        "because of invalid chars in password")
+        # test: unknown username
+        self.assertEquals(
+            result['form'].form.errors,
+            {'password': u'Enter only letters, numbers, or _ (underscore)'},
+            "expected error message was not found")
+
+    def test_user_login_view_valid_user_wrong_pw(self):
+        """
+        login view - try login with a valid username but wrong password
+        """
+        from c3sar.views.user import login_view
+        my_user = self._makeUser()
+        self.dbsession.add(my_user)
+        request = testing.DummyRequest(
+            post={'submit': True,
+                  'username': my_user.username,
+                  'password': 'N0T_THE_RIGHT_PW_but_a_v4l1d_0nE'})
+        self.config = testing.setUp(request=request)
+        result = login_view(request)
+
+        #pp.pprint( result)
+        #import pdb
+        #pdb.set_trace()
+
+        # test: form exists
+        self.assertTrue('form' in result.items()[0], 'form was not seen.')
+        # test: form does not validate
+        self.assertTrue(result['form'].form.validate(),
+                        "the form should validate, even with a wrong password")
+        # test: unknown username
+        self.assertEquals(
+            result['form'].form.errors,
+            {},
+            "expected NO error message")
+
+    def test_user_login_view_valid_user_and_pw(self):
+        """
+        test login view -- try to log in with a valid username and pw
+        """
+        from c3sar.views.user import login_view
+        _registerRoutes(self.config)
+        my_user = self._makeUser()
+        self.dbsession.add(my_user)
+        request = testing.DummyRequest(
+            post={'submit':True,
+                  'username':my_user.username,
+                  'password': 'password'}) # the right password
+        self.config = testing.setUp(request=request)
+        result = login_view(request)
+
+        print "the result: "
+        pp.pprint(result)
+
+        # test: view returns a redirect
+        self.assertTrue(isinstance(result, HTTPFound))
+
+        # # test: form exists
+        # self.assertTrue('form' in result.items()[0], 'form was not seen.')
+        # # test: form does not validate
+        # self.assertTrue(not result['form'].form.validate())
+
 
     def test_logout_view(self):
         """
@@ -286,12 +375,41 @@ class UserViewIntegrationTests(unittest.TestCase):
         instance = self._makeUser()
         self.dbsession.add(instance)
 
-        #import pdb
-        #pdb.set_trace()
         result = user_view(request)
 
         #print "result: "
         #pp.pprint(result)
+
+        #print "result['user'].username: "
+        #pp.pprint(result['user'].username)
+
+        # test: view returns a dict containing a user
+        self.assertEquals(result['user'].username, instance.username)
+
+        #print "result['users']: "
+        #pp.pprint(result['users'])
+        # test: view returns an empty list of users
+        #self.assertTrue(result['users'] ==  [])
+
+    def test_user_profile(self):
+        """
+        test the user_profile view
+
+        if a user with user_id from URL exists,
+        
+        """
+        from c3sar.views.user import user_profile
+        request = testing.DummyRequest()
+        request.matchdict['user_id'] = '1'
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+
+        result = user_profile(request)
+
+        print "result: "
+        pp.pprint(result)
 
         #print "result['user'].username: "
         #pp.pprint(result['user'].username)

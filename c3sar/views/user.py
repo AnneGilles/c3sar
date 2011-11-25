@@ -199,7 +199,8 @@ def user_confirm_email(request):
 #             permission='view',
 #             renderer='../templates/login.pt')
 def login_view(request):
-
+    DEBUG = True
+    if DEBUG: print "this is login_view"
     came_from = "space"
     headers = None
     logged_in = authenticated_userid(request)
@@ -226,31 +227,43 @@ def login_view(request):
     #request.session.flash(post_data)
 
     if not 'submit' in post_data:
-        if DEBUG: request.session.flash('not submitted!')
+        if DEBUG:
+            request.session.flash('not submitted!')
+            print "not submitted"
 
     if 'submit' in post_data and not form.validate():
-        request.session.flash(u'form didnt validate')
-
+        if DEBUG:
+            request.session.flash(u'form didnt validate')
+            print 'form didnt validate'
+            
     if 'submit' in post_data and form.validate():
 
         login = post_data['username']
-        if DEBUG: request.session.flash(u'username: ' + login)
-
+        if DEBUG:
+            request.session.flash(u'username: ' + login)
+            print u'username: ' + str(login)
+            
         password = post_data['password']
-        if DEBUG: request.session.flash(password)
-
+        if DEBUG:
+            request.session.flash(password)
+            print "password: " + str(password)
         if User.check_password(login, password):
             if DEBUG:
                 request.session.flash(u'User.check_password was True!')
                 request.session.flash(u'login: ' + login)
+                print 'User.check_password was True!'
             headers = remember(request, login)
-
-            home_view = route_url('home', request)
-            came_from = request.params.get('came_from', home_view)
+            
+            #home_view = route_url('home', request)
+            #came_from = request.params.get('came_from', home_view)
 
             if DEBUG:
                 request.session.flash(u'Logged in successfully.')
-            return HTTPFound(location = came_from, headers=headers)
+                print 'Logged in successfully.'
+                #print "home_view: " + str(home_view)
+                #print "came_from: " + str(came_from)
+                print "will login the user and redirect her"
+            return HTTPFound(location = route_url('home'), headers=headers)
 
         else:
             request.session.flash(
@@ -258,10 +271,12 @@ def login_view(request):
                 'passwordcheck')                        # to queue
             if DEBUG:
                 request.session.flash(u'User.check_password was NOT True!')
+                print 'User.check_password was NOT True!'
                 request.session.flash(u'account not found or passwords didnt match')
 
     if DEBUG:
         request.session.flash(u'Failed to login. Musta been errors!')
+    print "returning the form" 
     return {
         'form': FormRenderer(form),
         }
