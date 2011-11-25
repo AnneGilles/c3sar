@@ -102,3 +102,16 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.assertEquals(
             result['result_msg'],
             "Something didn't work. Please check whether you tried the right URL.")
+        #TODO... fix this.
+        #how to supply the parameters and make validation work?
+
+    def test_user_login_view(self):
+        """
+        testing the login view
+        """
+        from c3sar.views.user import login_view
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        result = login_view(request)
+        self.assertTrue('form' in result.items()[0], 'form was not seen.')
+        

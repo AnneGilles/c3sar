@@ -60,18 +60,12 @@ def user_register(request):
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
         request.session.flash('form does not validate!')
-        #request.session.flash(form.data['username'])
-        #request.session.flash(form.data['password'])
-        #request.session.flash(form.data['surname'])
-        #request.session.flash(form.data['lastname'])
-        #request.session.flash(form.data['email'])
 
     if 'form.submitted' in request.POST and form.validate():
         # ready for registration!
         request.session.flash('form validated!')
         dbsession = DBSession()
         username = form.data['username']
-
 
         message = Message(subject = "C3S: confirm your email address",
                           sender = "noreply@c-3-s.org",
@@ -153,56 +147,49 @@ def user_register(request):
 # url structure: /user/confirm/{code}/{user_name}/{user_email}
 def user_confirm_email(request):
     """
-    this view takes two arguments from the URL aka request.matchdict
+    this view takes three arguments from the URL aka request.matchdict
     - code
-    - user_name
+    - user name
+    - user email
     and tries to match them to database entries.
     if matching is possible,
     - the email address in question is confirmed as validated
     - the database entry is changed to reflect this
     """
-    DEBUG = False
     # values from URL/matchdict
     conf_code = request.matchdict['code']
     user_name = request.matchdict['user_name']
     user_email = request.matchdict['user_email']
 
-    if DEBUG:
-        print " -- confirmation code: " + conf_code
-        print " -- user name: " + user_name
-        print " -- user email: " + user_email
-
     #get matching user from db
     user = User.get_by_username(user_name)
-    if DEBUG: 
-        print "--- in users.py:user_confirm_email: type(user): " + str(type(user))
-        print "users attributes: " + str(dir(user))
+    
     # check if the information in the matchdict makes sense
     #  - user
-    #  -
-
     if isinstance(user, NoneType):
-        if DEBUG:
-            print "user is of type NoneType"
-        return {'result_msg': "Something didn't work. Please check whether you tried the right URL."}
-
+        #print "user is of type NoneType"
+        return {
+            'result_msg':
+            "Something didn't work. Please check whether you tried the right URL."
+            }
+    # - email
     if (user.email == user_email):
-        print "this one matched! " + str(user_email)
+        #print "this one matched! " + str(user_email)
 
         if (user.email_is_confirmed):
-            print "confirmed already"
-            return {'result_msg': "Your email address was confirmed already." }
-
-        print "checking confirmation code..."
+            #print "confirmed already"
+            return {'result_msg': "Your email address was confirmed already."}
+        # - confirm code
+        #print "checking confirmation code..."
         if (user.email_confirm_code == conf_code):
-            print "conf code " + str(conf_code)
-            print "user.conf code " + str(user.email_confirm_code)
+            #print "conf code " + str(conf_code)
+            #print "user.conf code " + str(user.email_confirm_code)
 
-            if DEBUG:
-                print " -- found the right confirmation code in db"
-                print " -- set this email address as confirmed."
+            #print " -- found the right confirmation code in db"
+            #print " -- set this email address as confirmed."
             user.email_is_confirmed = True
-            return {'result_msg': "Thanks! Your email address has been confirmed." }
+            return {'result_msg':
+                    "Thanks! Your email address has been confirmed." }
     # else
     return {'result_msg': "Verification has failed. Bummer!"}
 
@@ -229,23 +216,9 @@ def login_view(request):
 
     form = Form(request, LoginSchema)
 
-    home_view = route_url('home', request)
-    came_from = request.params.get('came_from', home_view)
-
-#    login_url = resource_url(request.context, request, 'login')
-#    login_url = request.url
-#    referrer = request.url
     logged_in = authenticated_userid(request)
-    loggedin =  authenticated_userid(request)
     request.session.flash(logged_in)
 
-#    if referrer == login_url:
-#        referrer = '/'
-
-#    came_from = request.params.get('came_from', referrer)
-
-    username = ''
-    message = ''
     login = ''
     password = ''
 
@@ -271,6 +244,10 @@ def login_view(request):
                 request.session.flash(u'User.check_password was True!')
                 request.session.flash(u'login: ' + login)
             headers = remember(request, login)
+
+            home_view = route_url('home', request)
+            came_from = request.params.get('came_from', home_view)
+
             if DEBUG:
                 request.session.flash(u'Logged in successfully.')
             return HTTPFound(location = came_from, headers=headers)
