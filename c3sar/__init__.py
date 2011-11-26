@@ -24,6 +24,7 @@ def includeme(config):
 #    c3sar = mailer_factory_from_settings(settings, prefix=prefix)
 #    config.registry.registerUtility(mailer, IMailer)
 
+
 def main(global_config, **settings):
     """
     This function returns a Pyramid WSGI application.
@@ -39,9 +40,9 @@ def main(global_config, **settings):
     authz_policy = ACLAuthorizationPolicy()
 
     config = Configurator(settings=settings,
-                          authentication_policy = authn_policy,
-                          authorization_policy  = authz_policy,
-                          session_factory = session_factory,
+                          authentication_policy=authn_policy,
+                          authorization_policy=authz_policy,
+                          session_factory=session_factory,
                           )
 
     # using a custom request with user information
@@ -55,7 +56,7 @@ def main(global_config, **settings):
                     renderer='templates/main.pt'
                     )
     config.add_route('favicon.ico', '/favicon.ico')
-    config.add_view('c3sar.views.basic.favicon_view', 
+    config.add_view('c3sar.views.basic.favicon_view',
                     route_name='favicon.ico')
     # config.add_view('c3sar.views.my_view.my_view',
     #                 route_name='home',
@@ -82,12 +83,12 @@ def main(global_config, **settings):
                     renderer='templates/not_implemented.pt'
                     )
 
-    # general 404: catchall if not found / wrong URL 
+    # general 404: catchall if not found / wrong URL
     from pyramid.httpexceptions import HTTPNotFound
     from c3sar.views.basic import notfound_view
     config.add_view(notfound_view, context=HTTPNotFound)
 
-    # special 404: not found view to redirect to 
+    # special 404: not found view to redirect to
     config.add_route('not_found', '/not_found')
     config.add_view('c3sar.views.basic.not_found_view',
                     route_name='not_found',
@@ -106,7 +107,8 @@ def main(global_config, **settings):
                      renderer='templates/user_add.pt'
                      )
     # user confirm_email
-    config.add_route('confirm_email', '/user/confirm/{code}/{user_name}/{user_email}')
+    config.add_route('confirm_email',
+                     '/user/confirm/{code}/{user_name}/{user_email}')
     config.add_view('c3sar.views.user.user_confirm_email',
                     route_name='confirm_email',
                     renderer='templates/user_confirm_email.pt')
@@ -129,13 +131,13 @@ def main(global_config, **settings):
                     renderer='templates/user_profile.pt')
 
     # user edit
-    config.add_route('user_edit_no_id', '/user/edit') # if no id appended
+    config.add_route('user_edit_no_id', '/user/edit')  # if no id appended
     config.add_view('c3sar.views.user.user_edit',
                     route_name='user_edit_no_id',
                     renderer='templates/user_edit_table.pt')
 
     config.add_route('user_edit', '/user/edit/{user_id}')
-    #config.add_route('user_edit', '/user/edit/{user_id}', 
+    #config.add_route('user_edit', '/user/edit/{user_id}',
     #                 traverse='/{user_id}')
     #config.add_route('user_edit', '/user/edit/{user_id}',
     #                 factory=UserContainer,
@@ -160,8 +162,10 @@ def main(global_config, **settings):
                     route_name='logout',
                     renderer='templates/user_login.pt')
     # user set default license
-    config.add_route('user_set_default_license', '/user/set_default_license/{user_id}')
-    # config.add_route('user_edit', '/user/edit/{user_id}', traverse='/{user_id}')
+    config.add_route('user_set_default_license',
+                     '/user/set_default_license/{user_id}')
+    # config.add_route('user_edit',
+    #                  '/user/edit/{user_id}', traverse='/{user_id}')
     #config.add_route('user_edit', '/user/edit/{user_id}',
     #                 factory=UserContainer,
     #                 )
@@ -170,12 +174,14 @@ def main(global_config, **settings):
                     renderer='templates/user_set_default_license.pt')
 
     # user get contract with id in filename
-    config.add_route('user_contract_de', '/user/bv/C3S_contract_de.{user_id}.pdf')
+    config.add_route('user_contract_de',
+                     '/user/bv/C3S_contract_de.{user_id}.pdf')
     config.add_view('c3sar.views.user.user_contract_de',
                     route_name='user_contract_de')
 
     # user get contract with username in filename
-    config.add_route('user_contract_de_username', '/user/bv/C3S_contract_{username}.pdf')
+    config.add_route('user_contract_de_username',
+                     '/user/bv/C3S_contract_{username}.pdf')
     config.add_view('c3sar.views.user.user_contract_de_username',
                     route_name='user_contract_de_username')
 
@@ -183,7 +189,6 @@ def main(global_config, **settings):
     #    config.add_route('user_get_bv', '/user/bv/{user_id}')
     #    config.add_view('c3sar.views.user.user_get_bv',
     #                    route_name='user_get_bv')
-    
 
     config.add_route('user_login_first',
                      '/sign_in_first')
@@ -225,7 +230,6 @@ def main(global_config, **settings):
 #                    route_name='band_add',
 #                    renderer='templates/band_search.pt')
 
-
     ## routes for tracks ##
     # track create
     config.add_route('track_add', '/track/add')
@@ -253,7 +257,6 @@ def main(global_config, **settings):
     config.add_view('c3sar.views.track.track_add_license',
                     route_name='track_add_license',
                     renderer='templates/track_add_license.pt')
-
 
     # delete
     config.add_route('track_del', '/track/rm/{track_id}')
@@ -312,7 +315,6 @@ def main(global_config, **settings):
                     route_name='license_search',
                     renderer='templates/license_search.pt')
 
-
     ## routes for RESTful interface ##
     config.add_route('api_get_user', '/api/get/user/{id}')
     config.add_view('c3sar.views.rest.show_user_view',
@@ -327,15 +329,11 @@ def main(global_config, **settings):
                     renderer='json',
                     )
 
-
-    ## 
+    ##
     config.add_route('url_param_test', '/url_param_test')
     config.add_view('c3sar.views.license.url_param_test',
                     route_name='url_param_test',
                     renderer='templates/url_params_test.pt')
 
-
     #config.scan()
-
     return config.make_wsgi_app()
-
