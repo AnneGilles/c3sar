@@ -103,10 +103,46 @@ class UserViewIntegrationTests(unittest.TestCase):
         # test: form exists
         self.assertTrue('form' in result.items()[0], 'form was not seen.')
         # test: form is not validated
-        self.assertTrue(not result['form'].form.is_validated, 
+        self.assertTrue(not result['form'].form.is_validated,
                         'form validated unexpectedly.')
         # TODO: test that form is not validating...
         # maybe rather a functional test?
+
+    def test_user_register_submit(self):
+        """
+        test the register view -- submit but don't validate the form
+        """
+        from c3sar.views.user import user_register
+        request = testing.DummyRequest(
+            post={'form.submitted': True,
+                  'username': u'foo',
+                  'password': u'passfoo'})
+        self.config = testing.setUp(request=request)
+        result = user_register(request)
+
+        #import pdb
+        #pdb.set_trace()
+
+        # test: form exists
+        self.assertTrue('form' in result.items()[0], 'form was not seen.')
+        # test: form does not validate
+        self.assertTrue(not result['form'].form.validate(),
+                        'form validated unexpectedly.')
+        self.assertEquals(
+            result['form'].form.errors,
+            {
+                'confirm_password': u'Missing value',
+                'city': u'Missing value',
+                'surname': u'Missing value',
+                'lastname': u'Missing value',
+                'number': u'Missing value',
+                'phone': u'Missing value',
+                'street': u'Missing value',
+                'postcode': u'Missing value',
+                'country': u'Missing value',
+                'email': u'Missing value'
+                },
+            "not the expected validation error messages")
 
     def test_user_confirm_email_view(self):
         """
@@ -139,7 +175,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp(request=request)
         result = login_view(request)
         self.assertTrue('form' in result.items()[0], 'form was not seen.')
-        
+
     def test_user_login_view_wrong_username(self):
         """
         testing the login view -- try to log in with a wrong username
@@ -363,7 +399,7 @@ class UserViewIntegrationTests(unittest.TestCase):
     def test_user_view_returns_redirect(self):
         """
         test the user_view view
-        
+
         if no user with user_id exists
         expect a redirect to not_found view
         """
@@ -385,7 +421,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         test the user_view view
 
         if a user with user_id from URL exists,
-        
+
         """
         from c3sar.views.user import user_view
         request = testing.DummyRequest()
@@ -416,7 +452,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         test the user_profile view
 
         if a user with user_id from URL exists,
-        
+
         """
         from c3sar.views.user import user_profile
         request = testing.DummyRequest()

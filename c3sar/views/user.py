@@ -42,7 +42,7 @@ def user_register(request):
     """
     a user registers with the system
     """
-
+    DEBUG = True
     form = Form(request, RegistrationSchema)
     #mailer = get_mailer(request)
 
@@ -60,6 +60,10 @@ def user_register(request):
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
         request.session.flash('form does not validate!')
+        if DEBUG: print "submitted, but not validated"
+    else:
+       if DEBUG: print "form.submitted was not seen"
+       pass
 
     if 'form.submitted' in request.POST and form.validate():
         # ready for registration!
@@ -163,7 +167,7 @@ def user_confirm_email(request):
 
     #get matching user from db
     user = User.get_by_username(user_name)
-    
+
     # check if the information in the matchdict makes sense
     #  - user
     if isinstance(user, NoneType):
@@ -235,14 +239,14 @@ def login_view(request):
         if DEBUG:
             request.session.flash(u'form didnt validate')
             print 'form didnt validate'
-            
+
     if 'submit' in post_data and form.validate():
 
         login = post_data['username']
         if DEBUG:
             request.session.flash(u'username: ' + login)
             print u'username: ' + str(login)
-            
+
         password = post_data['password']
         if DEBUG:
             request.session.flash(password)
@@ -253,7 +257,7 @@ def login_view(request):
                 request.session.flash(u'login: ' + login)
                 print 'User.check_password was True!'
             headers = remember(request, login)
-            
+
             #home_view = route_url('home', request)
             #came_from = request.params.get('came_from', home_view)
 
@@ -276,7 +280,7 @@ def login_view(request):
 
     if DEBUG:
         request.session.flash(u'Failed to login. Musta been errors!')
-    print "returning the form" 
+        print "returning the form"
     return {
         'form': FormRenderer(form),
         }
@@ -404,7 +408,7 @@ def user_edit(request):
         request.session.flash("phone: " + user.phone)
         request.session.flash("email_is_confirmed: " + str(user.email_is_confirmed))
 
-        
+
 
     if form.validate():
         request.session.flash("Yes! form.validate() !!!")
