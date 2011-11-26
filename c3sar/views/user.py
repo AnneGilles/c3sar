@@ -199,7 +199,7 @@ def user_confirm_email(request):
 #             permission='view',
 #             renderer='../templates/login.pt')
 def login_view(request):
-    DEBUG = True
+    DEBUG = False
     if DEBUG: print "this is login_view"
     came_from = "space"
     headers = None
@@ -263,7 +263,7 @@ def login_view(request):
                 #print "home_view: " + str(home_view)
                 #print "came_from: " + str(came_from)
                 print "will login the user and redirect her"
-            return HTTPFound(location = route_url('home'), headers=headers)
+            return HTTPFound(location = route_url(u'home', request=request), headers=headers)
 
         else:
             request.session.flash(
