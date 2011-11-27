@@ -72,7 +72,7 @@ class UserViewIntegrationTests(unittest.TestCase):
                   lastname=u'secondLastname',password=u'password',
                   email = u'second2@shri.de',
                   email_confirmation_code = u'barfbarf',
-                  email_is_confirmed=True,
+                  email_is_confirmed=False,
                   phone=u'+49 6421 968300422',
                   fax=u'+49 6421 690 6996'
                   ):
@@ -173,17 +173,58 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.assertTrue(isinstance(result, HTTPFound))
 
 
-    def test_user_confirm_email_view(self):
+    def test_user_confirm_email_view_invalid_user(self):
         """
-        a test for the user_email_confirm view -- non-validating
+        test user_email_confirm -- non-validating: invalid user
+        """
+        from c3sar.views.user import user_confirm_email
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+
+        # mock values: /user/confirm/SOME_CODE/foo/c@example.com
+        request.matchdict['code'] = u"SOME_CODE" 
+        request.matchdict['user_name'] = u"foo" 
+        request.matchdict['user_email'] = u"foo@example.com"
+
+        result = user_confirm_email(request)
+        self.assertEquals(
+            result['result_msg'],
+            "Something didn't work. Please check whether you tried the right URL.")
+
+    def test_user_confirm_email_view_invalid_email(self):
+        """
+        test user_email_confirm -- non-validating: valid user, invalid email
+
+        e.g. a valid user with a valid code tries to confirm an invalid email
+        """
+        from c3sar.views.user import user_confirm_email
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+
+        instance = self._makeUser2() # valid user
+        self.dbsession.add(instance)
+        
+        # mock values: /user/confirm/SOME_CODE/foo/c@example.com
+        request.matchdict['code'] = instance.email_confirm_code
+        request.matchdict['user_name'] = instance.username
+        request.matchdict['user_email'] = u"foo@example.com"
+
+        result = user_confirm_email(request)
+        self.assertEquals(
+            result['result_msg'],
+            "Verification has failed. Bummer!")
+
+    def test_user_confirm_email_view_already_confrmd(self):
+        """
+        a test for the user_email_confirm view -- already confirmed
         """
         from c3sar.views.user import user_confirm_email
         request = testing.DummyRequest()
         self.config = testing.setUp(request=request)
 
         instance = self._makeUser()
+        self.dbsession.add(instance)
 
-        # mock values: /user/confirm/SSEFP0/c/c@shri.de
         request.matchdict['code'] = instance.email_confirm_code
         request.matchdict['user_name'] =  instance.username
         request.matchdict['user_email'] = instance.email
@@ -191,9 +232,28 @@ class UserViewIntegrationTests(unittest.TestCase):
         result = user_confirm_email(request)
         self.assertEquals(
             result['result_msg'],
-            "Something didn't work. Please check whether you tried the right URL.")
-        #TODO... fix this.
-        #how to supply the parameters and make validation work?
+            "Your email address was confirmed already.")
+
+    def test_user_confirm_email_view(self):
+        """
+        a test for the user_email_confirm view -- working
+        """
+        from c3sar.views.user import user_confirm_email
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+
+        instance = self._makeUser2()
+        self.dbsession.add(instance)
+
+        request.matchdict['code'] = instance.email_confirm_code
+        request.matchdict['user_name'] =  instance.username
+        request.matchdict['user_email'] = instance.email
+
+        result = user_confirm_email(request)
+        self.assertEquals(
+            result['result_msg'],
+            "Thanks! Your email address has been confirmed.")
+
 
     def test_user_login_view(self):
         """
