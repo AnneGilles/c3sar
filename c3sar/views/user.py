@@ -42,7 +42,7 @@ def user_register(request):
     """
     a user registers with the system
     """
-    DEBUG = True
+    DEBUG = False
     form = Form(request, RegistrationSchema)
     #mailer = get_mailer(request)
 
@@ -126,7 +126,10 @@ def user_register(request):
 
         # send email
         try:
-            print("sending email........")
+            if DEBUG:
+                print("sending email........")
+            else:
+                pass
             #mailer.send(message)
             #mailer.send(msg_accountants)
 
@@ -377,7 +380,7 @@ def user_edit(request):
     """
     let users change some of their details
     """
-    dbsession = DBSession()
+    #dbsession = DBSession()
 
     # if no user_id in URL and not logged in, tell user to login
 
@@ -528,7 +531,7 @@ def user_contract_de(request):
     """
     get a PDF for the user to print out, sign and mail back
     """
-    dbsession = DBSession()
+    #dbsession = DBSession()
     from fdfgen import forge_fdf
     user_id = request.matchdict['user_id']
 
@@ -539,7 +542,7 @@ def user_contract_de(request):
         return generate_contract_de_blank()
 
 
-    user = User.get_by_user_id(user_id)
+    #user = User.get_by_user_id(user_id)
     from datetime import datetime
 
     fields = [
@@ -559,7 +562,7 @@ def user_contract_de(request):
     fdf = forge_fdf("", fields, [], [], [])
     # write to file
     my_fdf_filename = "fdf" + str(request.user.id) + ".fdf"
-    import os
+    #import os
     fdf_file = open(my_fdf_filename , "w")
     fdf_file.write(fdf)
     fdf_file.close()
@@ -596,7 +599,7 @@ def user_contract_de_username(request):
     """
     get a PDF for the user to print out, sign and mail back
     """
-    dbsession = DBSession()
+    #dbsession = DBSession()
     from fdfgen import forge_fdf
     user_id = request.matchdict['username']
 
@@ -610,7 +613,7 @@ def user_contract_de_username(request):
         response.app_iter = open("pdftk/berechtigungsvertrag-2.2_outlined.pdf" , "r")
         return response
 
-    user = User.get_by_user_id(user_id)
+    #user = User.get_by_user_id(user_id)
 
 
     fields = [
