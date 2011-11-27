@@ -61,7 +61,7 @@ def user_register(request):
         # form didn't validate
         request.session.flash('form does not validate!')
         if DEBUG: print "submitted, but not validated"
-    else:
+    else: # pragma: NO COVER # just for debugging, RLY
        if DEBUG: print "form.submitted was not seen"
        pass
 
@@ -231,28 +231,28 @@ def login_view(request):
     #request.session.flash(post_data)
 
     if not 'submit' in post_data:
-        if DEBUG:
+        if DEBUG: #pragma: no cover
             request.session.flash('not submitted!')
             print "not submitted"
 
     if 'submit' in post_data and not form.validate():
-        if DEBUG:
+        if DEBUG: #pragma: no cover
             request.session.flash(u'form didnt validate')
             print 'form didnt validate'
 
     if 'submit' in post_data and form.validate():
 
         login = post_data['username']
-        if DEBUG:
+        if DEBUG: #pragma: no cover
             request.session.flash(u'username: ' + login)
             print u'username: ' + str(login)
 
         password = post_data['password']
-        if DEBUG:
+        if DEBUG: #pragma: no cover
             request.session.flash(password)
             print "password: " + str(password)
         if User.check_password(login, password):
-            if DEBUG:
+            if DEBUG: #pragma: no cover
                 request.session.flash(u'User.check_password was True!')
                 request.session.flash(u'login: ' + login)
                 print 'User.check_password was True!'
@@ -261,7 +261,7 @@ def login_view(request):
             #home_view = route_url('home', request)
             #came_from = request.params.get('came_from', home_view)
 
-            if DEBUG:
+            if DEBUG: #pragma: no cover
                 request.session.flash(u'Logged in successfully.')
                 print 'Logged in successfully.'
                 #print "home_view: " + str(home_view)
@@ -273,12 +273,12 @@ def login_view(request):
             request.session.flash(
                 u"username and password didn't match!", # message
                 'passwordcheck')                        # to queue
-            if DEBUG:
+            if DEBUG: #pragma: no cover
                 request.session.flash(u'User.check_password was NOT True!')
                 print 'User.check_password was NOT True!'
                 request.session.flash(u'account not found or passwords didnt match')
 
-    if DEBUG:
+    if DEBUG: #pragma: no cover
         request.session.flash(u'Failed to login. Musta been errors!')
         print "returning the form"
     return {
