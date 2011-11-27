@@ -2,6 +2,7 @@ import unittest
 
 from pyramid import testing
 
+
 def _initTestingDB():
     from c3sar.models import DBSession
     from c3sar.models import Base
@@ -12,10 +13,12 @@ def _initTestingDB():
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
 
+
 def _registerRoutes(config):
     config.add_route('home', '/')
     config.add_route('about', '/about')
     config.add_route('listen', '/listen')
+
 
 def _registerCommonTemplates(config):
     config.testing_add_renderer('templates/main.pt')
@@ -36,7 +39,6 @@ class BasicViewTests(unittest.TestCase):
         transaction.abort()
         testing.tearDown()
 
-
     def test_home_view(self):
         from c3sar.views.basic import home_view
         _registerCommonTemplates(self.config)
@@ -45,7 +47,8 @@ class BasicViewTests(unittest.TestCase):
         #print "ergebnis :" + str(dir(result))
         #print "ergebnis typ:" + str(type(result))
         #print "ergebnis.items() :" + str(result.items())
-        #self.assertTrue('Basic Functionality' in result.body, "text not found")
+        self.assertTrue(
+            'Basic Functionality' in result.body, "text not found")
 
     def test_listen_view(self):
         from c3sar.views.basic import listen_view
@@ -81,7 +84,7 @@ class BasicViewTests(unittest.TestCase):
         result = favicon_view(request)
         self.assertEquals(result.content_type, 'image/x-icon',
                           "wrong content-type for favicon!")
-        self.assertEquals(len(result.body), 2238, 
+        self.assertEquals(len(result.body), 2238,
                           "size \not \equals 2238, favicon filesize changed!?")
 
     def test_not_implemented_view(self):
