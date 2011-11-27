@@ -8,6 +8,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 DEBUG = True
 
+
 def _initTestingDB():
     from c3sar.models import DBSession
     from c3sar.models import Base
@@ -18,6 +19,7 @@ def _initTestingDB():
     Base.metadata.create_all(engine)
     return DBSession
 
+
 def _registerRoutes(config):
     config.add_route('register', '/register')
     config.add_route('confirm_email', '/user/confirm/{user_name}/{user_email}')
@@ -27,8 +29,8 @@ def _registerRoutes(config):
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('user_login_first', '/sign_in_first')
-    config.add_route('home', '/') # for logout_view redirect
-    config.add_route('not_found', '/not_found') # for logout_view redirect
+    config.add_route('home', '/')  # for logout_view redirect
+    config.add_route('not_found', '/not_found')  # for user_view redirect
     #config.add_route('', '/')
 
 
@@ -55,30 +57,30 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def _makeUser(self,
                   username=u'firstUsername', surname=u'firstSurname',
-                  lastname=u'firstLastname',password=u'password',
-                  email = u'first1@shri.de',
-                  email_confirmation_code = u'barfbarf',
+                  lastname=u'firstLastname', password=u'password',
+                  email=u'first1@shri.de',
+                  email_confirmation_code=u'barfbarf',
                   email_is_confirmed=True,
                   phone=u'+49 6421 968300422',
                   fax=u'+49 6421 690 6996'
                   ):
         return self._getTargetClass()(
-            username,password,surname,lastname,
-            email,email_is_confirmed,email_confirmation_code,
+            username, password, surname, lastname,
+            email, email_is_confirmed, email_confirmation_code,
             phone, fax)
 
     def _makeUser2(self,
                   username=u'secondUsername', surname=u'secondSurname',
-                  lastname=u'secondLastname',password=u'password',
-                  email = u'second2@shri.de',
-                  email_confirmation_code = u'barfbarf',
+                  lastname=u'secondLastname', password=u'password',
+                  email=u'second2@shri.de',
+                  email_confirmation_code=u'barfbarf',
                   email_is_confirmed=False,
                   phone=u'+49 6421 968300422',
                   fax=u'+49 6421 690 6996'
                   ):
         return self._getTargetClass()(
-            username,password,surname,lastname,
-            email,email_is_confirmed,email_confirmation_code,
+            username, password, surname, lastname,
+            email, email_is_confirmed, email_confirmation_code,
             phone, fax)
 
     def test_user_register_view(self):
@@ -91,7 +93,6 @@ class UserViewIntegrationTests(unittest.TestCase):
         result = user_register(request)
         # test: a form exists
         self.assertTrue('form' in result.items()[0], 'form was not seen.')
-
 
     def test_user_register_not_validating(self):
         """
@@ -175,7 +176,6 @@ class UserViewIntegrationTests(unittest.TestCase):
         # test: view returns a redirect upon registration success
         self.assertTrue(isinstance(result, HTTPFound))
 
-
     def test_user_confirm_email_view_invalid_user(self):
         """
         email confirmation -- non-validating: invalid user
@@ -185,14 +185,14 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp(request=request)
 
         # mock values: /user/confirm/SOME_CODE/foo/c@example.com
-        request.matchdict['code'] = u"SOME_CODE" 
-        request.matchdict['user_name'] = u"foo" 
+        request.matchdict['code'] = u"SOME_CODE"
+        request.matchdict['user_name'] = u"foo"
         request.matchdict['user_email'] = u"foo@example.com"
 
         result = user_confirm_email(request)
         self.assertEquals(
             result['result_msg'],
-            "Something didn't work. Please check whether you tried the right URL.")
+            "Something didn't work. Please check the URL.")
 
     def test_user_confirm_email_view_invalid_email(self):
         """
@@ -204,9 +204,9 @@ class UserViewIntegrationTests(unittest.TestCase):
         request = testing.DummyRequest()
         self.config = testing.setUp(request=request)
 
-        instance = self._makeUser2() # valid user
+        instance = self._makeUser2()  # valid user
         self.dbsession.add(instance)
-        
+
         # mock values: /user/confirm/SOME_CODE/foo/c@example.com
         request.matchdict['code'] = instance.email_confirm_code
         request.matchdict['user_name'] = instance.username
@@ -229,7 +229,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.dbsession.add(instance)
 
         request.matchdict['code'] = instance.email_confirm_code
-        request.matchdict['user_name'] =  instance.username
+        request.matchdict['user_name'] = instance.username
         request.matchdict['user_email'] = instance.email
 
         result = user_confirm_email(request)
@@ -249,14 +249,13 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.dbsession.add(instance)
 
         request.matchdict['code'] = instance.email_confirm_code
-        request.matchdict['user_name'] =  instance.username
+        request.matchdict['user_name'] = instance.username
         request.matchdict['user_email'] = instance.email
 
         result = user_confirm_email(request)
         self.assertEquals(
             result['result_msg'],
             "Thanks! Your email address has been confirmed.")
-
 
     def test_user_login_view(self):
         """
@@ -297,12 +296,12 @@ class UserViewIntegrationTests(unittest.TestCase):
         """
         from c3sar.views.user import login_view
         request = testing.DummyRequest(
-            post={'submit':True,
-                  'username':u'paul',
-                  'password':u'pass'})
+            post={'submit': True,
+                  'username': u'paul',
+                  'password': u'pass'})
         self.config = testing.setUp(request=request)
 
-        self.assertEquals(request.POST,{'submit': True,
+        self.assertEquals(request.POST, {'submit': True,
                                         'password': 'pass',
                                         'username': 'paul'})
         result = login_view(request)
@@ -316,7 +315,7 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def test_user_login_view_valid_user_invalidChar_pw(self):
         """
-        login view - try login with valid user but invalid characters in password
+        login view - try login with valid user but invalid characters in passw
         """
         from c3sar.views.user import login_view
         my_user = self._makeUser()
@@ -369,9 +368,9 @@ class UserViewIntegrationTests(unittest.TestCase):
         my_user = self._makeUser()
         self.dbsession.add(my_user)
         request = testing.DummyRequest(
-            post={'submit':True,
-                  'username':my_user.username,
-                  'password': 'password'}) # the right password
+            post={'submit': True,
+                  'username': my_user.username,
+                  'password': 'password'})  # the right password
         self.config = testing.setUp(request=request)
         _registerRoutes(self.config)
 
@@ -381,7 +380,6 @@ class UserViewIntegrationTests(unittest.TestCase):
 
         # test: view returns a redirect
         self.assertTrue(isinstance(result, HTTPFound))
-
 
     def test_logout_view(self):
         """
@@ -395,7 +393,6 @@ class UserViewIntegrationTests(unittest.TestCase):
 
         # test: view returns a redirect
         self.assertTrue(isinstance(result, HTTPFound))
-
 
     def test_user_list(self):
         """
@@ -418,7 +415,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         #print "result['users']: "
         #pp.pprint(result['users'])
         # test: view returns an empty list of users
-        self.assertTrue(result['users'] ==  [])
+        self.assertTrue(result['users'] == [])
 
     def test_user_list_one(self):
         """
@@ -439,7 +436,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.assertNotEquals(result, {'users': []})
 
         # test: view returns a non empty list of users
-        self.assertTrue(not result['users'] ==  [])
+        self.assertTrue(not result['users'] == [])
 
         #print "result: "
         #pp.pprint(result)
@@ -468,7 +465,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.assertNotEquals(result, {'users': []})
 
         # test: view returns a non empty list of users
-        self.assertTrue(not result['users'] ==  [])
+        self.assertTrue(not result['users'] == [])
 
         #print "result: "
         #pp.pprint(result)
@@ -527,7 +524,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         #print "result['users']: "
         #pp.pprint(result['users'])
         # test: view returns an empty list of users
-        #self.assertTrue(result['users'] ==  [])
+        #self.assertTrue(result['users'] == [])
 
     def test_user_profile(self):
         """
@@ -553,4 +550,3 @@ class UserViewIntegrationTests(unittest.TestCase):
 
         # test: view returns a dict containing a user
         self.assertEquals(result['user'].username, instance.username)
-
