@@ -11,16 +11,17 @@ import ConfigParser
 import io
 import os
 
+
 class I2S3():
     """
     connect to i2 using S3 protocoll
     """
     print("This is I2S3")
-    calling_format=OrdinaryCallingFormat()
+    calling_format = OrdinaryCallingFormat()
 
     def get_config_from_settings(self):
         """
-        load settings from config file s3.ini 
+        load settings from config file s3.ini
         """
         config = ConfigParser.RawConfigParser(allow_no_value=True)
         print "-- Does config file s3.ini exist? " + str(
@@ -48,16 +49,16 @@ class I2S3():
             print "something went wrong. "
             print e
 
-
         try:
             self.conn = S3Connection(
-                aws_access_key_id = self.config.get("i2", "access_key_id"),
-                aws_secret_access_key = self.config.get("i2", "access_key_secret"),
-                port = 8091,
-                host = self.config.get("i2", "i2_host"),
-                calling_format = self.calling_format,
-                path = "/",
-                is_secure = False # self.config.get("i2", "is_secure")
+                aws_access_key_id=self.config.get("i2", "access_key_id"),
+                aws_secret_access_key=self.config.get(
+                    "i2", "access_key_secret"),
+                port=8091,
+                host=self.config.get("i2", "i2_host"),
+                calling_format=self.calling_format,
+                path="/",
+                is_secure=False  # self.config.get("i2", "is_secure")
                 )
             print("connection established!!")
         except Exception, e:
@@ -78,7 +79,7 @@ class I2S3():
     def create_or_get_bucket(self):
         try:
             bucket = self.conn.create_bucket("c3salpha")
-            print("I2S3.create_or_get_bucket(): created bucket: " +  str(bucket))
+            print("I2S3.create_or_get_bucket: created bucket: " + str(bucket))
         except S3CreateError, e:
             print e
             bucket = self.conn.get_bucket("c3salpha")
@@ -88,7 +89,6 @@ class I2S3():
     def create_named_bucket(self, name):
         bucket = self.conn.create_bucket(name)
         print("I2S3.create_named_bucket(): created bucket " + name)
-
 
 
 def initialize_s3():
@@ -110,21 +110,17 @@ def initialize_s3():
     rs = bucket.get_all_keys()
     print "bucket.get_all_keys(): " + str(rs)
 
-
-
-
-
     #print "dir(i2): " + str(dir(i2))
     #print "type(i2.conn): " + str(type(i2.conn))
     #print "dir(i2.conn): " + str(dir(i2.conn))
-    
     #rs = i2.conn.get_all_buckets()
     #print "All buckets: ", rs
     #print ("==================")
     print "i2.conn.is_secure: " + str(i2.conn.is_secure)
     #print "i2.conn.get_all_buckets(): " + str(i2.conn.get_all_buckets())
-    #print "i2.conn.create_bucket('testing'): " + str(i2.conn.create_bucket('testing'))
+    #print "i2.conn.create_bucket('testing'): "
+    #    + str(i2.conn.create_bucket('testing'))
     print "i2.conn.server_name(): " + str(i2.conn.server_name())
-    print "i2.conn.get_canonical_user_id(): " + str(i2.conn.get_canonical_user_id())
+    print "i2.conn.get_canonical_user_id(): " + str(
+        i2.conn.get_canonical_user_id())
     print "initialize_s3: done."
-

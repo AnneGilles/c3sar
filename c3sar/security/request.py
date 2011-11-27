@@ -1,11 +1,12 @@
 ### Making A 'User Object' Available as a Request Attribute
-# https://docs.pylonsproject.org/projects/pyramid_cookbook/dev/authentication.html
+# docs.pylonsproject.org/projects/pyramid_cookbook/dev/authentication.html
 from pyramid.decorator import reify
 from pyramid.request import Request
 from pyramid.security import unauthenticated_userid
 from c3sar.models import (
     User,
     )
+
 
 class RequestWithUserAttribute(Request):
     @reify

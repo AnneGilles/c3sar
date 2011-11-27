@@ -42,11 +42,12 @@ Base = declarative_base()
 # password crypt
 crypt = cryptacular.bcrypt.BCRYPTPasswordManager()
 
+
 def hash_password(password):
     return unicode(crypt.encode(password))
 
 
-class User(Base): 
+class User(Base):
     """
     applications user model
     """
@@ -57,11 +58,11 @@ class User(Base):
     lastname = Column(Unicode(255))
 
     # address
-    street =  Column(Unicode(255))
-    number =  Column(Unicode(255))
-    postcode =  Column(Unicode(255))
-    city =  Column(Unicode(255))
-    country =  Column(Unicode(255))
+    street = Column(Unicode(255))
+    number = Column(Unicode(255))
+    postcode = Column(Unicode(255))
+    city = Column(Unicode(255))
+    country = Column(Unicode(255))
 
     # contact
     fax = Column(Unicode(255))
@@ -75,8 +76,7 @@ class User(Base):
     last_login = Column(DateTime(), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     last_password_change = Column(DateTime,
-                                  default = func.current_timestamp())
-    
+                                  default=func.current_timestamp())
     _password = Column('password', Unicode(60))
 
     # groups = relationship(Group,
@@ -85,11 +85,14 @@ class User(Base):
 
     @property
     def __acl__(self):
-        return [ #PRAGMA: no cover
-            (Allow, 'user:%s' % self.id, 'editUser'), # user may edit herself
-            (Allow, 'group:accountant', ('view', 'editUser')),  # accountant group may edit
-            (Allow, 'group:admin', ('view', 'editUser')),  # admin group may edit
-        ]
+        return [
+            (Allow,                           # user may edit herself
+             'user:%s' % self.id, 'editUser'),
+            (Allow,                           # accountant group may edit
+             'group:accountant', ('view', 'editUser')),
+            (Allow,                           # admin group may edit
+             'group:admin', ('view', 'editUser')),
+            ]
 
     def _get_password(self):
         return self._password
@@ -100,11 +103,10 @@ class User(Base):
     password = property(_get_password, _set_password)
     password = synonym('_password', descriptor=password)
 
-
 #    def get_group_list(self):
 #        return [ str(group.name) for group in self.groups ]
 
-    def __init__(self, username, password, surname, lastname, 
+    def __init__(self, username, password, surname, lastname,
                  email, email_is_confirmed, email_confirm_code,
                  phone, fax):
         self.username = username
@@ -129,12 +131,12 @@ class User(Base):
     @classmethod
     def get_by_username(cls, username):
         dbSession = DBSession()
-        return dbSession.query(cls).filter(cls.username==username).first()
+        return dbSession.query(cls).filter(cls.username == username).first()
 
     @classmethod
     def get_by_user_id(cls, id):
         dbSession = DBSession()
-        return DBSession.query(cls).filter(cls.id==id).first()
+        return DBSession.query(cls).filter(cls.id == id).first()
 
     @classmethod
     def check_password(cls, username, password):
@@ -204,7 +206,7 @@ class License(Base):
 
     @classmethod
     def get_by_license_id(cls, license_id):
-        return DBSession.query(cls).filter(cls.id==license_id).first()
+        return DBSession.query(cls).filter(cls.id == license_id).first()
 
 #    def license_listing(cls, order_by, how_many=10):
     @classmethod
@@ -213,21 +215,20 @@ class License(Base):
 #        return q.order_by(order_by)[:how_many]
         return q
 
-    
 
 # table for relation between bands and members(=users)
 bands_members = Table('bands_members', Base.metadata,
     Column('band_id', Integer, ForeignKey('bands.id'),
-        primary_key = True, nullable=False),
+        primary_key=True, nullable=False),
     Column('user_id', Integer, ForeignKey('users.id'),
-        primary_key = True, nullable=False))
+        primary_key=True, nullable=False))
 
 # table for relation between bands and their tracks
 bands_tracks = Table('bands_tracks', Base.metadata,
     Column('band_id', Integer, ForeignKey('bands.id'),
-        primary_key = True, nullable=False),
+        primary_key=True, nullable=False),
     Column('tracks_id', Integer, ForeignKey('tracks.id'),
-        primary_key = True, nullable=False))
+        primary_key=True, nullable=False))
 
 # relation between licenses and tracks
 licenses_tracks = Table('licenses_tracks', Base.metadata,
@@ -241,7 +242,7 @@ track_license = Table('track_license',
                       )
 
 
-class Track(Base): ##########################################################
+class Track(Base):  ##########################################################
     """
     A Track. some music -- or just some metadata!
     """
@@ -257,7 +258,6 @@ class Track(Base): ##########################################################
                            secondary='track_license',
                            #primaryjoin="_and(Track.id==License.track_id)",
                            order_by="License.id")
-    
     # track_composers = reference to User(s) or 'some text'
     # track_lyrics = reference to User(s) or 'some text'
 
@@ -271,11 +271,11 @@ class Track(Base): ##########################################################
 
     @classmethod
     def get_by_track_name(cls, track_name):
-        return DBSession.query(cls).filter(cls.name==track_name).first()
+        return DBSession.query(cls).filter(cls.name == track_name).first()
 
     @classmethod
     def get_by_track_id(cls, track_id):
-        return DBSession.query(cls).filter(cls.id==track_id).first()
+        return DBSession.query(cls).filter(cls.id == track_id).first()
 
     @classmethod
     def track_listing(cls, order_by, how_many=10):
@@ -285,8 +285,7 @@ class Track(Base): ##########################################################
     # ToDo Album listing
 
 
-
-class Band(Base): #################################################### B A N D
+class Band(Base):  # ################################################## B A N D
     """
     A Band
     consists of Artists
@@ -299,14 +298,15 @@ class Band(Base): #################################################### B A N D
     name = Column(Unicode(255))
     homepage = Column(Unicode(255))
     email = Column(Unicode(100))
-    registrar_id = Column(Integer, ForeignKey('users.id')) # who registered this band?
+    registrar_id = Column(Integer,
+                          ForeignKey('users.id'))  # who registered this band?
     registrar = Column(Unicode(255))
     date_registered = Column(DateTime(), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     members = relationship(User,
                            secondary=bands_members,
                            backref="bands")
-    tracks =  relationship(Track,
+    tracks = relationship(Track,
                            secondary=bands_tracks,
                            backref="bands")
     #band_registrar_rel = relation(User, cascade="delete", backref="bands")
@@ -330,11 +330,11 @@ class Band(Base): #################################################### B A N D
 
     @classmethod
     def get_by_band_name(cls, band_name):
-        return DBSession.query(cls).filter(cls.name==band_name).first()
+        return DBSession.query(cls).filter(cls.name == band_name).first()
 
     @classmethod
     def get_by_band_id(cls, band_id):
-        return DBSession.query(cls).filter(cls.id==band_id).first()
+        return DBSession.query(cls).filter(cls.id == band_id).first()
 
     @classmethod
     def band_listing(cls, order_by, how_many=10):
@@ -342,16 +342,17 @@ class Band(Base): #################################################### B A N D
 #        return q.order_by(order_by)[:how_many]
         return q
 
-    @classmethod #find all bands a person has registered
+    @classmethod  # find all bands a person has registered
     def get_by_registrar_name(cls, registrar_name):
         """
         returns a list of bands
         """
-        return DBSession.query(cls).filter(cls.registrar==registrar_name).all()
+        return DBSession.query(cls).filter(
+            cls.registrar == registrar_name
+            ).all()
 
 
-
-class Playlist(Base): #######################################################
+class Playlist(Base):  # ####################################################
     """
     The Playlist definition. A Playlist is...
 
@@ -368,8 +369,6 @@ class Playlist(Base): #######################################################
         #self.value = value
 
 
-
-
 def populate():
     dbsession = DBSession()
 #    model = MyModel(name=u'root', value=55)
@@ -378,11 +377,11 @@ def populate():
 #    transaction.commit()
 
     user1 = User(username=u'firstUsername', surname=u'firstSurname',
-                 lastname=u'firstLastname',password=u'password',
-                 email = u'first1@shri.de', email_confirm_code = u'barfbarf',
+                 lastname=u'firstLastname', password=u'password',
+                 email=u'first1@shri.de', email_confirm_code=u'barfbarf',
                  email_is_confirmed=True,
-                 phone = u'+49 6421 968300422',
-                 fax = u'+49 6421 690 6996',
+                 phone=u'+49 6421 968300422',
+                 fax=u'+49 6421 690 6996',
                  )
     user1.set_address(street=u'Teststraße', number=u'1234a',
                       postcode=u'35039', city=u'Marburg Mitte',
@@ -390,11 +389,11 @@ def populate():
     dbsession.add(user1)
 
     user2 = User(username=u'secondUsername', surname=u'secondSurname',
-                 lastname=u'secondSurname',password=u'password',
-                 email = u'second1@shri.de', email_confirm_code = u'möökmöök',
+                 lastname=u'secondSurname', password=u'password',
+                 email=u'second1@shri.de', email_confirm_code=u'möökmöök',
                  email_is_confirmed=False,
-                 phone = u'+49 6421 968300421',
-                 fax = u"",
+                 phone=u'+49 6421 968300421',
+                 fax=u"",
                  )
     dbsession.add(user2)
 
@@ -407,7 +406,7 @@ def populate():
                  homepage=u"http://testband.com", registrar=u"paul",
                  registrar_id=2)
     dbsession.add(band2)
-        
+
     # track1 = Track(name=u"TestTrack1", album=u'TestAlbum1',
     #                url=u'http://testband.io/t1.mp3', filepath=None,
     #                bytesize=None)
@@ -419,28 +418,27 @@ def populate():
                    )
     track2.license = [
         License(
-            name=u"Creative Commons Attribution 3.0 Unported", 
+            name=u"Creative Commons Attribution 3.0 Unported",
             uri=u"http://creativecommons.org/licenses/by/3.0/",
             img=u"http://i.creativecommons.org/l/by/3.0/88x31.png",
             author=u"Somebody"
             )
         ]
     dbsession.add(track2)
-    
-    
-#<a rel="license" href="http://creativecommons.org/licenses/by/3.0/">
-#<img alt="Creative Commons License" style="border-width:0" 
-#     src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />
-#This work is licensed under a <a rel="license" 
-#     href="http://creativecommons.org/licenses/by/3.0/">
-#     Creative Commons Attribution 3.0 Unported License</a>.
-    license1 = License(name=u"Creative Commons Attribution 3.0 Unported", 
+
+    # <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">
+    # <img alt="Creative Commons License" style="border-width:0"
+    #     src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />
+    # This work is licensed under a <a rel="license"
+    #     href="http://creativecommons.org/licenses/by/3.0/">
+    #     Creative Commons Attribution 3.0 Unported License</a>.
+    license1 = License(name=u"Creative Commons Attribution 3.0 Unported",
                        uri=u"http://creativecommons.org/licenses/by/3.0/",
                        img=u"http://i.creativecommons.org/l/by/3.0/88x31.png",
                        author=u"Somebody")
     dbsession.add(license1)
 
-    license2 = License(name=u"All Rights reserved", 
+    license2 = License(name=u"All Rights reserved",
                        uri=u"",
                        img=u"",
                        author=u"Somebody")
@@ -448,12 +446,13 @@ def populate():
 
     try:
         dbsession.flush()
-    except Exception, e: #PRAGMA: no cover
+    except Exception, e:  # PRAGMA: no cover
         dbsession.rollback()
         print "--- ROLLBACK cause:  -------------------------------------- "
         print str(e)
         print "----------------------------------------------------------- "
     transaction.commit()
+
 
 def initialize_sql(engine):
     DBSession.configure(bind=engine)
@@ -461,10 +460,7 @@ def initialize_sql(engine):
     Base.metadata.create_all(engine)
     try:
         populate()
-    except IntegrityError, e: #PRAGMA: no cover
+    except IntegrityError, e:  # PRAGMA: no cover
         print "--- initialize_sql aborted due to IntegrityError: "
         print e
         transaction.abort()
-
-
-    
