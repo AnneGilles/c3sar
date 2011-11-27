@@ -192,7 +192,8 @@ class UserViewIntegrationTests(unittest.TestCase):
         result = user_confirm_email(request)
         self.assertEquals(
             result['result_msg'],
-            "Something didn't work. Please check the URL.")
+            "Something didn't work. " +
+            "Please check whether you tried the right URL.")
 
     def test_user_confirm_email_view_invalid_email(self):
         """
