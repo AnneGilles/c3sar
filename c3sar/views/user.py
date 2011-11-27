@@ -132,7 +132,7 @@ def user_register(request):
 
             # instead of sending mails, we inform in-browser
             request.session.flash('DEBUG: not sending email. to test email confirmation view, click here: <a href="/user/confirm/' + randomstring + '/' + str(user.username) + '/' + str(form.data['email']) + '">Confirm Email</a>')
-        except:
+        except: # pragma: no cover
             print "could not send email. no mail configured?"
 
         # remember who this was == sign in user == log her in

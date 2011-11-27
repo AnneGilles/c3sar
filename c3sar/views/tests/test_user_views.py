@@ -144,6 +144,35 @@ class UserViewIntegrationTests(unittest.TestCase):
                 },
             "not the expected validation error messages")
 
+    def test_user_register_submit_validate(self):
+        """
+        test the register view -- and validate the form
+        """
+        from c3sar.views.user import user_register
+        request = testing.DummyRequest(
+            post={'form.submitted': True,
+                  'username': u'foo',
+                  'password': u'passfoo',
+                  'confirm_password': u'passfoo',
+                  'city': u'foocity',
+                  'surname': u'surfooname',
+                  'lastname': u'lastfooname',
+                  'number': u'foonumber',
+                  'phone': u'foophone',
+                  'street': u'foostreet',
+                  'postcode': u'foocode',
+                  'country': u'fooland',
+                  'email': u'foo@example.com',
+                  'fax': '',
+                  })
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        result = user_register(request)
+
+        # test: view returns a redirect upon registration success
+        self.assertTrue(isinstance(result, HTTPFound))
+
+
     def test_user_confirm_email_view(self):
         """
         a test for the user_email_confirm view -- non-validating
