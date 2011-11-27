@@ -13,7 +13,7 @@ def _initTestingDB():
     from c3sar.models import Base
     from sqlalchemy import create_engine
     engine = create_engine('sqlite:///testing.userviews.db')
-    DBSession.configure(bind=engine)
+    #DBSession.configure(bind=engine)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
     return DBSession
@@ -82,6 +82,9 @@ class UserViewIntegrationTests(unittest.TestCase):
             phone, fax)
 
     def test_user_register_view(self):
+        """
+        register view -- form test
+        """
         from c3sar.views.user import user_register
         request = testing.DummyRequest()
         self.config = testing.setUp(request=request)
@@ -92,7 +95,7 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def test_user_register_not_validating(self):
         """
-        test the register view -- without validating the form
+        register view -- without validating the form
         """
         from c3sar.views.user import user_register
         request = testing.DummyRequest()
@@ -110,7 +113,7 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def test_user_register_submit(self):
         """
-        test the register view -- submit but don't validate the form
+        register view -- submit but don't validate the form
         """
         from c3sar.views.user import user_register
         request = testing.DummyRequest(
@@ -146,7 +149,7 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def test_user_register_submit_validate(self):
         """
-        test the register view -- and validate the form
+        register view -- and validate the form
         """
         from c3sar.views.user import user_register
         request = testing.DummyRequest(
@@ -175,7 +178,7 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def test_user_confirm_email_view_invalid_user(self):
         """
-        test user_email_confirm -- non-validating: invalid user
+        email confirmation -- non-validating: invalid user
         """
         from c3sar.views.user import user_confirm_email
         request = testing.DummyRequest()
@@ -193,7 +196,7 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def test_user_confirm_email_view_invalid_email(self):
         """
-        test user_email_confirm -- non-validating: valid user, invalid email
+        email confirmation -- non-validating: valid user, invalid email
 
         e.g. a valid user with a valid code tries to confirm an invalid email
         """
@@ -216,7 +219,7 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def test_user_confirm_email_view_already_confrmd(self):
         """
-        a test for the user_email_confirm view -- already confirmed
+        email confirmation view -- already confirmed
         """
         from c3sar.views.user import user_confirm_email
         request = testing.DummyRequest()
@@ -236,7 +239,7 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def test_user_confirm_email_view(self):
         """
-        a test for the user_email_confirm view -- working
+        email confirmation view -- working
         """
         from c3sar.views.user import user_confirm_email
         request = testing.DummyRequest()
@@ -257,17 +260,40 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def test_user_login_view(self):
         """
-        testing the login view -- basic form
+        login view -- basic form
         """
         from c3sar.views.user import login_view
         request = testing.DummyRequest()
         self.config = testing.setUp(request=request)
         result = login_view(request)
-        self.assertTrue('form' in result.items()[0], 'form was not seen.')
+        #self.assertTrue('form' in result['form'].form., 'form was not seen.')
+        self.assertTrue(not result['form'].form.is_validated,
+                        'form validated unexpectedly.')
+    # def test_user_login_view_already_loggedin(self):
+    #     """
+    #     login view -- if already logged in
+    #     """
+    #     from c3sar.views.user import login_view
+    #     #import pdb
+    #     #pdb.set_trace()
+
+    #     self.config.testing_securitypolicy(userid=u'username',
+    #                                        permissive=True)
+    #     request = testing.DummyRequest()
+    #     self.config = testing.setUp(request=request)
+    #     result = login_view(request)
+
+    #     pp.pprint(result)
+
+    #     #self.assertRaises(HTTPFound, login_view, request)
+    #     #self.assertTrue(isinstance(result, HTTPFound))
+    #     # TODO: fixme!
+    #     # I think I hit the wall where
+    #     # an integration test is needed to open a door and step through
 
     def test_user_login_view_wrong_username(self):
         """
-        testing the login view -- try to log in with a wrong username
+        login view -- try to log in with a wrong username
         """
         from c3sar.views.user import login_view
         request = testing.DummyRequest(
@@ -281,8 +307,6 @@ class UserViewIntegrationTests(unittest.TestCase):
                                         'username': 'paul'})
         result = login_view(request)
 
-        # test: form exists
-        self.assertTrue('form' in result.items()[0], 'form was not seen.')
         # test: form does not validate
         self.assertTrue(not result['form'].form.validate())
         # test: unknown username
@@ -304,12 +328,6 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp(request=request)
         result = login_view(request)
 
-        #pp.pprint( result)
-        #import pdb
-        #pdb.set_trace()
-
-        # test: form exists
-        self.assertTrue('form' in result.items()[0], 'form was not seen.')
         # test: form does not validate
         self.assertTrue(not result['form'].form.validate(),
                         "the form should not validate,"
@@ -334,12 +352,6 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp(request=request)
         result = login_view(request)
 
-        #pp.pprint( result)
-        #import pdb
-        #pdb.set_trace()
-
-        # test: form exists
-        self.assertTrue('form' in result.items()[0], 'form was not seen.')
         # test: form does not validate
         self.assertTrue(result['form'].form.validate(),
                         "the form should validate, even with a wrong password")
@@ -351,10 +363,9 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def test_user_login_view_valid_user_and_pw(self):
         """
-        test login view -- try to log in with a valid username and pw
+        login view -- try to log in with a valid username and pw
         """
         from c3sar.views.user import login_view
-        _registerRoutes(self.config)
         my_user = self._makeUser()
         self.dbsession.add(my_user)
         request = testing.DummyRequest(
@@ -362,33 +373,19 @@ class UserViewIntegrationTests(unittest.TestCase):
                   'username':my_user.username,
                   'password': 'password'}) # the right password
         self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
 
-        #import pdb
-        #pdb.set_trace()
+        result = login_view(request)
 
-        #result = login_view(request)
-        # XXX TODO: this one borks! but why?
-        #
-        #(Pdb) self.config.package.url.route_url('home', request)
-        #*** ComponentLookupError: (<InterfaceClass pyramid.interfaces.IRoutesMapper>, u'')
-        #(Pdb) self.config.package.url.route_url('login', request)
-        #*** ComponentLookupError: (<InterfaceClass pyramid.interfaces.IRoutesMapper>, u'')
-
-        #print "the result: "
-        #pp.pprint(result)
+        #pp.pprint(result) # <HTTPFound at ... 302 Found>
 
         # test: view returns a redirect
-        #self.assertTrue(isinstance(result, HTTPFound))
-
-        # # test: form exists
-        # self.assertTrue('form' in result.items()[0], 'form was not seen.')
-        # # test: form does not validate
-        # self.assertTrue(not result['form'].form.validate())
+        self.assertTrue(isinstance(result, HTTPFound))
 
 
     def test_logout_view(self):
         """
-        test the logout view
+        logout view
         """
         from c3sar.views.user import logout_view
         request = testing.DummyRequest()
@@ -399,10 +396,6 @@ class UserViewIntegrationTests(unittest.TestCase):
         # test: view returns a redirect
         self.assertTrue(isinstance(result, HTTPFound))
 
-        #print "result: " + str(pp.pprint(result))
-        #print "result.body: " + str(pp.pprint(result.body))
-        #print "result.headers: " + str(pp.pprint(result.headers))
-        #print "result.location: " + str(pp.pprint(result.location))
 
     def test_user_list(self):
         """
