@@ -15,12 +15,12 @@
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 # OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABIL-
 # ITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
-# SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+# SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-# taken from 
+# taken from
 # https://github.com/boto/boto/blob/master/tests/s3/test_connection.py
 # Tue Sept 13 2011
 # and adapted for our purpose
@@ -35,23 +35,24 @@ from boto.s3.connection import (
     )
 from boto.exception import S3PermissionsError
 
+
 class S3ConnectionTest (unittest.TestCase):
 
     my_aws_access_key_id = "c3salpha"
     my_aws_secret_access_key = "CHANGE_ME"
     my_s3_host = "storage.i2.io"
-    calling_format=OrdinaryCallingFormat()
+    calling_format = OrdinaryCallingFormat()
 
     def off_test_1_basic(self):
         print '--- running S3Connection tests ---'
         c = S3Connection(
-            aws_access_key_id = self.my_aws_access_key_id,
-            aws_secret_access_key = self.my_aws_secret_access_key,
-                                port = 8091,
-                                host = my_s3_host,
-                                calling_format = self.calling_format,
-                                path = "/",
-                                is_secure = False)
+            aws_access_key_id=self.my_aws_access_key_id,
+            aws_secret_access_key=self.my_aws_secret_access_key,
+            port=8091,
+            host=my_s3_host,
+            calling_format=self.calling_format,
+            path="/",
+            is_secure=False)
         # create a new, empty bucket
         bucket_name = 'test-%d' % int(time.time())
         print "the bucket_name is: " + bucket_name
@@ -61,7 +62,9 @@ class S3ConnectionTest (unittest.TestCase):
         # test logging
         logging_bucket = c.create_bucket(bucket_name + '-log')
         logging_bucket.set_as_logging_target()
-        bucket.enable_logging(target_bucket=logging_bucket, target_prefix=bucket.name)
+        bucket.enable_logging(
+            target_bucket=logging_bucket,
+            target_prefix=bucket.name)
         bucket.disable_logging()
 #        c.delete_bucket(logging_bucket)
         k = bucket.new_key()
@@ -84,7 +87,9 @@ class S3ConnectionTest (unittest.TestCase):
         url = k.generate_url(3600, force_http=True)
         file = urllib.urlopen(url)
         assert s1 == file.read(), 'invalid URL %s' % url
-        url = k.generate_url(3600, force_http=True, headers={'x-amz-x-token' : 'XYZ'})
+        url = k.generate_url(3600,
+                             force_http=True,
+                             headers={'x-amz-x-token': 'XYZ'})
         file = urllib.urlopen(url)
         assert s1 == file.read(), 'invalid URL %s' % url
 #        bucket.delete_key(k)

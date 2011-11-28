@@ -1,44 +1,49 @@
 import formencode
 
 from pyramid.view import view_config
+from pyramid.security import authenticated_userid
 
 from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
 
-from c3sar.models import Band
-from c3sar.models import User
-from c3sar.models import DBSession
+from c3sar.models import (
+    Band,
+    User,
+    DBSession,
+    )
 
 dbsession = DBSession()
 
-# formencode schema for Bands ################################################
 
+# formencode schema for Bands ################################################
 class BandSchema(formencode.Schema):
     allow_extra_fields = True  # needed for registrar_is_member checkbox,
     # see ../templates/band_add.pt
     #
     #filter_extra_fields = False
-    band_name = formencode.validators.String(not_empty = True)
-    band_homepage = formencode.validators.String(not_empty = False)
-    band_email = formencode.validators.Email(not_empty = True,
-                                             resolve_domain = False)
+    band_name = formencode.validators.String(not_empty=True)
+    band_homepage = formencode.validators.String(not_empty=False)
+    band_email = formencode.validators.Email(not_empty=True,
+                                             resolve_domain=False)
+
+
 class BandEditSchema(formencode.Schema):
     allow_extra_fields = True  # needed for registrar_is_member checkbox,
     # see ../templates/band_add.pt
     #
     #filter_extra_fields = False
-    name = formencode.validators.String(not_empty = True)
-    homepage = formencode.validators.String(not_empty = False)
-    email = formencode.validators.Email(not_empty = True,
-                                             resolve_domain = False)
-    
+    name = formencode.validators.String(not_empty=True)
+    homepage = formencode.validators.String(not_empty=False)
+    email = formencode.validators.Email(not_empty=True,
+                                        resolve_domain=False)
 
-##################################################################### band_add
+
+# #################################################################### band_add
 @view_config(route_name='band_add',
              permission='addBand',
              renderer='../templates/band_add.pt')
 def band_add(request):
-    
+
     form = Form(request, BandSchema)
 
     if 'form.submitted' in request.POST and not form.validate():
@@ -47,25 +52,20 @@ def band_add(request):
         request.session.flash(form.data['band_name'])
         request.session.flash(form.data['band_homepage'])
         request.session.flash(form.data['band_email'])
-        
-
     if 'form.submitted' in request.POST and form.validate():
         request.session.flash('form validated!')
         dbsession = DBSession()
-        
         band_registrar = request.user
-        
-        request.session.flash("reg_is_member: " + form.data['registrar_is_member'])
+        request.session.flash(
+            "reg_is_member: " + form.data['registrar_is_member'])
         is_member = form.data['registrar_is_member']
-
         #if is_member == 1:
- 
         band = Band(
-            name = form.data['band_name'],
-            homepage = form.data['band_homepage'],
-            email = form.data['band_email'],
-            registrar = request.user.username,
-            registrar_id = request.user.id,
+            name=form.data['band_name'],
+            homepage=form.data['band_homepage'],
+            email=form.data['band_email'],
+            registrar=request.user.username,
+            registrar_id=request.user.id,
             )
 
         dbsession.add(band)
@@ -77,17 +77,18 @@ def band_add(request):
 
         redirect_url = "/band/view/" + str(band.id)
 
-        request.session.flash( redirect_url)
+        request.session.flash(redirect_url)
 
         from pyramid.httpexceptions import HTTPFound
-        return HTTPFound(location = redirect_url)
+        return HTTPFound(location=redirect_url)
 
     return {
         'viewer_username': authenticated_userid(request),
         'form': FormRenderer(form)
         }
 
-##################################################################### band_edit
+
+# ################################################################### band_edit
 @view_config(route_name='band_edit',
              permission='view',
              renderer='../templates/band_edit.pt')
@@ -100,7 +101,7 @@ def band_edit(request):
     band_registrar = band.registrar
     band_registrar_id = band.registrar_id
 
-    form = Form(request, schema = BandEditSchema, obj = band)
+    form = Form(request, schema=BandEditSchema, obj=band)
 
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
@@ -108,20 +109,19 @@ def band_edit(request):
         #request.session.flash(form.data['name'])
         #request.session.flash(form.data['homepage'])
         #request.session.flash(form.data['email'])
-        
 
     if 'form.submitted' in request.POST and form.validate():
         #request.session.flash('form validated!')
         dbsession = DBSession()
- 
+
         if form.data['name'] != band.name:
-            band.name=form.data['name']
+            band.name = form.data['name']
             #request.session.flash('changing band name')
         if form.data['homepage'] != band.homepage:
-            band.homepage=form.data['homepage']
+            band.homepage = form.data['homepage']
             #request.session.flash('changing band homepage')
         if form.data['email'] != band.email:
-            band.email=form.data['email']
+            band.email = form.data['email']
             #request.session.flash('changing band email')
 
         #request.session.flash(u'writing to database ...')
@@ -132,9 +132,8 @@ def band_edit(request):
         'form': FormRenderer(form)
         }
 
-#################################################################### band_view
-from pyramid.security import authenticated_userid
 
+#################################################################### band_view
 @view_config(route_name='band_view',
              permission='view',
              renderer='../templates/band_view.pt')
@@ -143,21 +142,17 @@ def band_view(request):
     band_id = request.matchdict['band_id']
     band = Band.get_by_band_id(band_id)
 
-    #calculate for next/previous-navigation    
+    #calculate for next/previous-navigation
     if int(band_id) == 1:
         prev_id = 1
     else:
         prev_id = int(band_id) - 1
-    
     next_id = int(band_id) + 1
     # TODO: MAXiD
     # if band_id == MaxId: next_id = band_id
-    
 
     # show who is watching. maybe we should log this ;-)
     viewer_username = authenticated_userid(request)
-
-
 
     return {
         'band': band,
@@ -166,7 +161,8 @@ def band_view(request):
         'next_id': next_id
         }
 
-#################################################################### band_list
+
+# ################################################################### band_list
 @view_config(route_name='band_list',
              permission='view',
              renderer='../templates/band_list.pt')
