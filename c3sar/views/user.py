@@ -61,7 +61,7 @@ def user_register(request):
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
         request.session.flash('form does not validate!')
-        if DEBUG:
+        if DEBUG:  # pragma: no cover
             print "submitted, but not validated"
     else:  # pragma: NO COVER # just for debugging, RLY
         if DEBUG:
@@ -216,12 +216,12 @@ def user_confirm_email(request):
 #             renderer='../templates/login.pt')
 def login_view(request):
     DEBUG = False
-    if DEBUG:
+    if DEBUG:  # pragma: no cover
         print "this is login_view"
     came_from = "space"
     headers = None
     logged_in = authenticated_userid(request)
-    if logged_in is not None:
+    if logged_in is not None:  # need to find testcase to cover...
         request.session.flash('you are logged in already!')
         return HTTPFound(location=came_from,
                          headers=headers)
@@ -392,7 +392,7 @@ def user_edit(request):
     """
     let users change some of their details
     """
-    DEBUG = True
+    DEBUG = False
 
     # if no user_id in URL and not logged in, tell user to login
 
@@ -436,26 +436,31 @@ def user_edit(request):
     #    "email_is_confirmed: " + str(user.email_is_confirmed))
 
     if form.validate():
-        request.session.flash("Yes! form.validate() !!!")
-        print "the form validated."
+        if DEBUG:  # pragma: no cover
+            request.session.flash("Yes! form.validate() !!!")
+            print "the form validated."
 
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
         request.session.flash('Please check the form below for errors!')
-        #request.session.flash(form.data['user_surname'])
-        #request.session.flash(form.data['user_lastname'])
-        #request.session.flash(form.data['user_email'])
+        if DEBUG:
+            print "submitted but not validated!"
 
     if 'form.submitted' in request.POST and form.validate():
         # ready for changing database entries!
         request.session.flash('form validated!')
-        print "the form was submitted and validated."
+        if DEBUG:
+            print "the form was submitted and validated."
 
         if form.data['surname'] != user.surname:
-            request.session.flash('surname was not same --> changing')
+            if DEBUG:  # pragma: no cover
+                request.session.flash('surname was not same --> changing')
+                print "changing surname"
             user.surname = form.data['surname']
         if form.data['lastname'] != user.lastname:
-            request.session.flash('lastname was not same --> changing')
+            if DEBUG:  # pragma: no cover
+                request.session.flash('lastname was not same --> changing')
+                print "changing lastname"
             user.lastname = form.data['lastname']
         if form.data['email'] != user.email:
             request.session.flash('email was not same --> changing')
@@ -482,17 +487,11 @@ def user_edit(request):
             request.session.flash('country was not same --> changing')
             user.country = form.data['country']
 
-        #redirect_url = route_url('user_view', request)
-
-#       return HTTPFound(location = redirect_url, headers=headers)
-       # return dict (
-       #     message = 'You won!'
-       #     )
-
+    if DEBUG:  # pragma: no cover
+        print "returning the form"
     return {
         'the_user_id': user_id,
         'the_username': user.username,
- #       'email_is_confirmed': email_is_confirmed,
         'form': FormRenderer(form),
         }
 

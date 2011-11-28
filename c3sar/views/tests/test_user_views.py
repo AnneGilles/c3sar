@@ -554,7 +554,7 @@ class UserViewIntegrationTests(unittest.TestCase):
 
     def test_user_edit_view(self):
         """
-        user edit view -- form test
+        user edit view -- test return values
         """
         from c3sar.views.user import user_edit
         request = testing.DummyRequest()
@@ -564,18 +564,19 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.dbsession.flush()
         request.matchdict['user_id'] = instance.id
         result = user_edit(request)
-        # test: a form exists
-        #self.assertTrue('form' in result.items(), 'form was not seen.')
-        #print "user edit view -- form test"
-        #pp.pprint(result)
-        #import pdb
-        #pdb.set_trace()
-        #self.assertTrue
+        # test values
         self.assertEquals(result['the_user_id'], instance.id, "wrong id")
+        self.assertEquals(
+            result['the_username'], instance.username, "wrong username")
+        self.assertTrue(result['form'], "no form")
+        # test: no errors
+        self.assertEquals(
+             result['form'].form.errors, {},
+             "unexpected error message was found")
 
     def test_user_edit_view_no_userid_in_matchdict(self):
         """
-        user edit view -- matchdict test
+        user edit view -- matchdict test & redirect
 
         if matchdict is invalid, expect redirect
         """
@@ -604,16 +605,9 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.dbsession.flush()
         request.matchdict['user_id'] = instance.id
         result = user_edit(request)
+        #print "user edit view -- without validating"
         #pp.pprint(result)
-        # self.assertEquals(result['user'].username, instance.username)
-        #print  result['form'].form.errors
-
-        # self.assertTrue(result['form'].form.is_validated,
-        #                "form not validated?")
-        # import pdb
-        # pdb.set_trace()
-
-        # test: unknown username
+        # test: no errors
         self.assertEquals(
              result['form'].form.errors, {},
              "unexpected error message was found")
@@ -623,25 +617,127 @@ class UserViewIntegrationTests(unittest.TestCase):
         user edit view -- without validating the form
         """
         from c3sar.views.user import user_edit
-        request = testing.DummyRequest()
-        request.POST = {'username': " ",
-                        'form.submitted': True}
+        request = testing.DummyRequest(
+            post={
+                'form.submitted': True,
+                'username': u' ',  # <-- can't be edited anyways
+                'password': u'passfoo',
+                'confirm_password': u'passfoo',
+                'city': u'foocity',
+                'surname': u'',
+                'lastname': u'lastfooname',
+                'number': u'foonumber',
+                'phone': u'foophone',
+                'street': u'foostreet',
+                'postcode': u'foocode',
+                'country': u'fooland',
+                'email': u'foo@example.com',
+                'fax': '',
+                })
         self.config = testing.setUp(request=request)
         instance = self._makeUser()
         self.dbsession.add(instance)
         self.dbsession.flush()
         request.matchdict['user_id'] = instance.id
         result = user_edit(request)
+        #print "submitted non validating: "
         #pp.pprint(result)
         # self.assertEquals(result['user'].username, instance.username)
         #print  result['form'].form.errors
 
         # self.assertTrue(result['form'].form.is_validated,
         #                "form not validated?")
-        # import pdb
-        # pdb.set_trace()
+        #import pdb
+        #pdb.set_trace()
+
+        # test: empty surname --> validation error
+        self.assertEquals(
+             result['form'].form.errors, {'surname': u'Please enter a value'},
+             "unexpected error message was found")
+
+    def test_user_edit_submitted_validating(self):
+        """
+        user edit view -- without validating the form
+        """
+        from c3sar.views.user import user_edit
+        request = testing.DummyRequest(
+            post={
+                'form.submitted': True,
+                'username': u'bar',
+                'password': u'passfoo',
+                'confirm_password': u'passfoo',
+                'city': u'foocity',
+                'surname': u'surfooname',
+                'lastname': u'lastfooname',
+                'number': u'foonumber',
+                'phone': u'foophone',
+                'street': u'foostreet',
+                'postcode': u'foocode',
+                'country': u'fooland',
+                'email': u'foo@example.com',
+                'fax': '',
+                })
+        self.config = testing.setUp(request=request)
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+        self.dbsession.flush()
+        request.matchdict['user_id'] = instance.id
+        result = user_edit(request)
+        #print "submitted non validating: "
+        #pp.pprint(result)
+        # self.assertEquals(result['user'].username, instance.username)
+        #print  result['form'].form.errors
+
+        # self.assertTrue(result['form'].form.is_validated,
+        #                "form not validated?")
+        #import pdb
+        #pdb.set_trace()
 
         # test: unknown username
         self.assertEquals(
              result['form'].form.errors, {},
+             "unexpected error message was found")
+
+    def test_user_edit_submitted_invalid_email(self):
+        """
+        user edit view -- without validating the form
+        """
+        from c3sar.views.user import user_edit
+        request = testing.DummyRequest(
+            post={
+                'form.submitted': True,
+                'username': u'bar',
+                'password': u'passfoo',
+                'confirm_password': u'passfoo',
+                'city': u'foocity',
+                'surname': u'surfooname',
+                'lastname': u'lastfooname',
+                'number': u'foonumber',
+                'phone': u'foophone',
+                'street': u'foostreet',
+                'postcode': u'foocode',
+                'country': u'fooland',
+                'email': u'example.com',  # <---------- invalid
+                'fax': '',
+                })
+        self.config = testing.setUp(request=request)
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+        self.dbsession.flush()
+        request.matchdict['user_id'] = instance.id
+        result = user_edit(request)
+        #print "submitted invalid email: "
+        #pp.pprint(result)
+        # self.assertEquals(result['user'].username, instance.username)
+        #print  result['form'].form.errors
+
+        self.assertTrue(not result['form'].form.validate(),
+                        "the form should not have validated!")
+        #import pdb
+        #pdb.set_trace()
+
+        # test: unknown username
+        self.assertEquals(
+             result['form'].form.errors,
+             {'email': u'An email address must contain a single @'},
              "unexpected error message was found")
