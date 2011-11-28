@@ -443,13 +443,13 @@ def user_edit(request):
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
         request.session.flash('Please check the form below for errors!')
-        if DEBUG:
+        if DEBUG:  # pragma: no cover
             print "submitted but not validated!"
 
     if 'form.submitted' in request.POST and form.validate():
         # ready for changing database entries!
         request.session.flash('form validated!')
-        if DEBUG:
+        if DEBUG:  # pragma: no cover
             print "the form was submitted and validated."
 
         if form.data['surname'] != user.surname:

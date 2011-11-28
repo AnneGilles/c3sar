@@ -592,6 +592,24 @@ class UserViewIntegrationTests(unittest.TestCase):
         # test: a redirect is triggered
         self.assertTrue(isinstance(result, HTTPFound), 'no redirect seen')
 
+    def test_user_edit_view_no_matchdict(self):
+        """
+        user edit view -- matchdict test & redirect
+
+        if matchdict is invalid, expect redirect
+        """
+        from c3sar.views.user import user_edit
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+        self.dbsession.flush()
+        #request.matchdict['user_id'] = 'foo'
+        result = user_edit(request)
+        # test: a redirect is triggered
+        self.assertTrue(isinstance(result, HTTPFound), 'no redirect seen')
+
     def test_user_edit_non_validating(self):
         """
         user edit view -- without validating the form
