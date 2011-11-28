@@ -317,6 +317,8 @@ class UserViewIntegrationTests(unittest.TestCase):
     def test_user_login_view_valid_user_invalidChar_pw(self):
         """
         login view - try login with valid user but invalid characters in passw
+
+        form should not validate and show error message
         """
         from c3sar.views.user import login_view
         my_user = self._makeUser()
@@ -332,7 +334,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.assertTrue(not result['form'].form.validate(),
                         "the form should not validate,"
                         "because of invalid chars in password")
-        # test: unknown username
+        # test: invalid characters in password
         self.assertEquals(
             result['form'].form.errors,
             {'password': u'Enter only letters, numbers, or _ (underscore)'},
@@ -341,6 +343,9 @@ class UserViewIntegrationTests(unittest.TestCase):
     def test_user_login_view_valid_user_wrong_pw(self):
         """
         login view - try login with a valid username but wrong password
+
+        the form does validate and no form error message is shown
+        but a request.session message is displayed, see 'msg'
         """
         from c3sar.views.user import login_view
         my_user = self._makeUser()
@@ -360,6 +365,9 @@ class UserViewIntegrationTests(unittest.TestCase):
             result['form'].form.errors,
             {},
             "expected NO error message")
+        self.assertEquals(result['msg'],
+                          u"username and password didn't match!",
+                          "expected something in 'msg'")
 
     def test_user_login_view_valid_user_and_pw(self):
         """
@@ -766,7 +774,10 @@ class UserViewIntegrationTests(unittest.TestCase):
         """
         from c3sar.views.user import user_set_default_license
         request = testing.DummyRequest(
-            post={'username': "foo"})
+            post={
+                'form.submitted': True,
+                'username': "foo",
+                })
         self.config = testing.setUp(request=request)
         instance = self._makeUser()
         self.dbsession.add(instance)
@@ -792,3 +803,14 @@ class UserViewIntegrationTests(unittest.TestCase):
         #pp.pprint(result)
         #import pdb
         #pdb.set_trace()
+
+    def test_user_login_first_view(self):
+        """
+        set default license
+        """
+        from c3sar.views.user import user_login_first
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        result = user_login_first(request)
+        # test for the expected message
+        self.assertEquals(result['msg'], 'log in first', "unexpected result")

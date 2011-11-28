@@ -33,7 +33,7 @@ from c3sar.views.validators import (
     )
 
 
-DEBUG = True
+DEBUG = False
 
 
 #@view_config(route_name='register',
@@ -216,6 +216,7 @@ def user_confirm_email(request):
 #             renderer='../templates/login.pt')
 def login_view(request):
     DEBUG = False
+    msg = u''
     if DEBUG:  # pragma: no cover
         print "this is login_view"
     came_from = "space"
@@ -288,6 +289,7 @@ def login_view(request):
             request.session.flash(
                 u"username and password didn't match!",  # message
                 'passwordcheck')                        # to queue
+            msg = u"username and password didn't match!"
             if DEBUG:  # pragma: no cover
                 request.session.flash(u'User.check_password was NOT True!')
                 print 'User.check_password was NOT True!'
@@ -299,6 +301,7 @@ def login_view(request):
         print "returning the form"
     return {
         'form': FormRenderer(form),
+        'msg': msg,
         }
 
 
@@ -514,7 +517,6 @@ def user_set_default_license(request):
     form = Form(request, schema=UserDefaultLicenseSchema, obj=user)
 
     if 'form.submitted' in request.POST and form.validate():
-        # ready for registration!
         request.session.flash('form validated!')
 
     return {
@@ -525,7 +527,8 @@ def user_set_default_license(request):
 
 
 def generate_contract_de_blank():
-    print "== user is not logged in, so give her a contract without any data"
+    if DEBUG:  # pragma: no coverage
+        print "== user not logged in, so give her a contract without any data"
 
     # return a pdf file with a blank contract
     from pyramid.response import Response
