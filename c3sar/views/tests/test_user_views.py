@@ -551,3 +551,97 @@ class UserViewIntegrationTests(unittest.TestCase):
 
         # test: view returns a dict containing a user
         self.assertEquals(result['user'].username, instance.username)
+
+    def test_user_edit_view(self):
+        """
+        user edit view -- form test
+        """
+        from c3sar.views.user import user_edit
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+        self.dbsession.flush()
+        request.matchdict['user_id'] = instance.id
+        result = user_edit(request)
+        # test: a form exists
+        #self.assertTrue('form' in result.items(), 'form was not seen.')
+        #print "user edit view -- form test"
+        #pp.pprint(result)
+        #import pdb
+        #pdb.set_trace()
+        #self.assertTrue
+        self.assertEquals(result['the_user_id'], instance.id, "wrong id")
+
+    def test_user_edit_view_no_userid_in_matchdict(self):
+        """
+        user edit view -- matchdict test
+
+        if matchdict is invalid, expect redirect
+        """
+        from c3sar.views.user import user_edit
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+        self.dbsession.flush()
+        request.matchdict['user_id'] = 'foo'
+        result = user_edit(request)
+        # test: a redirect is triggered
+        self.assertTrue(isinstance(result, HTTPFound), 'no redirect seen')
+
+    def test_user_edit_non_validating(self):
+        """
+        user edit view -- without validating the form
+        """
+        from c3sar.views.user import user_edit
+        request = testing.DummyRequest()
+        request.POST = {'username': "foo"}
+        self.config = testing.setUp(request=request)
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+        self.dbsession.flush()
+        request.matchdict['user_id'] = instance.id
+        result = user_edit(request)
+        #pp.pprint(result)
+        # self.assertEquals(result['user'].username, instance.username)
+        #print  result['form'].form.errors
+
+        # self.assertTrue(result['form'].form.is_validated,
+        #                "form not validated?")
+        # import pdb
+        # pdb.set_trace()
+
+        # test: unknown username
+        self.assertEquals(
+             result['form'].form.errors, {},
+             "unexpected error message was found")
+
+    def test_user_edit_submitted_non_validating(self):
+        """
+        user edit view -- without validating the form
+        """
+        from c3sar.views.user import user_edit
+        request = testing.DummyRequest()
+        request.POST = {'username': " ",
+                        'form.submitted': True}
+        self.config = testing.setUp(request=request)
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+        self.dbsession.flush()
+        request.matchdict['user_id'] = instance.id
+        result = user_edit(request)
+        #pp.pprint(result)
+        # self.assertEquals(result['user'].username, instance.username)
+        #print  result['form'].form.errors
+
+        # self.assertTrue(result['form'].form.is_validated,
+        #                "form not validated?")
+        # import pdb
+        # pdb.set_trace()
+
+        # test: unknown username
+        self.assertEquals(
+             result['form'].form.errors, {},
+             "unexpected error message was found")
