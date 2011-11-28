@@ -5,6 +5,7 @@ from c3sar.models import (
     User,
     )
 
+
 class UniqueUsername(validators.FancyValidator):
     """
     check if username already exists in database
@@ -24,24 +25,25 @@ class RegistrationSchema(formencode.Schema):
     formencode schema for user registration
     """
     allow_extra_fields = True
-    username = formencode.All(validators.PlainText(not_empty = True),
+    username = formencode.All(validators.PlainText(not_empty=True),
                               UniqueUsername())
-    password = formencode.validators.PlainText(not_empty = True)
+    password = formencode.validators.PlainText(not_empty=True)
     email = formencode.validators.Email(
-        resolve_domain = False, not_empty=True)
-    surname =  formencode.validators.String(not_empty = True)
-    lastname =  formencode.validators.String(not_empty = True)
+        resolve_domain=False, not_empty=True)
+    surname = formencode.validators.String(not_empty=True)
+    lastname = formencode.validators.String(not_empty=True)
     #password =  formencode.validators.String(not_empty = True)
-    confirm_password =  formencode.validators.String(not_empty = True)
+    confirm_password = formencode.validators.String(not_empty=True)
     chained_validators = [
         formencode.validators.FieldsMatch('password', 'confirm_password')
         ]
-    phone =  formencode.validators.String(not_empty = True)
-    street =  formencode.validators.String(not_empty = True)
-    number =  formencode.validators.String(not_empty = True)
-    postcode =  formencode.validators.String(not_empty = True)
-    city=  formencode.validators.String(not_empty = True)
-    country =  formencode.validators.String(not_empty = True)
+    phone = formencode.validators.String(not_empty=True)
+    street = formencode.validators.String(not_empty=True)
+    number = formencode.validators.String(not_empty=True)
+    postcode = formencode.validators.String(not_empty=True)
+    city = formencode.validators.String(not_empty=True)
+    country = formencode.validators.String(not_empty=True)
+
 
 class SecurePassword(validators.FancyValidator):
     """
@@ -95,7 +97,7 @@ class UsernameExists(validators.FancyValidator):
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
     username = formencode.validators.PlainText(not_empty=True)
-    username = formencode.All(validators.PlainText(not_empty = True),
+    username = formencode.All(validators.PlainText(not_empty=True),
                               UsernameExists())
     password = formencode.validators.PlainText(not_empty=True)
 
@@ -104,31 +106,28 @@ class LoginSchema(formencode.Schema):
 class UserSettingsSchema(formencode.Schema):
     allow_extra_fields = True
     filter_extra_fields = True
-    surname =  formencode.validators.String(not_empty = True)
-    lastname =  formencode.validators.String(not_empty = True)
+    surname = formencode.validators.String(not_empty=True)
+    lastname = formencode.validators.String(not_empty=True)
     email = formencode.validators.Email(resolve_domain=False,
-                                        not_empty = True)
-    phone = formencode.validators.String(not_empty = True)
-    fax = formencode.validators.String(not_empty = False)
-    street = formencode.validators.String(not_empty = False)
-    number = formencode.validators.String(not_empty = False)
-    city = formencode.validators.String(not_empty = False)
-    postcode = formencode.validators.String(not_empty = False)
-    country = formencode.validators.String(not_empty = False)
-    
-
+                                        not_empty=True)
+    phone = formencode.validators.String(not_empty=True)
+    fax = formencode.validators.String(not_empty=False)
+    street = formencode.validators.String(not_empty=False)
+    number = formencode.validators.String(not_empty=False)
+    city = formencode.validators.String(not_empty=False)
+    postcode = formencode.validators.String(not_empty=False)
+    country = formencode.validators.String(not_empty=False)
 
 
 class UserPasswordSchema(formencode.Schema):
     allow_extra_fields = True
     filter_extra_fields = True
 
-    new_password = formencode.validators.PlainText(not_empty = True)
-    confirm_password =  formencode.validators.String(not_empty = True)
+    new_password = formencode.validators.PlainText(not_empty=True)
+    confirm_password = formencode.validators.String(not_empty=True)
 
 
 ## formencode schema for user default license
 class UserDefaultLicenseSchema(formencode.Schema):
     allow_extra_fields = True
     filter_extra_fields = True
-
