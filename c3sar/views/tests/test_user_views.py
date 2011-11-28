@@ -759,3 +759,36 @@ class UserViewIntegrationTests(unittest.TestCase):
              result['form'].form.errors,
              {'email': u'An email address must contain a single @'},
              "unexpected error message was found")
+
+    def test_user_set_default_license(self):
+        """
+        set default license
+        """
+        from c3sar.views.user import user_set_default_license
+        request = testing.DummyRequest(
+            post={'username': "foo"})
+        self.config = testing.setUp(request=request)
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+        self.dbsession.flush()
+        request.matchdict['user_id'] = instance.id
+        result = user_set_default_license(request)
+        #print "user set default license"
+        #pp.pprint(result)
+        # test: no errors
+        #self.assertEquals(
+        #     result['form'].form.errors, {},
+        #     "unexpected error message was found")
+
+    def test_generate_contract_de_blank(self):
+        """
+        set default license
+        """
+        from c3sar.views.user import generate_contract_de_blank
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        result = generate_contract_de_blank()
+        #print "generate contract de blank"
+        #pp.pprint(result)
+        #import pdb
+        #pdb.set_trace()
