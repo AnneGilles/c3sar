@@ -80,7 +80,7 @@ def sanitize_filename(value):
 def track_add(request):
 
     viewer_username = authenticated_userid(request)
-    if viewer_username == "":
+    if viewer_username == "":  # pragma: no cover
         viewer_username = "not logged in"
 
     form = Form(request, TrackSchema)
@@ -88,8 +88,8 @@ def track_add(request):
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
         request.session.flash('form does not validate!')
-        request.session.flash('name: ' + form.data['track_name'])
-        request.session.flash('url: ' + form.data['track_url'])
+        #request.session.flash('name: ' + form.data['track_name'])
+        #request.session.flash('url: ' + form.data['track_url'])
         #request.session.flash('file: ' + form.data['file'])
 
     if 'form.submitted' in request.POST and form.validate():
@@ -101,13 +101,13 @@ def track_add(request):
 
         import pprint
         pp = pprint.PrettyPrinter(depth=6)
-        print "---- form.data: ----"
+        #print "---- form.data: ----"
         pp.pprint(form.data)
         print "---- request.POST: ----"
         pp.pprint(request.POST)
 
-        print "yes, Im here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1"
-        print str(form.data['track_file'] == '')
+        #print "yes, Im here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1"
+        #print str(form.data['track_file'] == '')
 
         # check if the form contained a file and if yes....
         #if 'track_file' in form.data:
@@ -220,7 +220,7 @@ def track_add_license(request):
         # request.session.flash("And this is request.POST")
         # request.session.flash(request.POST)
 
-        my_results_dict = request.str_POST
+        my_results_dict = request.POST
         #request.session.flash(my_results_dict.keys())
 
         if DEBUG:

@@ -6,6 +6,9 @@
 
   <tal:block metal:fill-slot="content">
     <h1>Add a Track, ${viewer_username}!</h1>
+
+    <span tal:repeat="messages request.session.pop_flash()"></span>
+
     ${form.begin(request.route_url('track_add'), enctype="multipart/form-data")}
 
     ${form.csrf_token()}
