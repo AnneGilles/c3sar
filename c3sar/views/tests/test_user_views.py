@@ -31,6 +31,7 @@ def _registerRoutes(config):
     config.add_route('user_login_first', '/sign_in_first')
     config.add_route('home', '/')  # for logout_view redirect
     config.add_route('not_found', '/not_found')  # for user_view redirect
+    config.add_route('user_profile', '/user/view/{user_id}')  # for user_contract redirect
     #config.add_route('', '/')
 
 
@@ -791,18 +792,57 @@ class UserViewIntegrationTests(unittest.TestCase):
         #     result['form'].form.errors, {},
         #     "unexpected error message was found")
 
-    def test_generate_contract_de_blank(self):
+    def test_user_contract_de_username(self):
         """
-        set default license
+        user contract generation -- pdf generation
         """
-        from c3sar.views.user import generate_contract_de_blank
+        from c3sar.views.user import user_contract_de_username
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+        self.dbsession.flush()
         request = testing.DummyRequest()
+
         self.config = testing.setUp(request=request)
-        result = generate_contract_de_blank()
-        #print "generate contract de blank"
+        _registerRoutes(self.config)
+        request.matchdict['username'] = instance.username
+        result = user_contract_de_username(request)
+        #print "generate contract de username"
         #pp.pprint(result)
-        #import pdb
-        #pdb.set_trace()
+        #print len(result.body)
+
+        # test: result content_type == pdf
+        self.assertEquals(result.content_type, 
+                          'application/pdf', "result has wrong content type")
+        # test: result pdf is > 80KB
+        self.assertTrue(len(result.body) > 80000, 
+                        "resulting pdf smaller as expected")
+        # test: result pdf is < 100KB
+        self.assertTrue(len(result.body) < 100000, 
+                        "resulting pdf bigger as expected")
+
+    def test_user_contract_de_username_fail(self):
+        """
+        user contract generation -- failure case
+        """
+        from c3sar.views.user import user_contract_de_username
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+        self.dbsession.flush()
+        request = testing.DummyRequest()
+
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        request.matchdict['username'] = u''
+        result = user_contract_de_username(request)
+        #print "generate contract de username"
+        #pp.pprint(result)
+        #print len(result.body)
+
+        # test: result content_type != pdf
+        self.assertNotEquals(result.content_type, 
+                          'application/pdf', "result has wrong content type")
+        # test: is a redirect
+        self.assertTrue(isinstance(result, HTTPFound), 'no redirect seen') 
 
     def test_user_login_first_view(self):
         """

@@ -22,6 +22,7 @@ import os
 import random
 import string
 from types import NoneType
+from datetime import datetime
 
 from c3sar.views.validators import (
     UniqueUsername,
@@ -526,92 +527,64 @@ def user_set_default_license(request):
         }
 
 
-def generate_contract_de_blank():
-    if DEBUG:  # pragma: no coverage
-        print "== user not logged in, so give her a contract without any data"
-
-    # return a pdf file with a blank contract
-    from pyramid.response import Response
-    response = Response(content_type='application/pdf')
-    response.app_iter = open(
-        "pdftk/berechtigungsvertrag-2.2_outlined.pdf", "r")
-
-
-def generate_contract_de(userid):
-    # stub
-    pass
-
-
-@view_config(route_name='user_contract_de',
-             permission='view',
-             #permission='editUser'
-             )
-# url scheme: /user/bv/C3S_contract_de_{username}
-def user_contract_de(request):
+def generate_contract_de_fdf_pdf(user):
     """
-    get a PDF for the user to print out, sign and mail back
+    take user information and generate fdf
     """
-    #dbsession = DBSession()
+    if DEBUG:  # pragma: no cover
+        print "===== this is generate_fdf_pdf"
     from fdfgen import forge_fdf
-    user_id = request.matchdict['user_id']
-
-    if DEBUG:
-        print "user_id = " + str(user_id)
-    # check if user is not logged in, then return blank contract
-    if user_id == 'blank' or not hasattr(request.user, 'id'):
-        if DEBUG:
-            print "user_id equalled blank"
-        return generate_contract_de_blank()
-
-    #user = User.get_by_user_id(user_id)
-    from datetime import datetime
-
     fields = [
-        ('surname', request.user.surname),
-        ('lastname', request.user.lastname),
-        ('street', request.user.street),
-        ('number', request.user.number),
-        ('postcode', request.user.postcode),
-        ('city', request.user.city),
-        ('email', request.user.email_addresses[0].email_address),
-        ('user_id', request.user.id),
-        ('username', request.user.username),
-        ('date_registered', request.user.date_registered),
+        ('surname', user.surname),
+        ('lastname', user.lastname),
+        ('street', user.street),
+        ('number', user.number),
+        ('postcode', user.postcode),
+        ('city', user.city),
+        ('email', user.email),
+        ('user_id', user.id),
+        ('username', user.username),
+        ('date_registered', user.date_registered),
         ('date_generated', datetime.now()),
         ]
     #generate fdf string
     fdf = forge_fdf("", fields, [], [], [])
     # write to file
-    my_fdf_filename = "fdf" + str(request.user.id) + ".fdf"
-    #import os
+    my_fdf_filename = "fdf" + str(user.id) + ".fdf"
+
     fdf_file = open(my_fdf_filename, "w")
     fdf_file.write(fdf)
     fdf_file.close()
-    print "fdf file written."
-    print os.popen('pwd').read()
-    print os.popen(
+    if DEBUG:  # pragma: no cover
+        print "fdf file written."
+
+    res = os.popen(
         'pdftk pdftk/berechtigungsvertrag-2.2.pdf fill_form %s output'
-        'formoutput.%s.pdf flatten' % (my_fdf_filename, str(request.user.id))
-        ).read()
-    print "done: put data into form and finalized it"
+        ' formoutput.pdf flatten' % my_fdf_filename).read()
+
+    if DEBUG:  # pragma: no cover
+        print res
+        print "done: put data into form and finalized it"
 
     # delete the fdf file
-    print os.popen('rm %s' % my_fdf_filename).read()
-
+    res = os.popen('rm %s' % my_fdf_filename)
+    if DEBUG:  # pragma: no cover
+        print res
+        print "combining with bank account form"
     # combine
-    print "combining with bank account form"
-    print os.popen(
-        'pdftk formoutput.%s.pdf pdftk/bankaccount.pdf output output.%s.pdf'
-        % (str(request.user.id), str(request.user.id))).read()
-    print "combined personal form and bank form"
+    res = os.popen(
+        'pdftk formoutput.pdf pdftk/bankaccount.pdf output output.pdf').read()
+    if DEBUG:  # pragma: no cover
+        print res
+        print "combined personal form and bank form"
 
     # delete the fdf file
-    print os.popen('rm formoutput.%s.pdf' % str(request.user.id)).read()
+    os.popen('rm formoutput.pdf').read()
 
     # return a pdf file
     from pyramid.response import Response
     response = Response(content_type='application/pdf')
-    response.app_iter = open("output.%s.pdf" % str(request.user.id), "r")
+    response.app_iter = open("output.pdf", "r")
     return response
 
 
@@ -623,69 +596,22 @@ def user_contract_de(request):
 def user_contract_de_username(request):
     """
     get a PDF for the user to print out, sign and mail back
+
+    special feature: username in filename
     """
-    #dbsession = DBSession()
-    from fdfgen import forge_fdf
-    user_id = request.matchdict['username']
 
-    # check if user is not logged in
-    if user_id == 'blank':
-        print "===== user is not logged in"
-
-        # return a pdf file
-        from pyramid.response import Response
-        response = Response(content_type='application/pdf')
-        response.app_iter = open(
-            "pdftk/berechtigungsvertrag-2.2_outlined.pdf", "r")
-        return response
-
-    #user = User.get_by_user_id(user_id)
-
-    fields = [
-        ('surname', request.user.surname),
-        ('lastname', request.user.lastname),
-        ('street', request.user.street),
-        ('number', request.user.number),
-        ('postcode', request.user.postcode),
-        ('city', request.user.city),
-        ('email', request.user.email_addresses[0].email_address),
-        ('user_id', request.user.id),
-        ('username', request.user.username),
-        ('date_registered', request.user.date_registered),
-        ('date_generated', datetime.now()),
-        ]
-    #generate fdf string
-    fdf = forge_fdf("", fields, [], [], [])
-    # write to file
-    my_fdf_filename = "fdf" + str(request.user.id) + ".fdf"
-    import os
-    fdf_file = open(my_fdf_filename, "w")
-    fdf_file.write(fdf)
-    fdf_file.close()
-    print "fdf file written."
-    print os.popen('pwd').read()
-    print os.popen(
-        'pdftk pdftk/berechtigungsvertrag-2.2.pdf fill_form %s output'
-        ' formoutput.pdf flatten' % my_fdf_filename).read()
-    print "done: put data into form and finalized it"
-
-    # delete the fdf file
-    print os.popen('rm %s' % my_fdf_filename)
-
-    # combine
-    print "combining with bank account form"
-    print os.popen(
-        'pdftk formoutput.pdf pdftk/bankaccount.pdf output output.pdf').read()
-    print "combined personal form and bank form"
-
-    # delete the fdf file
-    print os.popen('rm formoutput.pdf').read()
-
-    # return a pdf file
-    from pyramid.response import Response
-    response = Response(content_type='application/pdf')
-    response.app_iter = open("output.pdf", "r")
-    return response
+    try:
+        username = request.matchdict['username']
+        user = User.get_by_username(username)
+        assert(isinstance(user, User))
+        if DEBUG:  # pragma: no cover
+            print "about to generate pdf for user " + str(user.username)
+        return generate_contract_de_fdf_pdf(user)
+    except Exception, e:
+        if DEBUG:  # pragma: no cover
+            print "something failed:"
+            print e
+        return HTTPFound(location=route_url('home', request))
 
 
 #@view_config(route_name='user_login_first',

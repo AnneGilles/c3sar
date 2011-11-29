@@ -173,22 +173,11 @@ def main(global_config, **settings):
                     route_name='user_set_default_license',
                     renderer='templates/user_set_default_license.pt')
 
-    # user get contract with id in filename
-    config.add_route('user_contract_de',
-                     '/user/bv/C3S_contract_de.{user_id}.pdf')
-    config.add_view('c3sar.views.user.user_contract_de',
-                    route_name='user_contract_de')
-
     # user get contract with username in filename
     config.add_route('user_contract_de_username',
                      '/user/bv/C3S_contract_{username}.pdf')
     config.add_view('c3sar.views.user.user_contract_de_username',
                     route_name='user_contract_de_username')
-
-    # user get contract
-    #    config.add_route('user_get_bv', '/user/bv/{user_id}')
-    #    config.add_view('c3sar.views.user.user_get_bv',
-    #                    route_name='user_get_bv')
 
     config.add_route('user_login_first',
                      '/sign_in_first')
