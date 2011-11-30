@@ -31,7 +31,8 @@ def _registerRoutes(config):
     config.add_route('user_login_first', '/sign_in_first')
     config.add_route('home', '/')  # for logout_view redirect
     config.add_route('not_found', '/not_found')  # for user_view redirect
-    config.add_route('user_profile', '/user/view/{user_id}')  # for user_contract redirect
+    config.add_route('user_profile',
+                     '/user/view/{user_id}')  # for user_contract redirect
     #config.add_route('', '/')
 
 
@@ -802,23 +803,44 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.dbsession.flush()
         request = testing.DummyRequest()
 
-        self.config = testing.setUp(request=request)
-        _registerRoutes(self.config)
-        request.matchdict['username'] = instance.username
-        result = user_contract_de_username(request)
-        #print "generate contract de username"
-        #pp.pprint(result)
-        #print len(result.body)
+        # rolled my own skiptest :-)
+        import subprocess
+        from subprocess import CalledProcessError
+        try:
+            #print "trying ......................."
+            res = subprocess.check_call(["which", "pdftk"])
+            #print "tried ........................"
+            #print "result of this: " + str(res)
+            if res == 0:
+                print " ======== going ahead with the tests !!"
 
-        # test: result content_type == pdf
-        self.assertEquals(result.content_type, 
-                          'application/pdf', "result has wrong content type")
-        # test: result pdf is > 80KB
-        self.assertTrue(len(result.body) > 80000, 
-                        "resulting pdf smaller as expected")
-        # test: result pdf is < 100KB
-        self.assertTrue(len(result.body) < 100000, 
-                        "resulting pdf bigger as expected")
+                self.config = testing.setUp(request=request)
+                _registerRoutes(self.config)
+                request.matchdict['username'] = instance.username
+                result = user_contract_de_username(request)
+                # print "generate contract de username"
+                # pp.pprint(result)
+                # print len(result.body)
+
+                # test: result content_type == pdf
+                self.assertEquals(result.content_type,
+                                  'application/pdf',
+                                  "result has wrong content type")
+                # test: result pdf is > 80KB
+                self.assertTrue(len(result.body) > 80000,
+                                "resulting pdf smaller as expected")
+                # test: result pdf is < 100KB
+                self.assertTrue(len(result.body) < 100000,
+                                "resulting pdf bigger as expected")
+
+        except CalledProcessError, cpe:
+            print "SKIPPING this test. You need to install pdftk !!!"
+            # print "excepted an error: ..........."
+            # print cpe
+            # print ".................was the error"
+
+
+
 
     def test_user_contract_de_username_fail(self):
         """
@@ -839,10 +861,10 @@ class UserViewIntegrationTests(unittest.TestCase):
         #print len(result.body)
 
         # test: result content_type != pdf
-        self.assertNotEquals(result.content_type, 
+        self.assertNotEquals(result.content_type,
                           'application/pdf', "result has wrong content type")
         # test: is a redirect
-        self.assertTrue(isinstance(result, HTTPFound), 'no redirect seen') 
+        self.assertTrue(isinstance(result, HTTPFound), 'no redirect seen')
 
     def test_user_login_first_view(self):
         """
