@@ -839,9 +839,6 @@ class UserViewIntegrationTests(unittest.TestCase):
             # print cpe
             # print ".................was the error"
 
-
-
-
     def test_user_contract_de_username_fail(self):
         """
         user contract generation -- failure case

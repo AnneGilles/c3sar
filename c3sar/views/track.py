@@ -158,7 +158,8 @@ def track_add(request):
 
             # prepare to save the file
             the_cwd = os.path.abspath('.')
-            file_path = os.path.join(os.path.join(the_cwd,'tracks'), filename)
+            file_path = os.path.join(os.path.join(the_cwd, 'tracks'),
+                                     filename)
             output_file = open(file_path, 'wb')
 
             # Finally write the data to the output file
@@ -194,7 +195,6 @@ def track_add(request):
 
         dbsession.add(track)
         dbsession.flush()  # to get track.id
-
 
         if DEBUG:  # pragma: no cover
             print "---- DEBUG ---- " + str(track.id)
@@ -305,7 +305,7 @@ def track_add_license(request):
              renderer='../templates/track_view.pt')
 def track_view(request):
     if DEBUG:  # pragma: no cover
-        print "============  T R A C K ==  V I E W ================================="
+        print "============  T R A C K ==  V I E W =========================="
     id = request.matchdict['track_id']
     track = Track.get_by_track_id(id)
 

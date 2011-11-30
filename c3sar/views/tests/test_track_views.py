@@ -73,6 +73,7 @@ class TrackViewIntegrationTests(unittest.TestCase):
         return self._getTargetClass()(
             name, album, url, filepath, bytesize
             )
+
     def _makeTrack2(self,
                    name=u'the other track name',
                    album=u'the other album',
@@ -118,7 +119,6 @@ class TrackViewIntegrationTests(unittest.TestCase):
         result = sanitize_filename('foo123.mp3')
         self.assertEquals(result, 'foo123.mp3', 'wrong result')
 
-
     def test_track_add_view(self):
         """
         add track -- form test
@@ -132,8 +132,8 @@ class TrackViewIntegrationTests(unittest.TestCase):
         self.assertTrue('form' in result, 'form was not seen.')
 
         # test: form shows no errors
-        self.assertEquals(result['form'].form.errors, {}, 'form showed errors.')
-
+        self.assertEquals(result['form'].form.errors, {},
+                          'form showed errors.')
 
     def test_track_add_not_validating(self):
         """
@@ -148,8 +148,10 @@ class TrackViewIntegrationTests(unittest.TestCase):
         # test: form exists
         self.assertTrue('form' in result, 'form was not seen.')
         # test: form is not validated
-        self.assertTrue(result['form'].form.is_validated, 'form expectedly didnt validate.')
-        self.assertTrue(not result['form'].form.validate(), 'form validated unexpectedly.')
+        self.assertTrue(result['form'].form.is_validated,
+                        'form expectedly didnt validate.')
+        self.assertTrue(not result['form'].form.validate(),
+                        'form validated unexpectedly.')
         # test: form shows no errors
         self.assertEquals(result['form'].form.errors,
                           {'track_name': u'Missing value'},
@@ -176,10 +178,10 @@ class TrackViewIntegrationTests(unittest.TestCase):
         result = track_add(request)
 
         # expect a redirect
-        self.assertTrue(isinstance(result, HTTPFound), "should have been a redirect")
+        self.assertTrue(isinstance(result, HTTPFound),
+                        "should have been a redirect")
 
         # ToDo: check for track entry in db
-
 
     def test_track_view(self):
         """
@@ -204,14 +206,10 @@ class TrackViewIntegrationTests(unittest.TestCase):
         #self.assertEquals(result['id'], 1, "wrong id?")
         #self.assertEquals(result['id'], 1, "wrong id?")
         #self.assertEquals(result['id'], 1, "wrong id?")
-
-
-
         # expect a redirect
-        #self.assertTrue(isinstance(result, HTTPFound), "should have been a redirect")
-
+        #self.assertTrue(isinstance(result, HTTPFound),
+        #                "should have been a redirect")
         # ToDo: check for track entry in db
-
 
     def test_track_list(self):
         """
