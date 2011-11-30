@@ -6,7 +6,7 @@ from pyramid.httpexceptions import HTTPFound
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
-DEBUG = True
+DEBUG = False
 
 
 def _initTestingDB():
@@ -49,33 +49,40 @@ class TrackViewIntegrationTests(unittest.TestCase):
         from c3sar.models import Track
         return Track
 
-    def _makeUser(self,
-                  username=u'firstUsername', surname=u'firstSurname',
-                  lastname=u'firstLastname', password=u'password',
-                  email=u'first1@shri.de',
-                  email_confirmation_code=u'barfbarf',
-                  email_is_confirmed=True,
-                  phone=u'+49 6421 968300422',
-                  fax=u'+49 6421 690 6996'
-                  ):
-        return self._getTargetClass()(
-            username, password, surname, lastname,
-            email, email_is_confirmed, email_confirmation_code,
-            phone, fax)
+    # def _makeUser(self,
+    #               username=u'firstUsername', surname=u'firstSurname',
+    #               lastname=u'firstLastname', password=u'password',
+    #               email=u'first1@shri.de',
+    #               email_confirmation_code=u'barfbarf',
+    #               email_is_confirmed=True,
+    #               phone=u'+49 6421 968300422',
+    #               fax=u'+49 6421 690 6996'
+    #               ):
+    #     return self._getTargetClass()(
+    #         username, password, surname, lastname,
+    #         email, email_is_confirmed, email_confirmation_code,
+    #         phone, fax)
 
-    def _makeUser2(self,
-                  username=u'secondUsername', surname=u'secondSurname',
-                  lastname=u'secondLastname', password=u'password',
-                  email=u'second2@shri.de',
-                  email_confirmation_code=u'barfbarf',
-                  email_is_confirmed=False,
-                  phone=u'+49 6421 968300422',
-                  fax=u'+49 6421 690 6996'
+    def _makeTrack(self,
+                   name=u'the track name',
+                   album=u'the album',
+                   url=u"http://the_track.the_album.com",
+                   filepath=u"mysong.mp3",
+                   bytesize=u"123456"
                   ):
         return self._getTargetClass()(
-            username, password, surname, lastname,
-            email, email_is_confirmed, email_confirmation_code,
-            phone, fax)
+            name, album, url, filepath, bytesize
+            )
+    def _makeTrack2(self,
+                   name=u'the other track name',
+                   album=u'the other album',
+                   url=u"http://the_other_track.the_other_album.com",
+                   filepath=u"my_other_song.mp3",
+                   bytesize=u"654321"
+                  ):
+        return self._getTargetClass()(
+            name, album, url, filepath, bytesize
+            )
 
     def test_sanitize_filename(self):
         """
@@ -144,8 +151,8 @@ class TrackViewIntegrationTests(unittest.TestCase):
         self.assertTrue(result['form'].form.is_validated, 'form expectedly didnt validate.')
         self.assertTrue(not result['form'].form.validate(), 'form validated unexpectedly.')
         # test: form shows no errors
-        self.assertEquals(result['form'].form.errors, 
-                          {'track_name': u'Missing value'}, 
+        self.assertEquals(result['form'].form.errors,
+                          {'track_name': u'Missing value'},
                           'form didnt show errors as expected.')
         #print "results: "
         #print result['form'].form.errors
@@ -159,10 +166,10 @@ class TrackViewIntegrationTests(unittest.TestCase):
         from c3sar.views.track import track_add
         request = testing.DummyRequest(
             post={'form.submitted': True,
-                  'track_name': u'my test track',
-                  'track_file': u'',
-                  'track_url': u'',
-                  'track_album': u'',
+                  u'track_name': u'my test track',
+                  u'track_file': u'',
+                  u'track_url': u'',
+                  u'track_album': u'',
                   })
         self.config = testing.setUp(request=request)
         _registerRoutes(self.config)
@@ -172,3 +179,60 @@ class TrackViewIntegrationTests(unittest.TestCase):
         self.assertTrue(isinstance(result, HTTPFound), "should have been a redirect")
 
         # ToDo: check for track entry in db
+
+
+    def test_track_view(self):
+        """
+        track_view -- look at the file
+        """
+        from c3sar.views.track import track_view
+        instance = self._makeTrack()  # a track
+        self.dbsession.add(instance)
+
+        request = testing.DummyRequest()
+        request.matchdict['track_id'] = 1
+        self.config = testing.setUp(request=request)
+        #_registerRoutes(self.config)
+        result = track_view(request)
+
+        if DEBUG:  # pragma: no cover
+            print "the result of test_track_view: "
+            pp.pprint(result)
+
+        self.assertEquals(result['id'], 1, "wrong id?")
+        #self.assertEquals(result['license'], 1, "wrong id?")
+        #self.assertEquals(result['id'], 1, "wrong id?")
+        #self.assertEquals(result['id'], 1, "wrong id?")
+        #self.assertEquals(result['id'], 1, "wrong id?")
+
+
+
+        # expect a redirect
+        #self.assertTrue(isinstance(result, HTTPFound), "should have been a redirect")
+
+        # ToDo: check for track entry in db
+
+
+    def test_track_list(self):
+        """
+        track_list
+        """
+        from c3sar.views.track import track_list
+
+        instance1 = self._makeTrack()  # a track
+        self.dbsession.add(instance1)
+        instance2 = self._makeTrack2()  # another track
+        self.dbsession.add(instance2)
+
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+
+        result = track_list(request)
+
+        if DEBUG:  # pragma: no cover
+            print "result of test_track_list"
+            pp.pprint(result)
+
+        # check that there are two tracks in list
+        self.assertEquals(len(result['tracks']), 2,
+                          "wrong number of tracks in list")

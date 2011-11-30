@@ -1,23 +1,29 @@
 import formencode
-from formencode import validators
+#from formencode import validators
 
 from pyramid.security import authenticated_userid
 from pyramid.url import route_url
 from pyramid.view import view_config
-
+from pyramid.httpexceptions import HTTPFound
 from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
 
-from c3sar.models import Track
-from c3sar.models import License
-from c3sar.models import DBSession
+from c3sar.models import (
+    Track,
+    License,
+    DBSession,
+    )
 
 dbsession = DBSession()
 
-import string
+DEBUG = False
+
+if DEBUG:  # pragma: no cover
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
+
 
 # validator for track: URL or file upload #####################################
-
 # class URLorFile(validators.FancyValidator):
 #     def _to_python(self, track_url, track_file, state):
 #         if track_url is '' and track_file is '':
@@ -85,12 +91,18 @@ def track_add(request):
 
     form = Form(request, TrackSchema)
 
+    if DEBUG:  # pragma: no cover
+        if 'form.submitted' in request.POST:
+            print "=== form details: ==="
+            pp.pprint(form)
+            print "track_name : " + form.data['track_name']
+            print "track_album: " + str(form.data['track_album'])
+            print "track_url  : " + str(form.data['track_url'])
+            print "track_file : " + str(form.data['track_file'])
+
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
         request.session.flash('form does not validate!')
-        #request.session.flash('name: ' + form.data['track_name'])
-        #request.session.flash('url: ' + form.data['track_url'])
-        #request.session.flash('file: ' + form.data['file'])
 
     if 'form.submitted' in request.POST and form.validate():
         request.session.flash('form validated!')
@@ -99,15 +111,12 @@ def track_add(request):
         file_path = ''
         output_file_size = None
 
-        import pprint
-        pp = pprint.PrettyPrinter(depth=6)
-        #print "---- form.data: ----"
-        pp.pprint(form.data)
-        print "---- request.POST: ----"
-        pp.pprint(request.POST)
-
-        #print "yes, Im here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1"
-        #print str(form.data['track_file'] == '')
+        if DEBUG:  # pragma: no cover
+            print "---- form.data: ----"
+            pp.pprint(form.data)
+            print "---- request.POST: ----"
+            pp.pprint(request.POST)
+            # print str(form.data['track_file'] == '')
 
         # check if the form contained a file and if yes....
         #if 'track_file' in form.data:
@@ -126,19 +135,30 @@ def track_add(request):
             # absolute file *path* as the filename.  This example is naive; it
             # trusts user input.
 
-            filename = sanitize_filename(request.POST['file'].filename)
+            filename = sanitize_filename(request.POST['track_file'].filename)
 
             # ``input_file`` contains the actual file data which needs to be
             # stored somewhere.
 
-            input_file = request.POST['file'].file
+            input_file = request.POST['track_file'].file
+
+            if DEBUG:  # pragma: no cover
+                # print " == size: " + str(len(input_file))
+                print " == input_file.type: " + str(type(input_file))
 
             # Using the filename like this without cleaning it is very
             # insecure so please keep that in mind when writing your own
             # file handling.
             import os
 
-            file_path = os.path.join('c3sar/tracks', filename)
+            if DEBUG:  # pragma: no cover
+                print "=== current working dir: " + os.path.abspath('.')
+
+                print "=== upload target dir: " + os.path.abspath('tracks')
+
+            # prepare to save the file
+            the_cwd = os.path.abspath('.')
+            file_path = os.path.join(os.path.join(the_cwd,'tracks'), filename)
             output_file = open(file_path, 'wb')
 
             # Finally write the data to the output file
@@ -159,15 +179,14 @@ def track_add(request):
             #return Response('OK')
 
         dbsession = DBSession()
-        name = form.data['track_name']
 
         if file_path.startswith('c3sar/'):
             file_path = file_path.replace('c3sar/', '')
 
         track = Track(
-            name=form.data['track_name'],
-            album=form.data['track_album'],
-            url=form.data['track_url'],
+            name=unicode(form.data['track_name']),
+            album=unicode(form.data['track_album']),
+            url=unicode(form.data['track_url']),
             #file=form.data['track_file'],
             filepath=file_path,
             bytesize=output_file_size,
@@ -175,16 +194,15 @@ def track_add(request):
 
         dbsession.add(track)
         dbsession.flush()  # to get track.id
-        print "---- DEBUG ---- " + str(track.id)
-        request.session.flash(u'writing to database ...')
 
-        # ToDo: send user to track_view/this_id
+
+        if DEBUG:  # pragma: no cover
+            print "---- DEBUG ---- " + str(track.id)
+            request.session.flash(u'writing to database ...')
+
         # ToDo: send mail...
 
-        #redirect_url = route_url('track_list', request)
         redirect_url = route_url('track_view', request, track_id=track.id)
-        #      + str(track.id)
-        from pyramid.httpexceptions import HTTPFound
         return HTTPFound(location=redirect_url)
 
     return {
@@ -201,9 +219,9 @@ def track_add_license(request):
     # which one?
     id = request.matchdict['track_id']
     track = Track.get_by_track_id(id)
-    #license = track.license[1]
-#    request.session.flash(track.license[0])
-#    request.session.flash(track.license[1])
+    # license = track.license[1]
+    # request.session.flash(track.license[0])
+    # request.session.flash(track.license[1])
     # who is doing this?
     viewer_username = authenticated_userid(request)
 
@@ -286,21 +304,20 @@ def track_add_license(request):
              permission='view',
              renderer='../templates/track_view.pt')
 def track_view(request):
-
+    if DEBUG:  # pragma: no cover
+        print "============  T R A C K ==  V I E W ================================="
     id = request.matchdict['track_id']
     track = Track.get_by_track_id(id)
 
     # catch Error if id /not /exists
     try:
-        print "===== track.id: " + str(track.id)
-        print "===== track.license.__len__(): " + str(track.license.__len__())
+        print "== track.id: " + str(track.id)
+        print "== track.license.__len__(): " + str(track.license.__len__())
     except AttributeError, a:
         #'NoneType' object has no attribute 'license'
-        print "========================================================="
-        print "========================================================="
+
+        print "== AttributeError: "
         print a
-        print "========================================================="
-        print "========================================================="
         # here we should redirect to NotFound or give some info
 
     #calculate for next/previous-navigation
@@ -331,22 +348,24 @@ def track_view(request):
         request.session.flash(
             "track.license.name: " + str(track.license[0].img))
 
-    print "===================================="
-    print "str(type(track.license)): " + str(type(license))
-    print "===================================="
-    print "str(dir(track.license)): " + str(dir(license))
-    print "===================================="
-    #print "str(help(track.license.pop())): "
-    # + str(help(track.license.pop()))
-    print "===================================="
-    print "str(type(license)): " + str(type(license))
-    print "===================================="
-    # print "str(type(license.name)): " + str(type(license.name))
-    print "===================================="
-    # print str(dir(license))
-    # print "===================================="
-    # print str(license.name)
-    print "===================================="
+    if DEBUG:  # pragma: no cover
+
+        print "===================================="
+        print "str(type(track.license)): " + str(type(license))
+        print "===================================="
+        print "str(dir(track.license)): " + str(dir(license))
+        print "===================================="
+        # print "str(help(track.license.pop())): "
+        # + str(help(track.license.pop()))
+        print "===================================="
+        print "str(type(license)): " + str(type(license))
+        print "===================================="
+        # print "str(type(license.name)): " + str(type(license.name))
+        print "===================================="
+        # print str(dir(license))
+        # print "===================================="
+        # print str(license.name)
+        print "===================================="
 
     return {
         'track': track,
@@ -368,7 +387,7 @@ def track_list(request):
     return {'tracks': tracks}
 
 
-## track_edit
+## track_edit # TODO
 @view_config(route_name='track_edit',
              permission='view',
              renderer='../templates/track_edit.pt')
@@ -377,7 +396,7 @@ def track_edit(request):
     return {'tracks': tracks}
 
 
-## track_del
+## track_del # TODO
 @view_config(route_name='track_del',
              permission='view',
              renderer='../templates/track_del.pt')
@@ -386,7 +405,7 @@ def track_del(request):
     return {'tracks': tracks}
 
 
-## track_search
+## track_search #TODO
 @view_config(route_name='track_search',
              permission='view',
              renderer='../templates/track_search.pt')
