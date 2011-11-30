@@ -10,7 +10,7 @@
     <meta name="description" content="creative commons collecting society" />
     <tal:block metal:define-slot="head-meta"></tal:block>
     <link rel="shortcut icon" href="${request.static_url('c3sar:static/favicon.ico')}" />
-    <link rel="stylesheet" href="${request.static_url('c3sar:static/pylons_off.css')}" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="${request.static_url('c3sar:static/pylons.css')}" type="text/css" media="screen" charset="utf-8" />
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton|Nobile:regular,i,b,bi&amp;subset=latin"
 	  type="text/css" media="screen" charset="utf-8" />
     <!--[if lte IE 6]>
