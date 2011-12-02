@@ -71,18 +71,29 @@ class TrackViewIntegrationTests(unittest.TestCase):
                    url=u"http://the_track.the_album.com",
                    filepath=u"mysong.mp3",
                    bytesize=u"123456"
-                  ):
+                   ):
         return self._getTargetClass()(
             name, album, url, filepath, bytesize
             )
 
     def _makeTrack2(self,
-                   name=u'the other track name',
-                   album=u'the other album',
-                   url=u"http://the_other_track.the_other_album.com",
-                   filepath=u"my_other_song.mp3",
-                   bytesize=u"654321"
-                  ):
+                    name=u'the other track name',
+                    album=u'the other album',
+                    url=u"http://the_other_track.the_other_album.com",
+                    filepath=u"my_other_song.mp3",
+                    bytesize=u"654321"
+                    ):
+        return self._getTargetClass()(
+            name, album, url, filepath, bytesize
+            )
+
+    def _makeTrack3(self,
+                    name=u'yet another track name',
+                    album=u'yet another album',
+                    url=u"http://yet_another_track.yet_another_album.com",
+                    filepath=u"yet_another_song.mp3",
+                    bytesize=u"321654"
+                    ):
         return self._getTargetClass()(
             name, album, url, filepath, bytesize
             )
@@ -266,13 +277,38 @@ class TrackViewIntegrationTests(unittest.TestCase):
 
         self.assertEquals(result['id'], 1, "wrong id?")
         #self.assertEquals(result['license'], 1, "wrong id?")
+        self.assertEquals(result['next_id'], 1, "wrong id?")
+        self.assertEquals(result['prev_id'], 1, "wrong id?")
         #self.assertEquals(result['id'], 1, "wrong id?")
+
+    def test_track_view_next_prev(self):
+        """
+        track_view -- check prev/next navigation
+        """
+        from c3sar.views.track import track_view
+        instance = self._makeTrack()  # a track
+        self.dbsession.add(instance)
+        instance = self._makeTrack2()  # another track
+        self.dbsession.add(instance)
+        instance = self._makeTrack3()  # yet another track
+        self.dbsession.add(instance)
+        self.dbsession.flush()
+
+        request = testing.DummyRequest()
+        request.matchdict['track_id'] = 2
+        self.config = testing.setUp(request=request)
+        #_registerRoutes(self.config)
+        result = track_view(request)
+
+        if DEBUG:  # pragma: no cover
+            print "the result of test_track_view: "
+            pp.pprint(result)
+
+        self.assertEquals(result['id'], 2, "wrong id?")
+        #self.assertEquals(result['license'], 1, "wrong id?")
+        self.assertEquals(result['next_id'], 3, "wrong id?")
+        self.assertEquals(result['prev_id'], 1, "wrong id?")
         #self.assertEquals(result['id'], 1, "wrong id?")
-        #self.assertEquals(result['id'], 1, "wrong id?")
-        # expect a redirect
-        #self.assertTrue(isinstance(result, HTTPFound),
-        #                "should have been a redirect")
-        # ToDo: check for track entry in db
 
     def test_track_view_id_not_found(self):
         """
