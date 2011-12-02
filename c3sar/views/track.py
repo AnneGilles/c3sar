@@ -17,11 +17,11 @@ from c3sar.models import (
 dbsession = DBSession()
 
 DEBUG = False
+#DEBUG = True
 
 if DEBUG:  # pragma: no cover
     import pprint
     pp = pprint.PrettyPrinter(indent=4)
-
 
 # validator for track: URL or file upload #####################################
 # class URLorFile(validators.FancyValidator):
@@ -95,10 +95,16 @@ def track_add(request):
         if 'form.submitted' in request.POST:
             print "=== form details: ==="
             pp.pprint(form)
-            print "track_name : " + form.data['track_name']
-            print "track_album: " + str(form.data['track_album'])
-            print "track_url  : " + str(form.data['track_url'])
-            print "track_file : " + str(form.data['track_file'])
+            pp.pprint(form.data)
+            #import pdb; pdb.set_trace()
+            if 'track_name' in form.data:
+                print "track_name : " + form.data['track_name']
+            if 'track_album' in form.data:
+                print "track_album: " + str(form.data['track_album'])
+            if 'track_url' in form.data:
+                print "track_url  : " + str(form.data['track_url'])
+            if 'track_file' in form.data:
+                print "track_file : " + str(form.data['track_file'])
 
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
@@ -116,11 +122,15 @@ def track_add(request):
             pp.pprint(form.data)
             print "---- request.POST: ----"
             pp.pprint(request.POST)
-            # print str(form.data['track_file'] == '')
+            print "---- request.POST['track_file'']: ----"
+            if 'track_file' in request.POST:
+                pp.pprint(request.POST['track_file'])
+            else:
+                print "no 'track_file' in request.POST"
 
         # check if the form contained a file and if yes....
-        #if 'track_file' in form.data:
-        if form.data['track_file'] != '':
+        if 'track_file' in form.data and form.data['track_file'] != '':
+        #if form.data['track_file'] != '':
             #request.session.flash('there is a file supplied through the form')
             #request.session.flash('filename: '
             #                     + str(form.data['file'].filename))
@@ -160,24 +170,34 @@ def track_add(request):
             the_cwd = os.path.abspath('.')
             file_path = os.path.join(os.path.join(the_cwd, 'tracks'),
                                      filename)
-            output_file = open(file_path, 'wb')
 
-            # Finally write the data to the output file
-            input_file.seek(0)
-            while True:
-                data = input_file.read(8192)
-                if not data:
-                    break
-                output_file.write(data)
+            # create a directory for tracks on the filesystem
+            if not os.path.exists(file_path):
+                os.makedirs(file_path)
 
-            # determining filesize
-            import os
-            output_file_size = os.path.getsize(file_path)
+            try:
+                output_file = open(file_path, 'wb')
 
-            output_file.close()
+                # Finally write the data to the output file
+                input_file.seek(0)
+                while True:
+                    data = input_file.read(8192)
+                    if not data:
+                        break
+                    output_file.write(data)
 
-            request.session.flash('Upload went well!')
-            #return Response('OK')
+                # determining filesize
+                import os
+                output_file_size = os.path.getsize(file_path)
+
+                output_file.close()
+
+                request.session.flash('Upload went well!')
+                # return Response('OK')
+            except IOError, ioerr:
+                print "==== got an error ===="
+                print ioerr
+                print "maybe you have to create a folder 'tracks' first?"
 
         dbsession = DBSession()
 
@@ -226,11 +246,6 @@ def track_add_license(request):
     viewer_username = authenticated_userid(request)
 
     form = Form(request)
-
-    DEBUG = True
-    if DEBUG:
-        import pprint
-        pp = pprint.PrettyPrinter(depth=6)
 
     if 'form.submitted' in request.POST:
         # request.session.flash("Here comes request.str_POST")
@@ -309,15 +324,18 @@ def track_view(request):
     id = request.matchdict['track_id']
     track = Track.get_by_track_id(id)
 
-    # catch Error if id /not /exists
-    try:
-        print "== track.id: " + str(track.id)
-        print "== track.license.__len__(): " + str(track.license.__len__())
-    except AttributeError, a:
-        #'NoneType' object has no attribute 'license'
-
-        print "== AttributeError: "
-        print a
+    # import pdb; pdb.set_trace()
+    # redirect if id does not exist in database
+    if not isinstance(track, Track):
+        msg = "the track does not exist in the database!"
+        return HTTPFound(route_url('not_found', request))
+#     try:
+#         print "== track.id: " + str(track.id)
+#         print "== track.license.__len__(): " + str(track.license.__len__())
+#     except AttributeError, a:
+#         #'NoneType' object has no attribute 'license'
+#         print "== AttributeError: "
+#         print a
         # here we should redirect to NotFound or give some info
 
     #calculate for next/previous-navigation
@@ -350,22 +368,14 @@ def track_view(request):
 
     if DEBUG:  # pragma: no cover
 
-        print "===================================="
         print "str(type(track.license)): " + str(type(license))
-        print "===================================="
         print "str(dir(track.license)): " + str(dir(license))
-        print "===================================="
         # print "str(help(track.license.pop())): "
         # + str(help(track.license.pop()))
-        print "===================================="
         print "str(type(license)): " + str(type(license))
-        print "===================================="
         # print "str(type(license.name)): " + str(type(license.name))
-        print "===================================="
         # print str(dir(license))
-        # print "===================================="
         # print str(license.name)
-        print "===================================="
 
     return {
         'track': track,
