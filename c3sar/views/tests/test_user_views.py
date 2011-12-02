@@ -834,7 +834,8 @@ class UserViewIntegrationTests(unittest.TestCase):
                                 "resulting pdf bigger as expected")
 
         except CalledProcessError, cpe:
-            print "SKIPPING this test. You need to install pdftk !!!"
+            print "SKIPPING test_user_contract_de_username. "
+            print "You need to install pdftk !!!"
             # print "excepted an error: ..........."
             # print cpe
             # print ".................was the error"
