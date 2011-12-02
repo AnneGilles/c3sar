@@ -139,6 +139,11 @@ class User(Base):
         return DBSession.query(cls).filter(cls.id == id).first()
 
     @classmethod
+    def get_max_id(cls):
+        """return the highest id (by counting rows in table)"""
+        return DBSession.query(cls).count()
+
+    @classmethod
     def check_password(cls, username, password):
         dbSession = DBSession()
         user = cls.get_by_username(username)
@@ -278,6 +283,11 @@ class Track(Base):  # #########################################################
         return DBSession.query(cls).filter(cls.id == track_id).first()
 
     @classmethod
+    def get_max_id(cls):
+        """return the highest id (by counting rows in table)"""
+        return DBSession.query(cls).count()
+
+    @classmethod
     def track_listing(cls, order_by, how_many=10):
         q = DBSession.query(cls).all()
         return q
@@ -337,6 +347,11 @@ class Band(Base):  # ################################################## B A N D
         return DBSession.query(cls).filter(cls.id == band_id).first()
 
     @classmethod
+    def get_max_id(cls):
+        """return the highest id (by counting rows in table)"""
+        return DBSession.query(cls).count()
+
+    @classmethod
     def band_listing(cls, order_by, how_many=10):
         q = DBSession.query(cls).all()
 #        return q.order_by(order_by)[:how_many]
@@ -367,6 +382,11 @@ class Playlist(Base):  # ####################################################
     def __init__(self, name,):
         self.name = name
         #self.value = value
+
+    @classmethod
+    def get_max_id(cls):
+        """return the highest id (by counting rows in table)"""
+        return DBSession.query(cls).count()
 
 
 def populate():

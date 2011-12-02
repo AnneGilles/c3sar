@@ -339,14 +339,17 @@ def track_view(request):
         # here we should redirect to NotFound or give some info
 
     #calculate for next/previous-navigation
-    if int(id) == 1:
-        prev_id = 1
-    else:
-        prev_id = int(id) - 1
-
-    next_id = int(id) + 1
-    # TODO: MAXiD
-    # if track_id == MaxId: next_id = track_id
+    max_id = Track.get_max_id()
+    # previous
+    if track.id == 1:             # if looking at first id
+        prev_id = max_id          # --> choose highest db row
+    else:                         # if looking at any other id
+        prev_id = track.id - 1    # --> choose previous
+    # next
+    if track.id != max_id:        # if not on highest id
+        next_id = track.id + 1    # --> choose next
+    elif track.id == max_id:      # if highest id
+        next_id = 1               # --> choose first id ('wrap around'))
 
     # show who is watching. maybe we should log this ;-)
     viewer_username = authenticated_userid(request)

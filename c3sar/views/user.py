@@ -338,12 +338,17 @@ def user_view(request):
         return HTTPFound(location=route_url('not_found', request))
 
     # calculate for next/previous navigation
-    prev_id = int(user_id) - 1
-    next_id = int(user_id) + 1
-    # ToDo: what if foo_id == 0 or nonexistant?
-    # maybe use template logic to not show prev-next-link?
-    # maybe try to figure out max_id? what is cheaper? just fail/404?
-    # we need the 404 anyway, if user picks random url/user_id
+    max_id = User.get_max_id()
+    # previous
+    if user.id == 1:            # if looking at first id
+        prev_id = max_id        # --> choose highest db row, 'wrap around'
+    else:                       # if looking at any other id
+        prev_id = user.id - 1   # --> choose previous
+    # next
+    if user.id != max_id:       # if not on highest id
+        next_id = user.id + 1   # --> choose next
+    elif user.id == max_id:     # if highest id
+        next_id = 1             # --> choose first id ('wrap around'))
 
     # show who is watching. maybe we should log this ;-)
     viewer_username = authenticated_userid(request)
