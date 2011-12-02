@@ -3,10 +3,12 @@ import unittest
 from pyramid import testing
 from pyramid.httpexceptions import HTTPFound
 
-import pprint
-pp = pprint.PrettyPrinter(indent=4)
-
 DEBUG = False
+#DEBUG = True
+
+if DEBUG:  # pragma: no cover
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
 
 
 def _initTestingDB():
@@ -323,3 +325,24 @@ class TrackViewIntegrationTests(unittest.TestCase):
         # check that there are two tracks in list
         self.assertEquals(len(result['tracks']), 2,
                           "wrong number of tracks in list")
+
+    def test_track_add_license(self):
+        """ add a license """
+        from c3sar.views.track import track_add_license
+        # add a track
+        track1 = self._makeTrack()
+        self.dbsession.add(track1)
+        self.dbsession.flush()
+
+        request = testing.DummyRequest()
+        request.matchdict['track_id'] = 1
+        self.config = testing.setUp(request=request)
+        result = track_add_license(request)
+
+        #import pdb; pdb.set_trace()
+        if DEBUG:  # pragma: no cover
+            pp.pprint(result)
+
+        # basic check if form exists
+        self.assertTrue('track' in result, "no track found")
+        #self.assertEquals('track_id', 1, "wrong id")
