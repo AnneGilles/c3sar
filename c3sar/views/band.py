@@ -16,6 +16,9 @@ from c3sar.models import (
 
 dbsession = DBSession()
 
+#DEBUG = True
+DEBUG = False
+
 
 # formencode schema for Bands ################################################
 class BandSchema(formencode.Schema):
@@ -51,17 +54,15 @@ def band_add(request):
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
         request.session.flash('form does not validate!')
-        request.session.flash(form.data['band_name'])
-        request.session.flash(form.data['band_homepage'])
-        request.session.flash(form.data['band_email'])
     if 'form.submitted' in request.POST and form.validate():
         request.session.flash('form validated!')
         dbsession = DBSession()
         band_registrar = request.user
-        request.session.flash(
-            "reg_is_member: " + form.data['registrar_is_member'])
-        is_member = form.data['registrar_is_member']
-        #if is_member == 1:
+
+        if 'registrar_is_member' in form.data:
+            request.session.flash(
+                "reg_is_member: " + form.data['registrar_is_member'])
+
         band = Band(
             name=form.data['band_name'],
             homepage=form.data['band_homepage'],
@@ -69,20 +70,9 @@ def band_add(request):
             registrar=request.user.username,
             registrar_id=request.user.id,
             )
-
         dbsession.add(band)
-        request.session.flash(u'writing to database ...')
-
-        # request.session.flash('id' + str(band.band_id)) # is None
-
         dbsession.flush()
-
-        redirect_url = "/band/view/" + str(band.id)
-
-        request.session.flash(redirect_url)
-
-        from pyramid.httpexceptions import HTTPFound
-        return HTTPFound(location=redirect_url)
+        return HTTPFound(route_url('band_view', request, band_id=band.id))
 
     return {
         'viewer_username': authenticated_userid(request),
@@ -117,21 +107,28 @@ def band_edit(request):
         #request.session.flash(form.data['email'])
 
     if 'form.submitted' in request.POST and form.validate():
-        #request.session.flash('form validated!')
-        dbsession = DBSession()
 
         if form.data['name'] != band.name:
             band.name = form.data['name']
-            #request.session.flash('changing band name')
+            if DEBUG:  # pragma: no cover
+                print "changing band name"
+                request.session.flash('changing band name')
         if form.data['homepage'] != band.homepage:
             band.homepage = form.data['homepage']
-            #request.session.flash('changing band homepage')
+            if DEBUG:  # pragma: no cover
+                print "changing band homepage"
+                request.session.flash('changing band homepage')
         if form.data['email'] != band.email:
             band.email = form.data['email']
-            #request.session.flash('changing band email')
+            if DEBUG:  # pragma: no cover
+                print "changing band email"
+                request.session.flash('changing band email')
+                # TODO: trigger email_verification process
 
         #request.session.flash(u'writing to database ...')
         dbsession.flush()
+        # if all went well, redirect to band view
+        return HTTPFound(route_url('band_view', request, band_id=band.id))
 
     return {
         'viewer_username': authenticated_userid(request),
@@ -182,6 +179,5 @@ def band_view(request):
              permission='view',
              renderer='../templates/band_list.pt')
 def band_list(request):
-    #dbsession = DBSession()
     bands = Band.band_listing(Band.id.desc())
     return {'bands': bands}
