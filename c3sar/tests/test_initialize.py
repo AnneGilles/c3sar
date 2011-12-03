@@ -5,6 +5,7 @@ from pyramid import testing
 
 DEBUG = False
 
+
 def _initTestingDB():
     from c3sar.models import DBSession
     from c3sar.models import Base
@@ -15,20 +16,22 @@ def _initTestingDB():
     Base.metadata.create_all(engine)
     return DBSession
 
+
 def _registerRoutes(config):
     config.add_route('home', '/')
+
 
 class InitializeSqlTests(unittest.TestCase):
 
     def setUp(self):
         from c3sar.models import DBSession
         DBSession.remove()
-    
+
     def tearDown(self):
         from c3sar.models import DBSession
         DBSession.remove()
         #    self.session.remove()
-            
+
     def _callFUT(self, engine):
         """
         call the function under test,

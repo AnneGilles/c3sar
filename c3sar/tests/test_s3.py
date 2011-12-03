@@ -13,6 +13,7 @@ from boto.exception import S3PermissionsError
 #     from c3sar.s3 import initialize_s3
 #     return initialize_s3
 
+
 class I2s3_Init_Test(unittest.TestCase):
     # testing 23-36
 #    from c3sar.s3 import I2S3

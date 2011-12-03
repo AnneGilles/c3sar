@@ -1,7 +1,9 @@
 import formencode
 
+from pyramid.url import route_url
 from pyramid.view import view_config
 from pyramid.security import authenticated_userid
+from pyramid.httpexceptions import HTTPFound
 
 from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
@@ -97,6 +99,10 @@ def band_edit(request):
     band_id = request.matchdict['band_id']
     band = Band.get_by_band_id(band_id)
 
+    if not isinstance(band, Band):
+        msg = "Band id not found in database"  # TODO: check template!
+        return HTTPFound(route_url('not_found', request))
+
     # no change through form, so reuse old value (for now)
     band_registrar = band.registrar
     band_registrar_id = band.registrar_id
@@ -142,14 +148,23 @@ def band_view(request):
     band_id = request.matchdict['band_id']
     band = Band.get_by_band_id(band_id)
 
+    # redirect if id does not exist in database
+    if not isinstance(band, Band):
+        request.session.flash('this id wasnt found in our database!')
+        return HTTPFound(route_url('not_found', request))
+
     #calculate for next/previous-navigation
-    if int(band_id) == 1:
-        prev_id = 1
-    else:
-        prev_id = int(band_id) - 1
-    next_id = int(band_id) + 1
-    # TODO: MAXiD
-    # if band_id == MaxId: next_id = band_id
+    max_id = Band.get_max_id()
+    #previous
+    if band.id == 1:           # if looking at first id
+        prev_id = max_id       # --> choose highest id
+    else:                      # if looking at other id
+        prev_id = band.id - 1  # --> choose previous
+    # next
+    if band.id != max_id:      # if not on highest id
+        next_id = band.id + 1  # --> choose next
+    elif band.id == max_id:    # if highest_id
+        next_id = 1            # --> choose first id ('wrap around')
 
     # show who is watching. maybe we should log this ;-)
     viewer_username = authenticated_userid(request)

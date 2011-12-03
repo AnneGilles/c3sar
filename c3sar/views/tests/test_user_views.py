@@ -3,10 +3,12 @@ import unittest
 from pyramid import testing
 from pyramid.httpexceptions import HTTPFound
 
-import pprint
-pp = pprint.PrettyPrinter(indent=4)
+#DEBUG = True
+DEBUG = False
 
-DEBUG = True
+if DEBUG:  # pragma: no cover
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
 
 
 def _initTestingDB():
@@ -94,7 +96,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp(request=request)
         result = user_register(request)
         # test: a form exists
-        self.assertTrue('form' in result.items()[0], 'form was not seen.')
+        self.assertTrue('form' in result, 'form was not seen.')
 
     def test_user_register_not_validating(self):
         """
@@ -107,7 +109,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         result = user_register(request)
 
         # test: form exists
-        self.assertTrue('form' in result.items()[0], 'form was not seen.')
+        self.assertTrue('form' in result, 'form was not seen.')
         # test: form is not validated
         self.assertTrue(not result['form'].form.is_validated,
                         'form validated unexpectedly.')
