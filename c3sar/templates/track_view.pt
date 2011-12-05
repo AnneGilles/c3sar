@@ -10,7 +10,7 @@
       <a href="${prev_id}">previous</a> |
       <a href="/track/list">all</a> |
       <a href="${next_id}">next</a> |
-      <a href="/track/edit">edit</a> |
+      <a href="/track/edit/${track.id}">edit</a> |
       <a href="/track/rm">delete</a>
     </p>
 
