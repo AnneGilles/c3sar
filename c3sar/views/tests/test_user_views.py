@@ -376,31 +376,32 @@ class UserViewIntegrationTests(unittest.TestCase):
         from c3sar.views.user import login_view
         request = testing.DummyRequest()
         self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
         result = login_view(request)
         #self.assertTrue('form' in result['form'].form., 'form was not seen.')
         self.assertTrue(not result['form'].form.is_validated,
                         'form validated unexpectedly.')
-    # def test_user_login_view_already_loggedin(self):
-    #     """
-    #     login view -- if already logged in
-    #     """
-    #     from c3sar.views.user import login_view
-    #     #import pdb
-    #     #pdb.set_trace()
 
-    #     self.config.testing_securitypolicy(userid=u'username',
-    #                                        permissive=True)
-    #     request = testing.DummyRequest()
-    #     self.config = testing.setUp(request=request)
-    #     result = login_view(request)
+    def test_user_login_view_already_loggedin(self):
+        """
+        login view -- if already logged in
+        """
+        from c3sar.views.user import login_view
+        a_user = self._makeUser()
+        self.dbsession.add(a_user)
+        self.dbsession.flush()
 
-    #     pp.pprint(result)
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        self.config.testing_securitypolicy(userid=u'username')
+        _registerRoutes(self.config)
+        result = login_view(request)
 
-    #     #self.assertRaises(HTTPFound, login_view, request)
-    #     #self.assertTrue(isinstance(result, HTTPFound))
-    #     # TODO: fixme!
-    #     # I think I hit the wall where
-    #     # an integration test is needed to open a door and step through
+        print("login_view: ")
+        print(result)
+        print(result.headers)
+
+        self.assertTrue(isinstance(result, HTTPFound))
 
     def test_user_login_view_wrong_username(self):
         """
@@ -412,6 +413,7 @@ class UserViewIntegrationTests(unittest.TestCase):
                   'username': u'paul',
                   'password': u'pass'})
         self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
 
         self.assertEquals(request.POST, {'submit': True,
                                         'password': 'pass',
@@ -439,6 +441,7 @@ class UserViewIntegrationTests(unittest.TestCase):
                   'username': my_user.username,
                   'password': 'schmööp schmööp'})
         self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
         result = login_view(request)
 
         # test: form does not validate
@@ -466,6 +469,7 @@ class UserViewIntegrationTests(unittest.TestCase):
                   'username': my_user.username,
                   'password': 'N0T_THE_RIGHT_PW_but_a_v4l1d_0nE'})
         self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
         result = login_view(request)
 
         # test: form does not validate

@@ -220,17 +220,22 @@ def login_view(request):
     msg = u''
     if DEBUG:  # pragma: no cover
         print "this is login_view"
-    came_from = "space"
+
+    # see https://github.com/Pylons/pyramid/blob/master/docs/tutorials/
+    #                         wiki2/src/authorization/tutorial/views.py
+    login_url = request.route_url('login')
+    referrer = request.url
+    if referrer == login_url:  # pragma: no cover
+        referrer = '/'
+    came_from = request.params.get('came_from', referrer)
+
     headers = None
     logged_in = authenticated_userid(request)
     if logged_in is not None:  # need to find testcase to cover...
         request.session.flash('you are logged in already!')
+        print('you are logged in already!')
         return HTTPFound(location=came_from,
                          headers=headers)
-
-    # test for csrf token
-    #request.session.flash('token?: ' + str(request.POST.get("_csrf")))
-    # results in message: ['token?: d593dc44ff2012385df0abc5e371b4a5503b0c46'
 
     if logged_in is None:
         request.session.pop_flash()
@@ -244,7 +249,6 @@ def login_view(request):
     password = ''
 
     post_data = request.POST
-    #request.session.flash(post_data)
 
     if not 'submit' in post_data:
         if DEBUG:  # pragma: no cover
