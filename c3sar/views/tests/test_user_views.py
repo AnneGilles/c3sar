@@ -152,6 +152,43 @@ class UserViewIntegrationTests(unittest.TestCase):
                 },
             "not the expected validation error messages")
 
+    def test_user_register_submit_check_UniqueUsername(self):
+        """
+        register view -- try to register a user with a non-unique username
+        in order to trigger c3sar.views.validators.UniqueUsername
+        """
+        from c3sar.views.user import user_register
+
+        instance = self._makeUser()
+        self.dbsession.add(instance)
+        self.dbsession.flush()
+
+        request = testing.DummyRequest(
+            post={'form.submitted': True,
+                  'username': u'firstUsername',  # <-- same as instance^
+                  'password': u'passfoo',
+                  'confirm_password': u'passfoo',
+                  'city': u'foocity',
+                  'surname': u'surfooname',
+                  'lastname': u'lastfooname',
+                  'number': u'foonumber',
+                  'phone': u'foophone',
+                  'street': u'foostreet',
+                  'postcode': u'foocode',
+                  'country': u'fooland',
+                  'email': u'foo@example.com',
+                  'fax': '',
+                  # dasowohl
+                  })
+        self.config = testing.setUp(request=request)
+        result = user_register(request)
+
+        print result['form'].form.errors
+        self.assertEquals(
+            result['form'].form.errors,
+            {'username': 'That username already exists'},
+            "not the expected validation error messages")
+
     def test_user_register_submit_validate(self):
         """
         register view -- and validate the form
