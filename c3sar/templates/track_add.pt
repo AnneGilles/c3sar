@@ -62,13 +62,13 @@
 
         <tr>
           <td>
-            ${form.label('track_file', u'Choose file to upload:')}
+            ${form.label('track_upload', u'Choose file to upload:')}
           </td>
           <td>
-            ${form.file('track_file')}
+            ${form.file('track_upload')}
           </td>
           <td>
-            ${form.errorlist('track_file')}
+            ${form.errorlist('track_upload')}
           </td>
         </tr>
         <tr>

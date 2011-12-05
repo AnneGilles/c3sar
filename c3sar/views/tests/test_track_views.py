@@ -203,59 +203,69 @@ class TrackViewIntegrationTests(unittest.TestCase):
         # TODO: remove that SAWarning:
         #       Unicode type received non-unicode bind param value.
 
-#    def test_track_add_validating_w_file(self):
-#        """
-#        track_add -- validating the form, metadata & file
-#        """
-#        from c3sar.views.track import track_add
-#
-#        # note: file upload is a FieldStorage thing
-#        # request.POST looks like this:
-#         MultiDict(
-#             [
-#                 (u'_csrf', u'fe0251aad0b051c0bfc856826ff50b2fe917c8ac'),
-#                 (u'track_name', u'another track'),
-#                 (u'track_album', u'another album'),
-#                 (u'track_url', u'http://somewhe.re/track.mp3'),
-#                 (u'track_file',
-#                  FieldStorage(
-#                   u'track_file', u"lissie_-_when_i'm_alone.mp3")),
-#                 (u'form.submitted', u'Save')])
-#
-#         from cgi import FieldStorage
-#         request = testing.DummyRequest(
-#             post={u'form.submitted': True,
-#                   u'track_name': u'my test track',
-# #                   u'track_file': {
-# #                     'file': u'models.py',
-# #                     'filename': u'models.py',
-# #                     },
-# #
-# #                   u'track_file': [
-# #                     ('filename', u'models.py'),
-# #                     #('filename', u'models.py')
-# #                     ],
-# #
-#                   u'track_file': FieldStorage(u'track_file', u'models.py'),
-#                   u'track_url': u'http://me.com/file.mp3',
-#                   u'track_album': u'my test album',
-#                   })
-#         self.config = testing.setUp(request=request)
-#         _registerRoutes(self.config)
-#         result = track_add(request)
-#
-#         # expect a redirect
-#         self.assertTrue(isinstance(result, HTTPFound),
-#                         "should have been a redirect")
-#         # ToDo: check for track entry in db
-#         from c3sar.models import Track
-#         my_track = Track.get_by_track_id(u'1')
-#         self.assertEquals(my_track.name, 'my test track')
-#         self.assertEquals(my_track.album, 'my test album')
-#         self.assertEquals(my_track.url, 'http://me.com/file.mp3')
-#         # TODO: remove that SAWarning:
-#         #       Unicode type received non-unicode bind param value.
-#        # TODO: how to test upload of file?
+    def test_track_add_validating_w_file(self):
+        """
+        track_add -- validating the form, metadata & file
+        """
+        from c3sar.views.track import track_add
+
+        # note: file upload is a FieldStorage thing
+        # # request.POST looks like this:
+        # MultiDict(
+        #     [
+        #      (u'_csrf', u'fe0251aad0b051c0bfc856826ff50b2fe917c8ac'),
+        #      (u'track_name', u'another track'),
+        #      (u'track_album', u'another album'),
+        #      (u'track_url', u'http://somewhe.re/track.mp3'),
+        #      (u'track_file',
+        #        FieldStorage(
+        #           u'track_file', u"lissie_-_when_i'm_alone.mp3")),
+        #      (u'form.submitted', u'Save')])
+        #
+        class AFile(object):
+            """dummy to allow for attributes """
+            pass
+        _a_file = AFile()
+        _a_file.file = open('c3sar/models.py', 'r')
+        _a_file.filename = 'my model'
+        import os
+        _a_file.size = os.path.getsize('c3sar/models.py')
+
+        request = testing.DummyRequest(
+            post={u'form.submitted': True,
+                  u'track_name': u'my test track',
+                  u'track_upload': _a_file,  # see class AFile above
+                  u'track_url': u'http://me.com/file.mp3',
+                  u'track_album': u'my test album',
+                  })
+        if DEBUG:  # pragma: no cover
+            print "the request.POST: "
+            pp.pprint(request.POST)
+
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        result = track_add(request)
+        if DEBUG:  # pragma: no cover
+            print "the result of track_add with file: "
+            pp.pprint(result)
+
+        # close the file again
+        _a_file.file.close()
+
+        # expect a redirect
+        self.assertTrue(isinstance(result, HTTPFound),
+                        "should have been a redirect")
+        # ToDo: check for track entry in db
+        from c3sar.models import Track
+        my_track = Track.get_by_track_id(u'1')
+        self.assertEquals(my_track.name, 'my test track')
+        self.assertEquals(my_track.album, 'my test album')
+        self.assertEquals(my_track.url, 'http://me.com/file.mp3')
+        #self.assertEquals(my_track.bytesize, _a_file.size)
+
+        # TODO: remove that SAWarning:
+        #       Unicode type received non-unicode bind param value.
+        # TODO: how to test upload of file?
 
     def test_track_view(self):
         """

@@ -1,3 +1,4 @@
+import os
 import formencode
 #from formencode import validators
 
@@ -93,18 +94,18 @@ def track_add(request):
 
     if DEBUG:  # pragma: no cover
         if 'form.submitted' in request.POST:
-            print "=== form details: ==="
-            pp.pprint(form)
-            pp.pprint(form.data)
-            #import pdb; pdb.set_trace()
             if 'track_name' in form.data:
                 print "track_name : " + form.data['track_name']
             if 'track_album' in form.data:
-                print "track_album: " + str(form.data['track_album'])
+                print "track_album: " + form.data['track_album']
             if 'track_url' in form.data:
-                print "track_url  : " + str(form.data['track_url'])
-            if 'track_file' in form.data:
-                print "track_file : " + str(form.data['track_file'])
+                print "track_url  : " + form.data['track_url']
+            if 'track_upload' in form.data:
+                print "track_upload : " + form.data['track_upload']
+                print "track_upload.filename : "
+                + form.data['track_upload'].filename
+                print "track_upload.file : "
+                + form.data['track_upload'].file
 
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
@@ -114,27 +115,25 @@ def track_add(request):
         request.session.flash('form validated!')
 
         # some defaults
-        file_path = ''
-        output_file_size = None
+        file_path = ''           # where the file is stored (incl. name)
+        output_file_size = None  # the size of the file
 
         if DEBUG:  # pragma: no cover
             print "---- form.data: ----"
             pp.pprint(form.data)
-            print "---- request.POST: ----"
-            pp.pprint(request.POST)
-            print "---- request.POST['track_file'']: ----"
-            if 'track_file' in request.POST:
-                pp.pprint(request.POST['track_file'])
+            print "---- request.POST['track_file']: ----"
+            if 'track_upload' in request.POST:
+                pp.pprint(request.POST['track_upload'])
+                pp.pprint(request.POST['track_upload'].filename)
+                pp.pprint(request.POST['track_upload'].file)
+#request.POST['track_upload']    FieldStorage(u'track_upload', u'blahblah.mp3')
+#request.POST['track_upload'].filename                          u'blahblah.mp3'
+#request.POST['track_upload'].file    <open file '<fdopen>', mode 'w+b' at ...>
             else:
-                print "no 'track_file' in request.POST"
+                print "no 'track_upload' in request.POST"
 
         # check if the form contained a file and if yes....
-        if 'track_file' in form.data and form.data['track_file'] != '':
-        #if form.data['track_file'] != '':
-            #request.session.flash('there is a file supplied through the form')
-            #request.session.flash('filename: '
-            #                     + str(form.data['file'].filename))
-            #request.session.flash('file: ' + str(form.data['file'].file))
+        if 'track_upload' in form.data and form.data['track_upload'] != '':
 
             # https://docs.pylonsproject.org/projects/
             #           pyramid_cookbook/dev/files.html#basic-file-uploads
@@ -145,35 +144,31 @@ def track_add(request):
             # absolute file *path* as the filename.  This example is naive; it
             # trusts user input.
 
-            filename = sanitize_filename(request.POST['track_file'].filename)
+            file_name = sanitize_filename(
+                request.POST['track_upload'].filename)
 
             # ``input_file`` contains the actual file data which needs to be
             # stored somewhere.
 
-            input_file = request.POST['track_file'].file
-
-            if DEBUG:  # pragma: no cover
-                # print " == size: " + str(len(input_file))
-                print " == input_file.type: " + str(type(input_file))
+            input_file = request.POST['track_upload'].file
 
             # Using the filename like this without cleaning it is very
             # insecure so please keep that in mind when writing your own
-            # file handling.
-            import os
+            # file handling. TODO !!!
 
             if DEBUG:  # pragma: no cover
                 print "=== current working dir: " + os.path.abspath('.')
-
                 print "=== upload target dir: " + os.path.abspath('tracks')
 
             # prepare to save the file
             the_cwd = os.path.abspath('.')
-            file_path = os.path.join(os.path.join(the_cwd, 'tracks'),
-                                     filename)
+            file_dir = os.path.join(the_cwd, 'tracks')
 
             # create a directory for tracks on the filesystem
-            if not os.path.exists(file_path):
-                os.makedirs(file_path)
+            if not os.path.exists(file_dir):
+                os.makedirs(file_dir)  # pragma: no cover
+
+            file_path = os.path.join(file_dir, file_name)
 
             try:
                 output_file = open(file_path, 'wb')
@@ -187,40 +182,34 @@ def track_add(request):
                     output_file.write(data)
 
                 # determining filesize
-                import os
                 output_file_size = os.path.getsize(file_path)
 
                 output_file.close()
 
-                request.session.flash('Upload went well!')
+                request.session.flash('file was saved')
                 # return Response('OK')
-            except IOError, ioerr:
+            except IOError, ioerr:  # pragma: no cover
                 print "==== got an error ===="
                 print ioerr
-                print "maybe you have to create a folder 'tracks' first?"
+                print "something failed."
 
         dbsession = DBSession()
 
-        if file_path.startswith('c3sar/'):
-            file_path = file_path.replace('c3sar/', '')
+#        if file_path.startswith('c3sar/'):
+#            file_path = file_path.replace('c3sar/', '')
 
         track = Track(
             name=unicode(form.data['track_name']),
             album=unicode(form.data['track_album']),
             url=unicode(form.data['track_url']),
-            #file=form.data['track_file'],
-            filepath=file_path,
+            filepath=unicode(file_path),
             bytesize=output_file_size,
             )
 
         dbsession.add(track)
-        dbsession.flush()  # to get track.id
+        dbsession.flush()
 
-        if DEBUG:  # pragma: no cover
-            print "---- DEBUG ---- " + str(track.id)
-            request.session.flash(u'writing to database ...')
-
-        # ToDo: send mail...
+         # ToDo: send mail...
 
         redirect_url = route_url('track_view', request, track_id=track.id)
         return HTTPFound(location=redirect_url)
@@ -257,7 +246,7 @@ def track_add_license(request):
         #request.session.flash(my_results_dict.keys())
 
         if DEBUG:
-            print "===== DEBUG ===== DEBUG ===== DEBUG ====="
+            print "====="
             pp.pprint(my_results_dict.keys())
             pp.pprint(my_results_dict['cc_js_want_cc_license'])
 
