@@ -124,7 +124,7 @@ class UserViewIntegrationTests(unittest.TestCase):
         request = testing.DummyRequest(
             post={'form.submitted': True,
                   'username': u'foo',
-                  'password': u'passfoo'})
+                  'password': u'passfoo123'})
         self.config = testing.setUp(request=request)
         result = user_register(request)
 
@@ -166,8 +166,8 @@ class UserViewIntegrationTests(unittest.TestCase):
         request = testing.DummyRequest(
             post={'form.submitted': True,
                   'username': u'firstUsername',  # <-- same as instance^
-                  'password': u'passfoo',
-                  'confirm_password': u'passfoo',
+                  'password': u'passf00bar',
+                  'confirm_password': u'passf00bar',
                   'city': u'foocity',
                   'surname': u'surfooname',
                   'lastname': u'lastfooname',
@@ -183,10 +183,80 @@ class UserViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp(request=request)
         result = user_register(request)
 
-        print result['form'].form.errors
         self.assertEquals(
             result['form'].form.errors,
             {'username': 'That username already exists'},
+            "not the expected validation error messages")
+
+    def test_user_register_submit_check_SecurePassword_len(self):
+        """
+        register -- try to register a user with a TOO SHORT password
+        in order to trigger c3sar.views.validators.SecurePassword
+        """
+        from c3sar.views.user import user_register
+        request = testing.DummyRequest(
+            post={'form.submitted': True,
+                  'username': u'firstUsername',
+                  'password': u'passf00',     # <-- 7 chars is TOO SHORT
+                  'confirm_password': u'passf00',
+                  'city': u'foocity',
+                  'surname': u'surfooname',
+                  'lastname': u'lastfooname',
+                  'number': u'foonumber',
+                  'phone': u'foophone',
+                  'street': u'foostreet',
+                  'postcode': u'foocode',
+                  'country': u'fooland',
+                  'email': u'foo@example.com',
+                  'fax': '',
+                  })
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        result = user_register(request)
+        #print "too short:"
+        #print result
+        #print result['form'].form.errors
+        self.assertEquals(
+            result['form'].form.errors,
+            {'password':
+             u'Your password must be longer than 8 characters long'},
+            "not the expected validation error messages")
+
+    def test_user_register_submit_check_SecurePassword_non_alpha(self):
+        """
+        register -- try to register a user with a TOO SIMPLE password
+        in order to trigger c3sar.views.validators.SecurePassword
+        It must contain at least 2 digits or non-alhphabetic character
+        """
+        from c3sar.views.user import user_register
+        request = testing.DummyRequest(
+            post={'form.submitted': True,
+                  'username': u'firstUsername',
+                  'password': u'passfoobar',     # <-- 7 chars is TOO SIMPLE
+                  'confirm_password': u'passfoobar',
+                  'city': u'foocity',
+                  'surname': u'surfooname',
+                  'lastname': u'lastfooname',
+                  'number': u'foonumber',
+                  'phone': u'foophone',
+                  'street': u'foostreet',
+                  'postcode': u'foocode',
+                  'country': u'fooland',
+                  'email': u'foo@example.com',
+                  'fax': '',
+                  })
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        result = user_register(request)
+
+        #print "too alphabetic"
+        #print result
+        #print result['form'].form.errors
+        self.assertEquals(
+            result['form'].form.errors,
+            {'password':
+                 u'You must include at least 2 non-alphabetic ' +
+             'characters in your password'},
             "not the expected validation error messages")
 
     def test_user_register_submit_validate(self):
@@ -197,8 +267,8 @@ class UserViewIntegrationTests(unittest.TestCase):
         request = testing.DummyRequest(
             post={'form.submitted': True,
                   'username': u'foo',
-                  'password': u'passfoo',
-                  'confirm_password': u'passfoo',
+                  'password': u'passfoo123',
+                  'confirm_password': u'passfoo123',
                   'city': u'foocity',
                   'surname': u'surfooname',
                   'lastname': u'lastfooname',

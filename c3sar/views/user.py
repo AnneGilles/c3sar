@@ -56,7 +56,7 @@ def user_register(request):
                                          + string.digits) for x in range(N))
     #print " -- the random string: " + randomstring
 
-    URL = "diogenes:6543"
+    URL = "localhost:6543"
     # ToDo XXX change this to be more generic
 
     if 'form.submitted' in request.POST and not form.validate():
