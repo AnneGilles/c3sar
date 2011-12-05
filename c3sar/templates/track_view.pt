@@ -17,7 +17,6 @@
     <h1>${track.name}</h1>
     <p>Album: <b class="hits">${track.album}</b>.</p>
     <p>URL: <b class="hits">${track.url}</b>.</p>
-    <!-- deprecated:    <p>File: <b class="hits">$ off {track.file}</b>.</p> -->
     <p>FilePath: <b>${track.filepath}</b> </p>
     <p>FileSize: <b>${track.bytesize}</b></p>
     <p><a href="/${track.filepath}">download now</a>.</p>
@@ -32,8 +31,8 @@
       </span>
       <span tal:condition="track_is_licensed">
 	<p>License name: ${license.name}</p>
-	<p>License image: ${license.img}</p>
-	<p>License URL: ${license.uri}</p>
+	<p tal:condition="license.img">License image: ${license.img}</p>
+	<p tal:condition="license.uri">License URL: ${license.uri}</p>
 	<p><a href="${license.uri}"><img src="${license.img}"></a></p>
       </span>
     </span>
