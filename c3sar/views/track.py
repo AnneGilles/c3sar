@@ -346,17 +346,20 @@ def track_view(request):
     #          "track.license.__len__(): " + str(track.license.__len__()))
     #request.session.flash("track.license.name: " + track.license[0].name)
 
+    #request.session.flash(track.license.__len__())
+# type(track.license) is  <class 'sqlalchemy.orm.collections.InstrumentedList'>
+
     if track.license.__len__() == 0:
         track_is_licensed = False
         license = License(name=u"All Rights Reserved.",
                           uri=u"", img=u"", author=u"default license")
-        request.session.flash("track_is_licensed: " + str(track_is_licensed))
+        #request.session.flash("track_is_licensed: " + str(track_is_licensed))
     else:
         track_is_licensed = True
         license = track.license[0]
-        request.session.flash("track_is_licensed: " + str(track_is_licensed))
-        request.session.flash(
-            "track.license.name: " + str(track.license[0].img))
+        #request.session.flash("track_is_licensed: " + str(track_is_licensed))
+        #request.session.flash(
+        #    "track.license.name: " + str(track.license[0].img))
 
     if DEBUG:  # pragma: no cover
 

@@ -416,12 +416,14 @@ class TrackViewIntegrationTests(unittest.TestCase):
         _registerRoutes(self.config)
         result = track_add_license(request)
 
-        #import pdb; pdb.set_trace()
         if DEBUG:  # pragma: no cover
             pp.pprint(result)
 
         # check for redirect
         self.assertTrue(isinstance(result, HTTPFound), "no redirect")
+        # redirect goes to track/view/1
+        self.assertTrue('track/view/1' in result.headerlist[2][1],
+                        "no redirect")
 
         from c3sar.models import Track
         the_track = Track.get_by_track_id(1)
@@ -438,6 +440,13 @@ class TrackViewIntegrationTests(unittest.TestCase):
             the_license.name,
             u'Creative Commons Attribution 3.0 Unported',
             "wrong license name")
+
+        # and now let's go to track/view/1
+        from c3sar.views.track import track_view
+        request = testing.DummyRequest()
+        request.matchdict['track_id'] = 1
+        self.config = testing.setUp(request=request)
+        result = track_view(request)
 
     def test_track_add_license_submit_by_nc_sa_de(self):
         """ track add license & submit: cc-by-nc-sa-de"""
