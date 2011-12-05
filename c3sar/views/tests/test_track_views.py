@@ -373,7 +373,7 @@ class TrackViewIntegrationTests(unittest.TestCase):
                           "wrong number of tracks in list")
 
     def test_track_add_license(self):
-        """ add a license """
+        """ add license view -- just open it"""
         from c3sar.views.track import track_add_license
         # add a track
         track1 = self._makeTrack()
@@ -385,10 +385,146 @@ class TrackViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp(request=request)
         result = track_add_license(request)
 
+        if DEBUG:  # pragma: no cover
+            pp.pprint(result)
+
+        self.assertTrue('track' in result, "no track found")
+
+    def test_track_add_license_submit_cc_generic(self):
+        """ track add license & submit: cc-by generic"""
+        from c3sar.views.track import track_add_license
+        # add a track
+        track1 = self._makeTrack()
+        self.dbsession.add(track1)
+        self.dbsession.flush()
+
+        request = testing.DummyRequest(
+            post={'form.submitted': True,
+                  u'cc_js_want_cc_license': u'sure',
+                  u'cc_js_share': u'1',
+                  u'cc_js_remix': u'',
+                  u'cc_js_jurisdiction': u'generic',
+                  u'cc_js_result_uri':
+                      u'http://creativecommons.org/licenses/by/3.0/',
+                  u'cc_js_result_img':
+                      u'http://i.creativecommons.org/l/by/3.0/88x31.png',
+                  u'cc_js_result_name':
+                      u'Creative Commons Attribution 3.0 Unported',
+                  })
+        request.matchdict['track_id'] = 1
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        result = track_add_license(request)
+
         #import pdb; pdb.set_trace()
         if DEBUG:  # pragma: no cover
             pp.pprint(result)
 
-        # basic check if form exists
-        self.assertTrue('track' in result, "no track found")
-        #self.assertEquals('track_id', 1, "wrong id")
+        # check for redirect
+        self.assertTrue(isinstance(result, HTTPFound), "no redirect")
+
+        from c3sar.models import Track
+        the_track = Track.get_by_track_id(1)
+        the_license = the_track.license[0]
+        self.assertEquals(the_license.id, 1,
+                          "wrong id: should be the only one in database")
+        self.assertEquals(the_license.img,
+                          u'http://i.creativecommons.org/l/by/3.0/88x31.png',
+                          "wrong license img")
+        self.assertEquals(the_license.uri,
+                          u'http://creativecommons.org/licenses/by/3.0/',
+                          "wrong license uri")
+        self.assertEquals(
+            the_license.name,
+            u'Creative Commons Attribution 3.0 Unported',
+            "wrong license name")
+
+    def test_track_add_license_submit_by_nc_sa_de(self):
+        """ track add license & submit: cc-by-nc-sa-de"""
+        from c3sar.views.track import track_add_license
+        # add a track
+        track1 = self._makeTrack()
+        self.dbsession.add(track1)
+        self.dbsession.flush()
+
+        request = testing.DummyRequest(
+            post={'form.submitted': True,
+                  u'cc_js_want_cc_license': u'sure',
+                  u'cc_js_share': u'1',
+                  u'cc_js_remix': u'',
+                  u'cc_js_nc': u'1',
+                  u'cc_js_jurisdiction': u'de',
+                  u'cc_js_result_uri':
+                      u'http://creativecommons.org/licenses/by-nc-sa/3.0/',
+                  u'cc_js_result_img':
+                      u'http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png',
+                  u'cc_js_result_name':
+                  u'Creative Commons Attribution-NonCommercial-ShareAlike 3.0',
+                  })
+        request.matchdict['track_id'] = 1
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        result = track_add_license(request)
+
+        if DEBUG:  # pragma: no cover
+            pp.pprint(result)
+
+        # check for redirect
+        self.assertTrue(isinstance(result, HTTPFound), "no redirect")
+
+        from c3sar.models import Track
+        the_track = Track.get_by_track_id(1)
+        the_license = the_track.license[0]
+        self.assertEquals(the_license.id, 1,
+                          "wrong id: should be the only one in database")
+        self.assertEquals(
+            the_license.img,
+            u'http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png',
+            "wrong license image")
+        self.assertEquals(
+            the_license.uri,
+            u'http://creativecommons.org/licenses/by-nc-sa/3.0/',
+            "wrong license uri")
+        self.assertEquals(
+            the_license.name,
+            u'Creative Commons Attribution-NonCommercial-ShareAlike 3.0',
+            "wrong license name")
+
+    def test_track_add_license_submit_all_rights_reserved(self):
+        """ track add license & submit: allrights reserved"""
+        from c3sar.views.track import track_add_license
+        # add a track
+        track1 = self._makeTrack()
+        self.dbsession.add(track1)
+        self.dbsession.flush()
+
+        request = testing.DummyRequest(
+            post={'form.submitted': True,
+                  u'cc_js_want_cc_license': u'nah',
+                  u'cc_js_share': u'1',
+                  u'cc_js_jurisdiction': u'de',
+                  u'cc_js_result_uri': u'',
+                  u'cc_js_result_img': u'',
+                  u'cc_js_result_name': u'No license chosen',
+                  })
+        request.matchdict['track_id'] = 1
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        result = track_add_license(request)
+
+        if DEBUG:  # pragma: no cover
+            pp.pprint(result)
+
+        # check for redirect
+        self.assertTrue(isinstance(result, HTTPFound), "no redirect")
+
+        from c3sar.models import Track
+        the_track = Track.get_by_track_id(1)
+        the_license = the_track.license[0]
+        self.assertEquals(the_license.id, 1,
+                          "wrong id: should be the only one in database")
+        self.assertEquals(the_license.img, u'', "wrong license image")
+        self.assertEquals(the_license.uri, u'', "wrong license uri")
+        self.assertEquals(the_license.name,
+                          u'All rights reserved',
+                          "wrong license name")

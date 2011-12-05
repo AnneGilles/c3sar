@@ -237,18 +237,18 @@ def track_add_license(request):
     form = Form(request)
 
     if 'form.submitted' in request.POST:
-        # request.session.flash("Here comes request.str_POST")
-        # request.session.flash(request.str_POST)
-        # request.session.flash("And this is request.POST")
-        # request.session.flash(request.POST)
+        request.session.flash("And this is request.POST")
+        request.session.flash(request.POST)
 
         my_results_dict = request.POST
         #request.session.flash(my_results_dict.keys())
+        #pp.pprint(my_results_dict)
 
-        if DEBUG:
-            print "====="
-            pp.pprint(my_results_dict.keys())
-            pp.pprint(my_results_dict['cc_js_want_cc_license'])
+        if 'cc_js_want_cc_license' in my_results_dict:
+            if DEBUG:  # pragma: no cover
+                print "====="
+                pp.pprint(my_results_dict.keys())
+                pp.pprint(my_results_dict['cc_js_want_cc_license'])
 
             # request.session.flash("cc license? "
             #        + my_results_dict['cc_js_want_cc_license'])
@@ -278,14 +278,14 @@ def track_add_license(request):
                 #    dbsession.add(track) # no, don't add, just update
                 request.session.flash(u'writing to database ... by flush')
                 dbsession.flush()
-            else:
+            elif (my_results_dict['cc_js_want_cc_license'] == 'nah'):
                 request.session.flash("got an all rights reserved license...")
-                track.license = License(
-                    name='All rights reserved',
-                    uri='',
-                    img='',
-                    author=viewer_username
-                    )
+                track.license.append(License(
+                        name=u'All rights reserved',
+                        uri=u'',
+                        img=u'',
+                        author=viewer_username
+                        ))
                 request.session.flash(u'writing to database ... by flushing')
                 dbsession.flush()
         # redirect to license_view
