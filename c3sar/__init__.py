@@ -235,11 +235,11 @@ def main(global_config, **settings):
     config.add_view('c3sar.views.track.track_view',
                     route_name='track_view',
                     renderer='templates/track_view.pt')
-    # edit / settings
-    # config.add_route('track_edit', '/track/edit/{track_id}')
-    # config.add_view('c3sar.views.track.track_edit',
-    #                 route_name='track_edit',
-    #                 renderer='templates/track_edit.pt')
+    # edit
+    config.add_route('track_edit', '/track/edit/{track_id}')
+    config.add_view('c3sar.views.track.track_edit',
+                     route_name='track_edit',
+                     renderer='templates/track_edit.pt')
 
     # track: add license
     config.add_route('track_add_license', '/track/add_license/{track_id}')
