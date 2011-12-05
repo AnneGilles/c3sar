@@ -537,3 +537,111 @@ class TrackViewIntegrationTests(unittest.TestCase):
         self.assertEquals(the_license.name,
                           u'All rights reserved',
                           "wrong license name")
+
+    def test_track_edit_invalid_id(self):
+        """edit track -- supply invalid id"""
+        from c3sar.views.track import track_edit
+        # add a track
+        track1 = self._makeTrack()
+        self.dbsession.add(track1)
+        self.dbsession.flush()
+
+        request = testing.DummyRequest()
+        request.matchdict['track_id'] = 12
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        result = track_edit(request)
+
+        if DEBUG:  # pragma: no cover
+            pp.pprint(result)
+
+        # check for redirect
+        self.assertTrue(isinstance(result, HTTPFound), "no redirect")
+
+    def test_track_edit_get_values(self):
+        """edit track -- supply invalid id"""
+        from c3sar.views.track import track_edit
+        # add a track
+        track1 = self._makeTrack()
+        self.dbsession.add(track1)
+        self.dbsession.flush()
+
+        request = testing.DummyRequest()
+        request.matchdict['track_id'] = 1
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        result = track_edit(request)
+
+        if DEBUG:  # pragma: no cover
+            pp.pprint(result)
+
+        # check for redirect
+        self.assertTrue('form' in result, "no form seen")
+        self.assertEquals(
+            result['form'].form.data,
+            {'album': u'the album',
+             'url': u'http://the_track.the_album.com',
+             'name': u'the track name'},
+            "wrong form values seen")
+
+    def test_track_edit_submit_invalid_values(self):
+        """edit track -- supply invalid id"""
+        from c3sar.views.track import track_edit
+        # add a track
+        track1 = self._makeTrack()
+        self.dbsession.add(track1)
+        self.dbsession.flush()
+
+        request = testing.DummyRequest(
+            post={'form.submitted': True,
+                  'name': u''
+                })
+        request.matchdict['track_id'] = 1
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        result = track_edit(request)
+
+        # check for redirect
+        self.assertTrue('form' in result, "no form seen")
+        self.assertEquals(
+            result['form'].form.errors,
+            {'album': u'Missing value',
+             'name': u'Please enter a value',
+             'url': u'Missing value'})
+
+    def test_track_edit_set_new_values(self):
+        """edit track -- submit valid data through form"""
+        from c3sar.views.track import track_edit
+        # add a track
+        track1 = self._makeTrack()
+        self.dbsession.add(track1)
+        self.dbsession.flush()
+
+        request = testing.DummyRequest(
+            post={'form.submitted': True,
+                  'name': u"changed track name",
+                  'album': u'changed album name',
+                  'url': u"http://totally.different.url"}
+            )
+        request.matchdict['track_id'] = 1
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        result = track_edit(request)
+
+        if DEBUG:  # pragma: no cover
+            pp.pprint(result)
+            #pp.pprint(result.headers[2])
+
+        # check for redirect
+        self.assertTrue(isinstance(result, HTTPFound), "no redirect seen")
+        self.assertTrue('track/view/1' in str(result.headers),
+                        "wrong redirect seen")
+        # compare submitted data with track from database
+        from c3sar.models import Track
+        db_track = Track.get_by_track_id(1)
+        self.assertEquals(db_track.name, u"changed track name",
+                          "data mismatch")
+        self.assertEquals(db_track.album, u"changed album name",
+                          "data mismatch")
+        self.assertEquals(db_track.url, u"http://totally.different.url",
+                          "data mismatch")

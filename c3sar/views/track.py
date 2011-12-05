@@ -392,28 +392,87 @@ def track_list(request):
     return {'tracks': tracks}
 
 
+class TrackEditSchema(formencode.Schema):
+    allow_extra_fields = True
+    name = formencode.validators.String(not_empty=True)
+    album = formencode.validators.String(not_empty=False)
+    url = formencode.validators.String(
+                               not_empty=True)  # works, but no good for urls
+    #    track_url = formencode.All(
+    #     validators.String(not_empty = True),
+    #         validators.URL(),
+    #     #URLorFile()
+    #         )
+    # = formencode.validators.FieldStorageUploadConverter()
+    #    track_file = formencode.All(
+    #        validators.FieldStorageUploadConverter(),
+    #        #validators.FileUploadKeeper()
+    #        )
+    #              FileUploadKeeper
+    # see  site-packages/FormEncode-1.2.4-py2.6.egg/formencode/validators.py
+    #    # check that we ger *either* URL *or* file ######################
+    #    chained_validators = [
+    #        URLorFile()
+    #        ]
+
+
 ## track_edit # TODO
 @view_config(route_name='track_edit',
              permission='view',
              renderer='../templates/track_edit.pt')
 def track_edit(request):
-    tracks = Track.track_listing(Track.id.desc())
-    return {'tracks': tracks}
+    track_id = request.matchdict['track_id']
+    track = Track.get_by_track_id(track_id)
+
+    if track is None:
+        msg = "Track was not found in database!"
+        request.session.flash("Track was not found in database!")
+        return HTTPFound(route_url('not_found', request))
+
+    form = Form(request, schema=TrackEditSchema, obj=track)
+
+    if 'form.submitted' in request.POST and not form.validate():
+        request.session.flash('form does not validate. check errors below!')
+
+    if 'form.submitted' in request.POST and form.validate():
+        if form.data['name'] != track.name:
+            track.name = form.data['name']
+            if DEBUG:  # pragma: no cover
+                print "changing track name"
+                request.session.flash('changing track name')
+        if form.data['album'] != track.album:
+            track.album = form.data['album']
+            if DEBUG:  # pragma: no cover
+                print "changing track album"
+                request.session.flash('changing track album')
+        if form.data['url'] != track.url:
+            track.url = form.data['url']
+            if DEBUG:  # pragma: no cover
+                print "changing track url"
+                request.session.flash('changing track url')
+                # TODO: trigger url_verification process
+
+        #request.session.flash(u'writing to database ...')
+        dbsession.flush()
+        # if all went well, redirect to track view
+        return HTTPFound(route_url('track_view', request, track_id=track.id))
+
+    return {'form': FormRenderer(form)}
 
 
 ## track_del # TODO
 @view_config(route_name='track_del',
              permission='view',
-             renderer='../templates/track_del.pt')
+#             renderer='../templates/track_del.pt')
+             renderer='../templates/not_implemented.pt')
 def track_del(request):
-    tracks = Track.track_listing(Track.id.desc())
-    return {'tracks': tracks}
+    return {'msg': "track_del has not been implemented yet"}
 
 
 ## track_search #TODO
 @view_config(route_name='track_search',
              permission='view',
-             renderer='../templates/track_search.pt')
+#             renderer='../templates/track_search.pt')
+             renderer='../templates/not_implemented.pt')
 def track_search(request):
-    tracks = Track.track_listing(Track.id.desc())
-    return {'tracks': tracks}
+    return {'msg': "track_search has not been implemented yet"}
