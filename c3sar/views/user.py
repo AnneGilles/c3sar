@@ -233,7 +233,7 @@ def login_view(request):
     logged_in = authenticated_userid(request)
     if logged_in is not None:  # need to find testcase to cover...
         request.session.flash('you are logged in already!')
-        print('you are logged in already!')
+        #print('you are logged in already!')
         return HTTPFound(location=came_from,
                          headers=headers)
 

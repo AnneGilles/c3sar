@@ -397,9 +397,9 @@ class UserViewIntegrationTests(unittest.TestCase):
         _registerRoutes(self.config)
         result = login_view(request)
 
-        print("login_view: ")
-        print(result)
-        print(result.headers)
+        #print("login_view: ")
+        #print(result)
+        #print(result.headers)
 
         self.assertTrue(isinstance(result, HTTPFound))
 
