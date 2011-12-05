@@ -1,6 +1,9 @@
 import re
 import formencode
-from formencode import validators
+from formencode import (
+    validators,
+    Invalid
+    )
 from c3sar.models import (
     User,
     )
@@ -20,31 +23,6 @@ class UniqueUsername(validators.FancyValidator):
         return username
 
 
-class RegistrationSchema(formencode.Schema):
-    """
-    formencode schema for user registration
-    """
-    allow_extra_fields = True
-    username = formencode.All(validators.PlainText(not_empty=True),
-                              UniqueUsername())
-    password = formencode.validators.PlainText(not_empty=True)
-    email = formencode.validators.Email(
-        resolve_domain=False, not_empty=True)
-    surname = formencode.validators.String(not_empty=True)
-    lastname = formencode.validators.String(not_empty=True)
-    #password =  formencode.validators.String(not_empty = True)
-    confirm_password = formencode.validators.String(not_empty=True)
-    chained_validators = [
-        formencode.validators.FieldsMatch('password', 'confirm_password')
-        ]
-    phone = formencode.validators.String(not_empty=True)
-    street = formencode.validators.String(not_empty=True)
-    number = formencode.validators.String(not_empty=True)
-    postcode = formencode.validators.String(not_empty=True)
-    city = formencode.validators.String(not_empty=True)
-    country = formencode.validators.String(not_empty=True)
-
-
 class SecurePassword(validators.FancyValidator):
     """
     check for the password to be secure
@@ -52,16 +30,15 @@ class SecurePassword(validators.FancyValidator):
     see
     http://formencode.org/Validator.html#writing-your-own-validator
     """
-    #min = 8 #ToDo XXX
-    min = 1
-    non_letter = 1
+    min = 8
+    non_letter = 2
     letter_regex = re.compile(r'[a-zA-Z]')
 
     messages = {
         'too_few': 'Your password must be longer than %(min)i '
                   'characters long',
         'non_letter': 'You must include at least %(non_letter)i '
-                     'characters in your password',
+                     'non-alphabetic characters in your password',
         }
 
     def _to_python(self, value, state):
@@ -77,9 +54,35 @@ class SecurePassword(validators.FancyValidator):
                           value, state)
         non_letters = self.letter_regex.sub('', value)
         if len(non_letters) < self.non_letter:
-            raise Invalid(self.message("non_letter",
+            raise Invalid(self.message("non_letter", state,
                                         non_letter=self.non_letter),
                           value, state)
+
+
+class RegistrationSchema(formencode.Schema):
+    """
+    formencode schema for user registration
+    """
+    allow_extra_fields = True
+    username = formencode.All(validators.PlainText(not_empty=True),
+                              UniqueUsername())
+    password = formencode.All(validators.PlainText(not_empty=True),
+                              SecurePassword())
+    email = formencode.validators.Email(
+        resolve_domain=False, not_empty=True)
+    surname = formencode.validators.String(not_empty=True)
+    lastname = formencode.validators.String(not_empty=True)
+    #password =  formencode.validators.String(not_empty = True)
+    confirm_password = formencode.validators.String(not_empty=True)
+    chained_validators = [
+        formencode.validators.FieldsMatch('password', 'confirm_password')
+        ]
+    phone = formencode.validators.String(not_empty=True)
+    street = formencode.validators.String(not_empty=True)
+    number = formencode.validators.String(not_empty=True)
+    postcode = formencode.validators.String(not_empty=True)
+    city = formencode.validators.String(not_empty=True)
+    country = formencode.validators.String(not_empty=True)
 
 
 class UsernameExists(validators.FancyValidator):
