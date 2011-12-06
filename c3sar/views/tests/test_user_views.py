@@ -633,22 +633,20 @@ class UserViewIntegrationTests(unittest.TestCase):
         _registerRoutes(self.config)
         instance = self._makeUser()
         self.dbsession.add(instance)
+        # one more user
+        instance2 = self._makeUser2()
+        self.dbsession.add(instance2)
+        self.dbsession.flush()
 
         result = user_view(request)
-
-        #print "result: "
-        #pp.pprint(result)
-
-        #print "result['user'].username: "
-        #pp.pprint(result['user'].username)
 
         # test: view returns a dict containing a user
         self.assertEquals(result['user'].username, instance.username)
 
-        #print "result['users']: "
-        #pp.pprint(result['users'])
-        # test: view returns an empty list of users
-        #self.assertTrue(result['users'] == [])
+        request = testing.DummyRequest()
+        request.matchdict['user_id'] = '2'
+        self.config = testing.setUp(request=request)
+        result = user_view(request)
 
     def test_user_profile(self):
         """
@@ -728,10 +726,23 @@ class UserViewIntegrationTests(unittest.TestCase):
         instance = self._makeUser()
         self.dbsession.add(instance)
         self.dbsession.flush()
-        #request.matchdict['user_id'] = 'foo'
         result = user_edit(request)
-        # test: a redirect is triggered
+
+        # test: a redirect is triggered iff no matchdict
         self.assertTrue(isinstance(result, HTTPFound), 'no redirect seen')
+        self.assertTrue('not_found' in str(result.headers),
+                        'not redirecting to not_found')
+
+        # and one more with faulty matchdict
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        request.matchdict['user_id'] = 'foo'
+        result = user_edit(request)
+        # test: a redirect is triggered iff matchdict faulty
+        self.assertTrue(isinstance(result, HTTPFound), 'no redirect seen')
+        self.assertTrue('not_found' in str(result.headers),
+                        'not redirecting to not_found')
 
     def test_user_edit_non_validating(self):
         """

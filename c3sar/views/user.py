@@ -411,47 +411,17 @@ def user_edit(request):
 
     try:
         user_id = request.matchdict['user_id']
-    except:
-        if DEBUG:  # pragma: no cover
-            print "no user_id in matchdict !!!"
-        return HTTPFound(location=request.route_url('user_login_first'))
+    except KeyError, ke:
+        #print ke
+        return HTTPFound(location=request.route_url('not_found'))
 
-    try:
-        user = User.get_by_user_id(user_id)
-        if not hasattr(user, id):
-            return HTTPFound(location=request.route_url('user_login_first'))
-    except:
-        pass
+    user = User.get_by_user_id(user_id)
 
-    #if DEBUG:  #pragma: no cover
-    try:
-        userid_string = str(user.id)
-        #print "user.id: " + str(userid_string)
-    except:
-        return HTTPFound(location=request.route_url('user_login_first'))
-
-#    request.session.flash("email confirmed? " + str(user.user_email_conf))
-#    if user.email_conf == True:
-#        email_is_confirmed = "Yes"
-#    else:
-#        email_is_confirmed = "No"
+    if user is None:
+        msg = "User was not founf in database."
+        return HTTPFound(location=request.route_url('not_found'))
 
     form = Form(request, schema=UserSettingsSchema, obj=user)
-
-    # if DEBUG: # pragma: no cover
-    #     print (" -------- telefax: " + str(user.fax))
-    #     request.session.flash("telefax: " + str(user.fax))
-    #     print (" -------- password: " + str(user.password))
-    #     request.session.flash("password: " + user.password)
-    #     print (" -------- phone: " + str(user.phone))
-    #     request.session.flash("phone: " + user.phone)
-    #request.session.flash(
-    #    "email_is_confirmed: " + str(user.email_is_confirmed))
-
-    if form.validate():
-        if DEBUG:  # pragma: no cover
-            request.session.flash("Yes! form.validate() !!!")
-            print "the form validated."
 
     if 'form.submitted' in request.POST and not form.validate():
         # form didn't validate
