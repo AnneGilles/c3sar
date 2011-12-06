@@ -25,7 +25,7 @@ def includeme(config):
 #    config.registry.registerUtility(mailer, IMailer)
 
 
-def main(global_config, **settings):
+def main(global_config, **settings):  # pragma: no cover
     """
     This function returns a Pyramid WSGI application.
     """
@@ -34,7 +34,7 @@ def main(global_config, **settings):
     initialize_sql(engine)
     #initialize_s3()
 
-    # user sessioning
+    # user sessioning: beaker
     session_factory = session_factory_from_settings(settings)
     authn_policy = AuthTktAuthenticationPolicy('s0secret!!')
     authz_policy = ACLAuthorizationPolicy()
