@@ -34,7 +34,7 @@ if sys.version_info[:3] < (2,5,0):
 setup(name='c3sar',
       version='0.1',
       description='c3sar',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pylons",
@@ -49,12 +49,11 @@ setup(name='c3sar',
       include_package_data=True,
       zip_safe=False,
       test_suite='c3sar.tests',
-      install_requires = requires,
-      tests_require = test_requirements,
-      entry_points = """\
+      install_requires=requires,
+      tests_require=test_requirements,
+      entry_points="""\
       [paste.app_factory]
       main = c3sar:main
       """,
       paster_plugins=['pyramid'],
       )
-
