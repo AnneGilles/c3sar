@@ -25,7 +25,7 @@ def includeme(config):
 #    config.registry.registerUtility(mailer, IMailer)
 
 
-def main(global_config, **settings):  # pragma: no cover
+def main(global_config, **settings):
     """
     This function returns a Pyramid WSGI application.
     """
