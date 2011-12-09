@@ -9,42 +9,22 @@ pp = pprint.PrettyPrinter(indent=4)
 class FunctionalTests(unittest.TestCase):
 
     def setUp(self):
-        self.config.include('c3sar')
+#        from c3sar.models import DBSession
+#        global dbsession
+#        self.dbsession = DBSession
+#        self.dbsession.remove()
         from c3sar import main
-        app = main({})
+        my_settings = {'sqlalchemy.url': 'sqlite://'}  # mock
+#        from sqlalchemy import create_engine
+#        engine = create_engine('sqlite://')
+        from sqlalchemy import engine_from_config
+        engine = engine_from_config(my_settings)
+        app = main({}, **my_settings)
+        # if I try app = main({}) it tells me 'url' wasnt there
         from webtest import TestApp
         self.testapp = TestApp(app)
 
     def test_root(self):
         res = self.testapp.get('/', status=200)
-        self.failUnless('Pyramid' in res.body)
-        pp.pprint(res.body)
-
-
-#     def setUp(self):
-#         """ This sets up the application registry with the
-#         registrations your application declares in its ``includeme``
-#         function.
-#         """
-#         import c3sar
-
-#         from webtest import TestApp
-#         self.testapp = TestApp(app)
-
-#     def test_root(self):
-#         res = self.testapp.get('/', status=200)
-#         self.failUnless('Pyramid' in res.body)
-
-#         pp.pprint(res)
-
-#     def test_main(self):
-#         from c3sar import main
-#         app = main({})
-
-#    def test_request_user_attribute(self):
-#
-#        print "------- request.user: " + str(request.user)
-
-
-suite = unittest.TestLoader().loadTestsFromTestCase(FunctionalTests)
-unittest.TextTestRunner(verbosity=2).run(suite)
+        self.failUnless('Basic Functionality' in res.body)
+        #pp.pprint(res.body)
