@@ -34,6 +34,7 @@ from c3sar.views.validators import (
     )
 
 
+dbsession = DBSession()
 DEBUG = False
 
 
@@ -71,9 +72,8 @@ def user_register(request):
 
     if 'form.submitted' in request.POST and form.validate():
         # ready for registration!
-        request.session.flash('form validated!')
-        dbsession = DBSession()
-        username = form.data['username']
+        #request.session.flash('form validated!')
+        username = unicode(form.data['username'])
 
         message = Message(
             subject="C3S: confirm your email address",
@@ -98,20 +98,20 @@ def user_register(request):
 
         user = User(
             username=username,
-            password=form.data['password'],
-            surname=form.data['surname'],
-            lastname=form.data['lastname'],
-            email=form.data['email'],
+            password=unicode(form.data['password']),
+            surname=unicode(form.data['surname']),
+            lastname=unicode(form.data['lastname']),
+            email=unicode(form.data['email']),
             email_is_confirmed=False,
-            email_confirm_code=randomstring,
-            phone=form.data['phone'],
-            fax=form.data['fax'],
+            email_confirm_code=unicode(randomstring),
+            phone=unicode(form.data['phone']),
+            fax=unicode(form.data['fax']),
             )
-        user.set_address(street=form.data['street'],
-                         number=form.data['number'],
-                         postcode=form.data['postcode'],
-                         city=form.data['city'],
-                         country=form.data['country'],
+        user.set_address(street=unicode(form.data['street']),
+                         number=unicode(form.data['number']),
+                         postcode=unicode(form.data['postcode']),
+                         city=unicode(form.data['city']),
+                         country=unicode(form.data['country']),
                          )
 
         #        user.groups.append('User')
@@ -141,9 +141,9 @@ def user_register(request):
             # instead of sending mails, we inform in-browser
             request.session.flash(
                 'DEBUG: not sending email. to test email confirmation view, '
-                'click here: <a href="/user/confirm/' + randomstring + '/'
-                + str(user.username) + '/' + str(form.data['email'])
-                + '">Confirm Email</a>')
+                'append this to URL to confirm email: /user/confirm/'
+                + randomstring + '/'
+                + str(user.username) + '/' + str(form.data['email']))
         except:  # pragma: no cover
             print "could not send email. no mail configured?"
 
