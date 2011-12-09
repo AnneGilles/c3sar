@@ -391,10 +391,7 @@ class Playlist(Base):  # ####################################################
 
 def populate():
     dbsession = DBSession()
-#    model = MyModel(name=u'root', value=55)
-#    session.add(model)
-#    session.flush()
-#    transaction.commit()
+    transaction.begin()  # this is needed to make the webtest tests not fail
 
     user1 = User(username=u'firstUsername', surname=u'firstSurname',
                  lastname=u'firstLastname', password=u'password',
