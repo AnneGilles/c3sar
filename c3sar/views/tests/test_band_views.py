@@ -150,21 +150,27 @@ class BandViewIntegrationTests(unittest.TestCase):
                   'band_email': u'testband@example.com',
                   'registrar_is_member': '1',
                   })
-        request.user = self._makeUser()
+        request.user = self._makeUser()  # a user to add the band
+        request.user.username = u"newUser"
         self.dbsession.add(request.user)
+        self.dbsession.flush()
+        the_user_id = request.user.id
+
         self.config = testing.setUp(request=request)
         _registerRoutes(self.config)
         result = band_add(request)
+
         self.assertTrue(isinstance(result, HTTPFound),
                         "expected redirect not seen")
         # check database contents
         from c3sar.models import Band
-        test_band = Band.get_by_band_id(1)
-        self.assertEquals(test_band.id, 1)
+        max_band_id = Band.get_max_id()
+        test_band = Band.get_by_band_id(max_band_id)
+        self.assertEquals(test_band.id, max_band_id)
         self.assertEquals(test_band.name, 'testband')
         self.assertEquals(test_band.homepage, 'http://testba.nd')
-        self.assertEquals(test_band.registrar_id, None)  # no real user :-/
-        self.assertEquals(test_band.registrar, 'firstUsername')
+        self.assertEquals(test_band.registrar_id, the_user_id)  # no real user :-/
+        self.assertEquals(test_band.registrar, 'newUser')
 
     def test_band_view_None(self):
         """
@@ -172,7 +178,7 @@ class BandViewIntegrationTests(unittest.TestCase):
         """
         from c3sar.views.band import band_view
         request = testing.DummyRequest()
-        request.matchdict['band_id'] = 1
+        request.matchdict['band_id'] = 123456  # high id, RLY
         self.config = testing.setUp(request=request)
         _registerRoutes(self.config)
         result = band_view(request)
@@ -190,14 +196,22 @@ class BandViewIntegrationTests(unittest.TestCase):
         from c3sar.views.band import band_view
         band_instance = self._makeBand1()
         self.dbsession.add(band_instance)
+        self.dbsession.flush()
+        the_id = band_instance.id  # db id of that band
+        from c3sar.models import Band
+        max_id = Band.get_max_id()
 
         request = testing.DummyRequest()
-        request.matchdict['band_id'] = 1
+        request.matchdict['band_id'] = the_id
         self.config = testing.setUp(request=request)
         result = band_view(request)
         self.assertTrue('band' in result, 'band was not seen.')
-        self.assertTrue(result['prev_id'] is 1, 'wrong nav id.')
-        self.assertTrue(result['next_id'] is 1, 'wrong nav id.')
+        self.assertTrue(
+            result['prev_id'] is the_id - 1 or max_id,
+            'wrong nav id.')
+        self.assertTrue(
+            result['next_id'] is the_id + 1 or 1,
+            'wrong nav id.')
         self.assertTrue('viewer_username' in result,
                         'viewer_username was not seen.')
         self.assertTrue(result['viewer_username'] is None,
@@ -276,8 +290,9 @@ class BandViewIntegrationTests(unittest.TestCase):
         band_instance = self._makeBand1()
         self.dbsession.add(band_instance)
         self.dbsession.flush()
+        the_id = band_instance.id  # the id of the band just created
         request = testing.DummyRequest()
-        request.matchdict['band_id'] = 1
+        request.matchdict['band_id'] = the_id
         self.config = testing.setUp(request=request)
         _registerRoutes(self.config)
         result = band_edit(request)
@@ -365,12 +380,17 @@ class BandViewIntegrationTests(unittest.TestCase):
     def test_track_list(self):
         """
         track_list
+
+        get number of bands from db, add two,
+        check view and confirm resulting number
         """
+        from c3sar.models import Band
+        band_count = Band.get_max_id()  # how many in db?
         from c3sar.views.band import band_list
 
-        instance1 = self._makeBand1()  # a band
+        instance1 = self._makeBand1()  # add a band
         self.dbsession.add(instance1)
-        instance2 = self._makeBand2()  # another band
+        instance2 = self._makeBand2()  # add another band
         self.dbsession.add(instance2)
 
         request = testing.DummyRequest()
@@ -383,5 +403,5 @@ class BandViewIntegrationTests(unittest.TestCase):
             pp.pprint(result)
 
         # check that there are two bandss in list
-        self.assertEquals(len(result['bands']), 2,
+        self.assertEquals(len(result['bands']), band_count + 2,
                           "wrong number of bands in list")
