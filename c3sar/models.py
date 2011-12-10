@@ -213,6 +213,11 @@ class License(Base):
     def get_by_license_id(cls, license_id):
         return DBSession.query(cls).filter(cls.id == license_id).first()
 
+    @classmethod
+    def get_max_id(cls):
+        """return the highest id (by counting rows in table)"""
+        return DBSession.query(cls).count()
+
 #    def license_listing(cls, order_by, how_many=10):
     @classmethod
     def license_listing(cls, how_many=10):
