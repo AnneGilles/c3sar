@@ -7,17 +7,18 @@
   <p>you are ${viewer_username}.
 
     <p>
-      <a href="${prev_id}">previous</a> | 
+      <a href="${prev_id}">previous</a> |
       <a href="/license/list">all</a> |
       <a href="${next_id}">next</a> |
-      <a href="/license/edit">edit</a> |
-      <a href="/license/rm">delete</a> 
+      <a href="/license/edit/${license.id}">edit</a> |
+      <a href="/license/rm/${license.id}">delete</a>
     </p>
 
     <h1>${license.name}</h1>
     <p>ID: ${license.id}</p>
-    <p>URL: ${license.uri}</p>
-    <p>IMG: ${license.img}</p> <img src="${license.img}">
+    <p tal:condition="license.uri">URL: ${license.uri}</p>
+    <p tal:condition="license.img">IMG: ${license.img}</p>
+    <a tal:condition="license.uri" href="${license.uri}" target="_blank"><img src="${license.img}"></a>
     <p>Author: ${license.author}</p>
 
 </tal:block>
