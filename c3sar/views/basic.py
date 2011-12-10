@@ -1,6 +1,4 @@
-#from yafowil import loader
-#from yafowil.base import factory
-#from yafowil.controller import Controller
+from sqlalchemy.exc import ProgrammingError
 
 from pyramid.httpexceptions import HTTPNotFound
 
@@ -20,8 +18,8 @@ from c3sar.models import (
     User,
     DBSession,
     Band,
-    #Track,
-    #Playlist
+    Track,
+    Playlist
     )
 
 dbsession = DBSession()
@@ -32,11 +30,19 @@ dbsession = DBSession()
              route_name='home',
              renderer='../templates/main.pt')
 def home_view(request):
-    num_users = dbsession.query(User).count()
-    #    num_tracks = dbsession.query(Track).count()
-    num_tracks = 0
-    num_bands = dbsession.query(Band).count()
-    #num_bands = 0
+    try:
+        num_users = dbsession.query(User).count()
+        num_tracks = dbsession.query(Track).count()
+        # num_tracks = 0
+        num_bands = dbsession.query(Band).count()
+        # num_bands = 0
+    except ProgrammingError, pe:
+        # ProgrammingError: (ProgrammingError)
+        # SQLite objects created in a thread can only be used in that same
+        # thread.The object was created in thread id -1333776384
+        # and this is thread id -1329573888
+        print "not a bug, a feature: logout first, please!"
+        return HTTPFound(route_url('logout', request))
 
     logged_in = authenticated_userid(request)
     user_id = User.get_by_username(logged_in)
