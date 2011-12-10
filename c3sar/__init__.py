@@ -292,12 +292,13 @@ def main(global_config, **settings):
     config.add_route('license_edit', '/license/edit/{license_id}')
     config.add_view('c3sar.views.license.license_edit',
                     route_name='license_edit',
-                    renderer='templates/license_edit.pt')
+                    renderer='templates/not_implemented.pt')
     # delete
     config.add_route('license_del', '/license/rm/{license_id}')
     config.add_view('c3sar.views.license.license_del',
                     route_name='license_del',
-                    renderer='templates/license_del.pt')
+                    #renderer='templates/license_del.pt')
+                    renderer='templates/not_implemented.pt')
     # search
     config.add_route('license_search', '/license/search')
     config.add_view('c3sar.views.license.license_search',
