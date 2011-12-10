@@ -315,15 +315,22 @@ def license_view(request):
     license_id = request.matchdict['license_id']
     license = License.get_by_license_id(license_id)
 
-    #calculate for next/previous-navigation
-    if int(license_id) == 1:
-        prev_id = 1
-    else:
-        prev_id = int(license_id) - 1
+    if license is None:
+        msg = "This license was not found in our database"
+        return HTTPFound(request.route_url('not_found'))
 
-    next_id = int(license_id) + 1
-    # TODO: MAXiD
-    # if license_id == MaxId: next_id = license_id
+    #calculate for next/previous-navigation
+    max_id = License.get_max_id()
+    # previous
+    if license.id == 1:           # if looking at first id
+        prev_id = max_id          # --> choose highest id (wrap around)
+    else:                         # if looking at any other
+        prev_id = license.id - 1  # --> choose previous
+    # next
+    if license.id != max_id:      # if not on highest id
+        next_id = license.id + 1  # --> choose next
+    elif license.id == max_id:    # if highest id
+        next_id = 1               # --> choose first id (wrap around)
 
     # show who is watching. maybe we should log this ;-)
     viewer_username = authenticated_userid(request)
@@ -342,28 +349,33 @@ def license_view(request):
              renderer='../templates/licenses_list.pt')
 def license_list(request):
     licenses = License.license_listing(License.id.desc())
-    return {'licenses': licenses}
+    return {
+        'licenses': licenses,
+        }
 
 
 ## license_edit
 @view_config(route_name='license_edit',
              permission='view',
-             renderer='../templates/licenses_edit.pt')
+             #renderer='../templates/license_edit.pt'
+             renderer='../templates/not_implemented.pt')
 def license_edit(request):
-    pass
+    return {'msg': 'not implemented :-/'}
 
 
 ## license_del
 @view_config(route_name='license_del',
              permission='view',
-             renderer='../templates/licenses_del.pt')
+             #renderer='../templates/licenses_del.pt')
+             renderer='../templates/not_implemented.pt')
 def license_del(request):
-    pass
+    return {'msg': 'not implemented :-/'}
 
 
 ## license_search
 @view_config(route_name='license_search',
              permission='view',
-             renderer='../templates/licenses_search.pt')
+             #renderer='../templates/licenses_search.pt')
+             renderer='../templates/not_implemented.pt')
 def license_search(request):
-    pass
+    return {'msg': 'not implemented :-/'}
