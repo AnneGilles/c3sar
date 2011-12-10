@@ -37,14 +37,13 @@ class TrackViewIntegrationTests(unittest.TestCase):
     def setUp(self):
         self.dbsession = _initTestingDB()
         self.config = testing.setUp()
-        #self.config.include('pyramid_mailer.testing')
-        self.config.include('c3sar')
+        #self.config.include('c3sar')
         self.dbsession.remove()
 
     def tearDown(self):
         import transaction
         transaction.abort()
-        #self.session.remove()
+        self.dbsession.remove()
         testing.tearDown()
 
     def _getTargetClass(self):
