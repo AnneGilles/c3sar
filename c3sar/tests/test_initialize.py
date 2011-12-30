@@ -51,7 +51,7 @@ class InitializeSqlTests(unittest.TestCase):
             print str(DBSession.query(User).first().username)
 
         self.assertEqual(
-            DBSession.query(User).first().username, u'firstUsername')
+            DBSession.query(User).first().username, u'the_admin')
 
 # for debugging uncomment this and run this module via bin/python:
 #suite = unittest.TestLoader().loadTestsFromTestCase(InitializeSqlTests)
