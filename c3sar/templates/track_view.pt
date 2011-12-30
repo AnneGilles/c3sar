@@ -21,6 +21,8 @@
     <p>FileSize: <b>${track.bytesize}</b></p>
     <p><a href="/${track.filepath}">download now</a>.</p>
 
+    <h2>metadata</h2>
+    <p>registrar: <b>${track.registrar_id}</b></p>
 
     <h2>License</h2>
 
