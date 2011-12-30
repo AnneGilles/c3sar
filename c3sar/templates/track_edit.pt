@@ -1,0 +1,72 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xml:lang="en" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+  
+  
+  <tal:block metal:fill-slot="content">
+    
+    
+    <h1>track settings</h1>
+    
+    ${form.begin(request.url)}
+    <fieldset>
+      ${form.csrf_token()}
+      <table>
+	<tr>
+	  <td>
+	    ${form.label('name', 'The Name of your Track:')}
+	  </td>
+	  <td>
+            ${form.text('name')}
+	  </td>
+	  <td>
+            ${form.errorlist('name')}
+	  </td>
+	</tr>
+        <tr>
+	  <td>
+            ${form.label('album', 'The Album of your Track:')}
+	  </td>
+	  <td>
+            ${form.text('album')}
+	  </td>
+	  <td>
+            ${form.errorlist('album')}
+	  </td>
+	</tr>
+        <tr>
+	  <td>
+            ${form.label('url', 'The URL of your Track:')}
+	  </td>
+	  <td>
+            ${form.text('url')}
+	  </td>
+	  <td>
+            ${form.errorlist('url')}
+	  </td>
+	</tr>
+        <tr>
+	  <td>
+            ${form.label('upload', 'The File:')}
+	  </td>
+	  <td>
+            ${form.text('upload')}
+	  </td>
+	  <td>
+            ${form.errorlist('upload')}
+	  </td>
+	</tr>
+        <tr>
+	  <td>
+	  </td>
+	  <td>
+            ${form.submit('form.submitted', 'Save', class_='submit')}
+	  </td>
+	</tr>
+      </table>
+    </fieldset>
+    ${form.end()}
+  </tal:block>  
+</html>
