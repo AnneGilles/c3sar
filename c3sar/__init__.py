@@ -74,6 +74,20 @@ def main(global_config, **settings):
     #                 renderer='templates/mytemplate.pt'
     #                 )
 
+    # general 403: used when lacking some permission
+    # overrides builtin 403 forbidden_view
+    from pyramid.httpexceptions import HTTPForbidden
+    #from c3sar.views.basic import not_allowed_view
+    config.add_view('c3sar.views.basic.not_allowed_view',
+                    context=HTTPForbidden,
+                    renderer='templates/not_allowed.pt')
+
+    # not needed as of now: route and view for 403, see above
+    #config.add_route('not_allowed', '/not_allowed')
+    #config.add_view('c3sar.views.basic.not_allowed_view',
+    #                    route_name='not_allowed',
+    #                    renderer='templates/not_allowed.pt')
+
     # about
     config.add_route('about', '/about')
     config.add_view('c3sar.views.basic.about_view',
@@ -159,7 +173,7 @@ def main(global_config, **settings):
     #                 )
     config.add_view('c3sar.views.user.user_edit',
                     route_name='user_edit',
-                    permission='editUser',
+                    #permission='editUser',  # now managed in the view!
                     renderer='templates/user_edit_table.pt')
 
     # delete
