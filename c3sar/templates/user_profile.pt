@@ -18,7 +18,7 @@
     <p>ID: <b>${user.id}</b>.</p>
     <p>Surname: <b>${user.surname}</b>.</p>
     <p>Lastname: <b>${user.lastname}</b>.</p>
-    <p>Email: <b>$ off {user.email}</b>.</p>
+    <p>Email: <b>${user.email}</b>.</p>
     <p>Email confirmed?: <b> $ off {user.email_conf}</b>.</p>
     <p>Telephone: <b> $ off {user.telephone}</b>.</p>
     <p>Telefax: <b> $ off {user.telefax}</b>.</p>
@@ -26,7 +26,7 @@
     <p>Last login: <b>${user.last_login}</b>.</p>
     <p>Last password change: <b>${user.last_password_change}</b>.</p>
     <p>Active? <b>${user.is_active}</b>.</p>
-    <p>Groups: <b>$ off {user.get_group_list()} </b></p>
+    <p>Groups: <b>${user.get_group_list()} </b></p>
 
 
     <hr>
