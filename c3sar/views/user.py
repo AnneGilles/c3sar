@@ -16,6 +16,7 @@ from pyramid.view import view_config
 from c3sar.models import (
     DBSession,
     User,
+    Group,
     )
 
 import os
@@ -114,8 +115,12 @@ def user_register(request):
                          country=unicode(form.data['country']),
                          )
 
-        #        user.groups.append('User')
-        dbsession.add(user)
+        user_group = Group.get_Users_group()
+        user.groups = [user_group]
+
+        # dbsession.add(user)
+        dbsession.flush(user)
+
         #
         # boto stuff: creating a bucket for that user
         # don't do that -- we better have one bucket for all tracks...
@@ -392,22 +397,30 @@ def user_profile(request):
         'next_id': next_id,
         }
 
+from pyramid.security import has_permission
+from pyramid.httpexceptions import HTTPForbidden
+
 
 # ################################################################### user_edit
 # #from formencode import htmlfill
 # from c3sregistration.security import UserContainer
-@view_config(route_name='user_edit',
-             #permission='view',
-             permission='editUser',
+#@view_config(route_name='user_edit',
+#             #permission='view',
+#             permission='editUser',
 #             context=UserContainer,
-             renderer='../templates/user_edit_table.pt')
+#             renderer='../templates/user_edit_table.pt')
 def user_edit(request):
     """
     let users change some of their details
     """
     DEBUG = False
 
-    # if no user_id in URL and not logged in, tell user to login
+    if not has_permission('editUser', request.context, request):
+        #print "NOT has_permission !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        request.message = "You do not have permissions to edit this user!"
+        raise HTTPForbidden
+
+   # if no user_id in URL and not logged in, tell user to login
 
     try:
         user_id = request.matchdict['user_id']
