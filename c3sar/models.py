@@ -61,14 +61,14 @@ class Group(Base):
     def __init__(self, name):
         self.name = name
 
-#     @classmethod
-#     def get_users_group(cls, groupname="User"):
-#         dbsession = DBSession()
-#         users_group = dbsession.query(
-#             cls).filter(cls.name == groupname).first()
-#         #print('users_group:' + str(users_group))
-#         return users_group
-
+    @classmethod
+    def get_Users_group(cls, groupname="User"):
+        """Choose the right group for users"""
+        dbsession = DBSession()
+        users_group = dbsession.query(
+            cls).filter(cls.name == groupname).first()
+        print('=== get_Users_group:' + str(users_group))
+        return users_group
 #    def set_group(cls, )
 
 # table for relation between bands and members(=users)
