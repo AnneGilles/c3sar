@@ -128,3 +128,16 @@ def not_found_view(request):
     return dict(
         msg='not found'
         )
+
+
+def not_allowed_view(request):
+    #import pdb
+    #pdb.set_trace()
+    request.response_status = 403
+#    request.response_headerlist = [
+#        ('Location', 'http://localhost/track/view/3'),
+#        ('Content-Type', 'text/plain; charset=UTF-8'),
+#        ('Content-Length', '109')]
+    return dict(
+#        message='no message'
+        )
