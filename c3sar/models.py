@@ -314,14 +314,6 @@ class Track(Base):  # #########################################################
     # track_composers = reference to User(s) or 'some text'
     # track_lyrics = reference to User(s) or 'some text'
 
-    @classmethod
-    def get_registrar_by_id(self, reg_id):
-        #print "===== this is get_registrar_by_id"
-        #print "== reg_id: " + str(reg_id)
-        test_user = User.get_by_user_id(reg_id)
-        #print test_user.username
-        return test_user.username
-
     @property
     def __acl__(self):
         return [
