@@ -36,7 +36,7 @@ def home_view(request):
         # num_tracks = 0
         num_bands = dbsession.query(Band).count()
         # num_bands = 0
-    except ProgrammingError, pe:
+    except ProgrammingError, pe:  # pragma: no cover
         # ProgrammingError: (ProgrammingError)
         # SQLite objects created in a thread can only be used in that same
         # thread.The object was created in thread id -1333776384

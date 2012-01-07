@@ -73,6 +73,16 @@ class BandViewIntegrationTests(unittest.TestCase):
         return self._getTargetClass()(
             bandname, bandemail, homepage, registrar, registrar_id)
 
+    def _makeBand3(self,
+                   bandname=u'thirdBandname',
+                   bandemail=u'band3@example.com',
+                   homepage=u'http://band3.example.com',
+                   registrar=u'firstUsername',
+                   registrar_id=1,
+                   ):
+        return self._getTargetClass()(
+            bandname, bandemail, homepage, registrar, registrar_id)
+
     def _makeUser(self,
                   username=u'firstUsername', surname=u'firstSurname',
                   lastname=u'firstLastname', password=u'password',
@@ -168,7 +178,7 @@ class BandViewIntegrationTests(unittest.TestCase):
         self.assertEquals(test_band.id, max_band_id)
         self.assertEquals(test_band.name, 'testband')
         self.assertEquals(test_band.homepage, 'http://testba.nd')
-        self.assertEquals(test_band.registrar_id, the_user_id)  # no real user :-/
+        self.assertEquals(test_band.registrar_id, the_user_id)  # no real user
         self.assertEquals(test_band.registrar, 'newUser')
 
     def test_band_view_None(self):
@@ -228,18 +238,18 @@ class BandViewIntegrationTests(unittest.TestCase):
         self.dbsession.flush()
 
         request = testing.DummyRequest()
-        request.matchdict['band_id'] = 2
+        request.matchdict['band_id'] = 1
         self.config = testing.setUp(request=request)
         result = band_view(request)
         self.assertTrue('band' in result, 'band was not seen.')
-        self.assertTrue(result['prev_id'] is 1, 'wrong nav id.')
-        self.assertTrue(result['next_id'] is 1, 'wrong nav id.')
+        self.assertTrue(result['prev_id'] is 2, 'wrong nav id.')
+        self.assertTrue(result['next_id'] is 2, 'wrong nav id.')
         self.assertTrue('viewer_username' in result,
                         'viewer_username was not seen.')
         self.assertTrue(result['viewer_username'] is None,
                         'viewer_username was not seen.')
 
-    def test_band_view_two(self):
+    def test_band_view_three(self):
         """
         view a band - three bands: test next/previous navigation
         """
@@ -248,17 +258,17 @@ class BandViewIntegrationTests(unittest.TestCase):
         self.dbsession.add(band_instance1)
         band_instance2 = self._makeBand2()
         self.dbsession.add(band_instance2)
-        band_instance3 = self._makeBand1()
+        band_instance3 = self._makeBand3()
         self.dbsession.add(band_instance3)
         self.dbsession.flush()
 
         request = testing.DummyRequest()
-        request.matchdict['band_id'] = 2
+        request.matchdict['band_id'] = 3
         self.config = testing.setUp(request=request)
         result = band_view(request)
         self.assertTrue('band' in result, 'band was not seen.')
-        self.assertTrue(result['prev_id'] is 1, 'wrong nav id.')
-        self.assertTrue(result['next_id'] is 3, 'wrong nav id.')
+        self.assertTrue(result['prev_id'] is 2, 'wrong nav id.')
+        self.assertTrue(result['next_id'] is 1, 'wrong nav id.')
         self.assertTrue('viewer_username' in result,
                         'viewer_username was not seen.')
         self.assertTrue(result['viewer_username'] is None,
