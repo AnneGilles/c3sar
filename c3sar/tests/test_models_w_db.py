@@ -558,8 +558,9 @@ class TestPlaylistModel(unittest.TestCase):
         return Playlist
 
     def _makeOne(self,
-                 name=u'Some Playlist Name'):
-        return self._getTargetClass()(name)
+                 name=u'Some Playlist Name',
+                 issuer=1):
+        return self._getTargetClass()(name, issuer)
 
     def test_constructor(self):
         if DEBUG:  # pragma: no cover
@@ -568,6 +569,9 @@ class TestPlaylistModel(unittest.TestCase):
         instance = self._makeOne()
         self.assertEqual(instance.name,
                          'Some Playlist Name',
+                         "Got unecpected value from constructor!")
+        self.assertEqual(instance.issuer,
+                         1,
                          "Got unecpected value from constructor!")
 
 ## ideas for testing 'main', or at least having it covered:
