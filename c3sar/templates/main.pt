@@ -15,8 +15,8 @@
       <p>
 	Users:
         <a href="/user/list">index</a> |
-        <a href="/user/view/1">view</a> |
 	<a href="/register">create</a> |
+        <a href="/user/view/1">view</a> |
         <a href="/user/edit/1">edit</a> |
         <a href="/user/rm">delete</a>
         <br/>
@@ -45,6 +45,14 @@
 	<a href="/license/edit/1">edit</a> |
 	<a href="/license/rm/1">delete</a> |
 	<a href="/license/view/1">show</a> |
+      </p>
+      <p>
+	Playlists:
+	<a href="/playlist/list">index</a> |
+	<a href="/playlist/add">add</a> |
+	<a href="/playlist/edit/1">edit</a> |
+	<a href="/playlist/rm/1">delete</a> |
+	<a href="/playlist/view/1">show</a> |
       </p>
       <hr>
       <a href="http://localhost:6543/url_param_test?license_url=http://creativecommons.org/licenses/by/3.0/&license_name=Creative%20Commons%20Attribution%203.0%20Unported&userID=42&user-work=foo.jpg">Test some url parameters</a>, as well as <a href="http://localhost:6543/url_param_test">without parameters</a>, like a query "?foo=bar" appended to the url.<br>
