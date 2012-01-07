@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+
+  <tal:block metal:fill-slot="content">
+    <h1>Add a Playlist!</h1>
+
+    <span tal:repeat="messages request.session.pop_flash()"></span>
+
+    <form action="/playlist/add" method="POST">
+    <fieldset>
+      <table>
+	<tr>
+	  <td>
+	    ${form.name.label}:
+	  </td>
+	  <td>
+	    ${form.name}
+	  </td>
+	  <td>
+	    <b tal:repeat="error form.name.errors">${error}</b>
+	  </td>
+	</tr>
+      </table>
+    </fieldset>
+    <input type='submit'>
+  </tal:block>
+
+</html>

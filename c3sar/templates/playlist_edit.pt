@@ -1,0 +1,51 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xml:lang="en" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+  <tal:block metal:fill-slot="deform-js-css">
+    <link rel="stylesheet" href="${request.static_url('c3sar:static/deform/form.css')}" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="${request.static_url('c3sar:static/deform/jquery-ui-1.8.11.custom.css')}" type="text/css" media="screen" charset="utf-8" />
+    <script type="text/javascript" src="/static/deform/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="/static/deform/jquery.form.js"></script>
+    <script type="text/javascript" src="/static/deform/deform.js"></script>
+    <script type="text/javascript" src="http://deformdemo.repoze.org/static/scripts/jquery-ui-1.8.11.custom.min.js"></script>  </tal:block>
+  
+  <tal:block metal:fill-slot="content">
+    
+    
+    <h1>edit the playlist</h1>
+
+    <div id="form" tal:content="structure form"/>
+    
+<!--!    <form action="request.route_URL('playlist_edit')" method="POST">
+    <fieldset>
+      $ off {form.csrf_token()}
+      <table>
+	<tr>
+	  <td>
+	    ${form.name.label}
+	  </td>
+	  <td>
+            ${form.name}
+	  </td>
+	  <td>
+            ${form.name.errors}
+	  </td>
+	</tr>
+        <tr>
+	  <td>
+	  </td>
+	  <td>
+            <input type="submit">
+	  </td>
+	</tr>
+      </table>
+    </fieldset>
+    </form>
+-->
+  </tal:block>
+  <tal:block metal:fill-slot="deform-load">
+    <!-- loading deform -->
+    <script type="text/javascript">deform.load()</script>
+</html>

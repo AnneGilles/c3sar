@@ -1,0 +1,29 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xml:lang="en" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal"      
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="base">
+  
+  <tal:block metal:fill-slot="content">
+    <div id="main">
+      <h1>List of Playlists</h1>
+      for your orientation
+      <table border="1" cellpadding="10" width="90%">
+	<!-- table header -->
+	<tr><td>id</td><td>name</td><td>issuer</td><td>date</td><td>blah</td></tr>
+	<!-- table content -->
+	<tr tal:repeat="playlist playlists">
+	  <td><a href="/playlist/view/${playlist.id}">${playlist.id}</a></td>
+	  <td>${playlist.name}</td>
+	  <td><a href="/user/view/${playlist.issuer}">${playlist.issuer | "None"}</a></td>
+	  <td>${playlist.date_created}</td>
+	  <td><a href="/playlist/edit/${playlist.id}">edit</a></td>	  
+	  <td><a href="/playlist/view/${playlist.id}">view</a></td>
+	</tr>
+      </table>
+      <p><a href="/playlist/add">Add another Playlist</a>
+
+
+    </div>
+  </tal:block>
+</html>
