@@ -149,7 +149,7 @@ class PlaylistViewIntegrationTests(unittest.TestCase):
 
         from c3sar.models import Playlist
         my_playlist = Playlist.get_by_id(u'1')
-        print "my_playlist: " + str(my_playlist)
+        #print "my_playlist: " + str(my_playlist)
 #       self.assertEquals(my_playlist.name, 'a test playlist')
 
     def test_playlist_list(self):
@@ -175,3 +175,108 @@ class PlaylistViewIntegrationTests(unittest.TestCase):
         # check that there are two playlists in list
         self.assertEquals(len(result['playlists']), 2,
                           "wrong number of playlists in list")
+
+    def test_playlist_view_first(self):
+        """
+        playlist_view, loooking at first playlist
+        """
+        from c3sar.views.playlist import playlist_view
+
+        instance1 = self._makePlaylist()  # a playlist
+        self.dbsession.add(instance1)
+        instance2 = self._makePlaylist2()  # another playlist
+        self.dbsession.add(instance2)
+
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        request.matchdict['playlist_id'] = 1
+
+        result = playlist_view(request)
+
+        if DEBUG:  # pragma: no cover
+            print "result of test_playlist_view_first"
+            pp.pprint(result)
+
+    def test_playlist_view_second(self):
+        """
+        playlist_view, looking at second
+        """
+        from c3sar.views.playlist import playlist_view
+
+        instance1 = self._makePlaylist()  # a playlist
+        self.dbsession.add(instance1)
+        instance2 = self._makePlaylist2()  # another playlist
+        self.dbsession.add(instance2)
+
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        request.matchdict['playlist_id'] = 2
+
+        result = playlist_view(request)
+
+        if DEBUG:  # pragma: no cover
+            print "result of test_playlist_view_second"
+            pp.pprint(result)
+
+    def test_playlist_view_nonexistant(self):
+        """
+        playlist_view, looking at second
+        """
+        from c3sar.views.playlist import playlist_view
+
+        instance1 = self._makePlaylist()  # a playlist
+        self.dbsession.add(instance1)
+
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        request.matchdict['playlist_id'] = 123
+
+        result = playlist_view(request)
+
+        if DEBUG:  # pragma: no cover
+            print "result of test_playlist_view_nonexistant"
+            pp.pprint(result)
+
+    def test_playlist_edit_first(self):
+        """
+        playlist_edit, editing first playlist
+        """
+        from c3sar.views.playlist import playlist_edit
+
+        instance1 = self._makePlaylist()  # a playlist
+        self.dbsession.add(instance1)
+        instance2 = self._makePlaylist2()  # another playlist
+        self.dbsession.add(instance2)
+
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        request.matchdict['playlist_id'] = 1
+
+        result = playlist_edit(request)
+
+        if DEBUG:  # pragma: no cover
+            print "result of test_playlist_edit_first"
+            pp.pprint(result)
+
+    def test_playlist_edit_nonexistant(self):
+        """
+        playlist_edit, try editing nonexistant playlist
+        """
+        from c3sar.views.playlist import playlist_edit
+
+        instance1 = self._makePlaylist()  # a playlist
+        self.dbsession.add(instance1)
+        instance2 = self._makePlaylist2()  # another playlist
+        self.dbsession.add(instance2)
+
+        request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        _registerRoutes(self.config)
+        request.matchdict['playlist_id'] = 1234
+
+        result = playlist_edit(request)
+
+        if DEBUG:  # pragma: no cover
+            print "DEBUG: result of test_playlist_edit_nonexistant"
+            pp.pprint(result)
