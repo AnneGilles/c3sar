@@ -9,12 +9,13 @@
       <h1>List of Bands</h1>
       
       <table border="1" cellpadding="10" width="90%">
-	<tr><td>id</td><td>name</td><td>homepage</td><td>email</td><td>edit</td><td>view</td></tr>
+	<tr><td>id</td><td>name</td><td>homepage</td><td>email</td><td>registrar_id</td><td>edit</td><td>view</td></tr>
 	<tr tal:repeat="band bands">
 	  <td><a href="/band/view/${band.id}">${band.id}</a></td>
 	  <td>${band.name}</td>
 	  <td><a href="${band.homepage}" target="_blank">${band.homepage}</a></td>
 	  <td><a href="mailto:${band.email}">${band.email}</a></td>
+	  <td><a href="/user/view/${band.registrar_id}">${band.registrar_id}</a></td>
 	  <td><a href="/band/edit/${band.id}">edit</a></td>	  
 	  <td><a href="/band/view/${band.id}">view</a></td>
 	</tr>

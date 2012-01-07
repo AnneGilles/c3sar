@@ -47,6 +47,38 @@ def hash_password(password):
     return unicode(crypt.encode(password))
 
 
+class Group(Base):
+    """
+    groups aka roles for users
+    """
+    __tablename__ = 'groups'
+    id = Column(Integer, primary_key=True, nullable=False)
+    name = Column(Unicode(30), unique=True, nullable=False)
+
+    def __str__(self):
+        return 'group:%s' % self.name
+
+    def __init__(self, name):
+        self.name = name
+
+    @classmethod
+    def get_Users_group(cls, groupname="User"):
+        """Choose the right group for users"""
+        dbsession = DBSession()
+        users_group = dbsession.query(
+            cls).filter(cls.name == groupname).first()
+        print('=== get_Users_group:' + str(users_group))
+        return users_group
+#    def set_group(cls, )
+
+# table for relation between bands and members(=users)
+users_groups = Table('users_groups', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id'),
+        primary_key=True, nullable=False),
+    Column('group_id', Integer, ForeignKey('groups.id'),
+        primary_key=True, nullable=False))
+
+
 class User(Base):
     """
     applications user model
@@ -79,19 +111,20 @@ class User(Base):
                                   default=func.current_timestamp())
     _password = Column('password', Unicode(60))
 
-    # groups = relationship(Group,
-    #                       secondary=users_groups,
-    #                       backref="users")
+    groups = relationship(Group,
+                          secondary=users_groups,
+                          backref="users")
 
     @property
     def __acl__(self):
         return [
             (Allow,                           # user may edit herself
-             'user:%s' % self.id, 'editUser'),
+             self.username, 'editUser'),
+             #'user:%s' % self.username, 'editUser'),
             (Allow,                           # accountant group may edit
-             'group:accountant', ('view', 'editUser')),
+             'group:accountants', ('view', 'editUser')),
             (Allow,                           # admin group may edit
-             'group:admin', ('view', 'editUser')),
+             'group:admins', ('view', 'editUser')),
             ]
 
     def _get_password(self):
@@ -103,8 +136,8 @@ class User(Base):
     password = property(_get_password, _set_password)
     password = synonym('_password', descriptor=password)
 
-#    def get_group_list(self):
-#        return [ str(group.name) for group in self.groups ]
+    def get_group_list(self):
+        return [str(group.name) for group in self.groups]
 
     def __init__(self, username, password, surname, lastname,
                  email, email_is_confirmed, email_confirm_code,
@@ -225,7 +258,6 @@ class License(Base):
 #        return q.order_by(order_by)[:how_many]
         return q
 
-
 # table for relation between bands and members(=users)
 bands_members = Table('bands_members', Base.metadata,
     Column('band_id', Integer, ForeignKey('bands.id'),
@@ -264,12 +296,36 @@ class Track(Base):  # #########################################################
     filepath = Column(Unicode(255))
     bytesize = Column(Integer)
 
+    # who added this and when?
+    date_registered = Column(DateTime,
+                             default=func.current_timestamp(),
+                             nullable=False)
+    date_last_change = Column(DateTime,
+                              default=func.current_timestamp(),
+                              nullable=False)
+
+    registrar_id = Column(Integer,
+                          ForeignKey('users.id'))
+
     license = relationship("License",
                            secondary='track_license',
                            #primaryjoin="_and(Track.id==License.track_id)",
                            order_by="License.id")
     # track_composers = reference to User(s) or 'some text'
     # track_lyrics = reference to User(s) or 'some text'
+
+    @property
+    def __acl__(self):
+        return [
+            # authenticated users may add a track
+            (Allow, 'system.Authenticated', ('view', 'addTrack')),
+            # user may edit her tracks
+            (Allow, self.registrar_id, 'editTrack'),
+            # accountant group may edit
+            (Allow, 'group:accountants', ('view', 'editTrack')),
+            (Allow, 'group:admins', (
+                    'view', 'editTrack', 'addTrack')),
+            ]
 
     def __init__(self, name, album, url, filepath, bytesize):
         self.name = name
@@ -413,6 +469,28 @@ def populate():
     dbsession = DBSession()
     transaction.begin()  # this is needed to make the webtest tests not fail
 
+    # some default groups
+    group1 = Group(name=u'admins')
+    dbsession.add(group1)
+    group2 = Group(name=u'accountants')
+    dbsession.add(group2)
+    group3 = Group(name=u'User')
+    dbsession.add(group3)
+
+    # one admin user
+    admin = User(username=u'the_admin', surname=u'Admin',
+                 lastname=u'User', password=u'password',
+                 email=u'admin@example.org', email_confirm_code=u'somecode',
+                 email_is_confirmed=True,
+                 phone=u'+49 9876 54321',
+                 fax=u'+49 9876 54333',
+                 )
+    admin.set_address(street=u'', number=u'',
+                      postcode=u'', city=u'',
+                      country=u'')
+    admin.groups = [group1]
+    dbsession.add(admin)
+
     user1 = User(username=u'firstUsername', surname=u'firstSurname',
                  lastname=u'firstLastname', password=u'password',
                  email=u'first1@shri.de', email_confirm_code=u'barfbarf',
@@ -423,6 +501,10 @@ def populate():
     user1.set_address(street=u'Teststraße', number=u'1234a',
                       postcode=u'35039', city=u'Marburg Mitte',
                       country=u'Deutschland')
+    user1.groups = [
+        group3,              # add to Users group
+        Group(name=u'foo')    # add a new group
+        ]
     dbsession.add(user1)
 
     user2 = User(username=u'secondUsername', surname=u'secondSurname',
@@ -432,27 +514,32 @@ def populate():
                  phone=u'+49 6421 968300421',
                  fax=u"",
                  )
+    user2.groups = [group3]
     dbsession.add(user2)
 
     band1 = Band(name=u"TestBand1", email=u"testband1@shri.de",
                  homepage=u"http://testband.io", registrar=u"hans",
-                 registrar_id=1)
+                 registrar_id=user1.id)
     dbsession.add(band1)
 
     band2 = Band(name=u"TestBand2", email=u"testband2@shri.de",
                  homepage=u"http://testband.com", registrar=u"paul",
-                 registrar_id=2)
+                 registrar_id=user2.id)
     dbsession.add(band2)
 
-    # track1 = Track(name=u"TestTrack1", album=u'TestAlbum1',
-    #                url=u'http://testband.io/t1.mp3', filepath=None,
-    #                bytesize=None)
-    # dbsession.add(track1)
+    track1 = Track(name=u"TestTrack1", album=u'TestAlbum1',
+                   url=u'http://testband.io/t1.mp3', filepath=None,
+                   bytesize=None)
+    track1.registrar_id = user1.id
+    #print("user1.id: " + str(user1.id))
+    #print("track1.registrar_id: " + str(track1.registrar_id))
+    dbsession.add(track1)
 
     track2 = Track(name=u"TestTrack2", album=u'TestAlbum2',
                    url=u'http://testband.io/t2.mp3', filepath=None,
                    bytesize=None,
                    )
+    track2.registrar_id = user2.id
     track2.license = [
         License(
             name=u"Creative Commons Attribution 3.0 Unported",

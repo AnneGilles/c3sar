@@ -10,13 +10,14 @@
       for your orientation
       <table border="1" cellpadding="10" width="90%">
 	<!-- table header -->
-	<tr><td>id</td><td>license</td><td>name</td><td>album</td><td>edit</td><td>view</td></tr>
+	<tr><td>id</td><td>license</td><td>name</td><td>album</td><td>registrar</td><td>edit</td><td>view</td></tr>
 	<!-- table content -->
 	<tr tal:repeat="track tracks">
 	  <td><a href="/track/view/${track.id}">${track.id}</a></td>
 	  <td><img src="${track.license[0].img | None}"></td>
 	  <td><a href="/track/view/${track.id}">${track.name}</a></td>
 	  <td>${track.album}</td>
+	  <td>${track.registrar_id}</td>
 	  <td><a href="/track/edit/${track.id}">edit</a></td>	  
 	  <td><a href="/track/view/${track.id}">view</a></td>
 	</tr>

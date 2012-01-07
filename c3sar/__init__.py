@@ -4,7 +4,15 @@ from sqlalchemy import engine_from_config
 from c3sar.models import initialize_sql
 #from c3sar.models import initialize_s3
 from c3sar.security.request import RequestWithUserAttribute
-
+from c3sar.security import groupfinder
+from c3sar.security import (
+    Root,
+    UserFactory,
+#    BandFactory,
+    TrackFactory,
+#    LicenseFactory,
+#    PlaylistFactory,
+    )
 # for user sessioning
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -36,13 +44,16 @@ def main(global_config, **settings):
 
     # user sessioning: beaker
     session_factory = session_factory_from_settings(settings)
-    authn_policy = AuthTktAuthenticationPolicy('s0secret!!')
+    authn_policy = AuthTktAuthenticationPolicy('s0secret!!',
+                                               callback=groupfinder,
+                                               )
     authz_policy = ACLAuthorizationPolicy()
 
     config = Configurator(settings=settings,
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy,
                           session_factory=session_factory,
+                          root_factory=Root,
                           )
 
     # using a custom request with user information
@@ -62,6 +73,20 @@ def main(global_config, **settings):
     #                 route_name='home',
     #                 renderer='templates/mytemplate.pt'
     #                 )
+
+    # general 403: used when lacking some permission
+    # overrides builtin 403 forbidden_view
+    from pyramid.httpexceptions import HTTPForbidden
+    #from c3sar.views.basic import not_allowed_view
+    config.add_view('c3sar.views.basic.not_allowed_view',
+                    context=HTTPForbidden,
+                    renderer='templates/not_allowed.pt')
+
+    # not needed as of now: route and view for 403, see above
+    #config.add_route('not_allowed', '/not_allowed')
+    #config.add_view('c3sar.views.basic.not_allowed_view',
+    #                    route_name='not_allowed',
+    #                    renderer='templates/not_allowed.pt')
 
     # about
     config.add_route('about', '/about')
@@ -103,9 +128,10 @@ def main(global_config, **settings):
     # user registration / create /add
     config.add_route('register', '/register')
     config.add_view('c3sar.views.user.user_register',
-                     route_name='register',
-                     renderer='templates/user_add.pt'
-                     )
+                    route_name='register',
+                    permission='registerUser',
+                    renderer='templates/user_add.pt'
+                    )
     # user confirm_email
     config.add_route('confirm_email',
                      '/user/confirm/{code}/{user_name}/{user_email}')
@@ -136,7 +162,10 @@ def main(global_config, **settings):
                     route_name='user_edit_no_id',
                     renderer='templates/user_edit_table.pt')
 
-    config.add_route('user_edit', '/user/edit/{user_id}')
+    config.add_route('user_edit',
+                     '/user/edit/{user_id}',
+                     factory=UserFactory,
+                     traverse='/{user_id}')
     #config.add_route('user_edit', '/user/edit/{user_id}',
     #                 traverse='/{user_id}')
     #config.add_route('user_edit', '/user/edit/{user_id}',
@@ -144,6 +173,7 @@ def main(global_config, **settings):
     #                 )
     config.add_view('c3sar.views.user.user_edit',
                     route_name='user_edit',
+                    #permission='editUser',  # now managed in the view!
                     renderer='templates/user_edit_table.pt')
 
     # delete
@@ -221,25 +251,36 @@ def main(global_config, **settings):
 
     ## routes for tracks ##
     # track create
-    config.add_route('track_add', '/track/add')
+    config.add_route('track_add', '/track/add',
+                     factory=TrackFactory,
+                     )
     config.add_view('c3sar.views.track.track_add',
                     route_name='track_add',
+                    permission='addTrack',
                     renderer='templates/track_add.pt')
     # track index
-    config.add_route('track_list', '/track/list')
+    config.add_route('track_list', '/track/list',
+                     factory=TrackFactory)
     config.add_view('c3sar.views.track.track_list',
                     route_name='track_list',
+                    #permission='viewTrack',
                     renderer='templates/track_list.pt')
     # view
-    config.add_route('track_view', '/track/view/{track_id}')
+    config.add_route('track_view', '/track/view/{track_id}',
+                     factory=TrackFactory)
     config.add_view('c3sar.views.track.track_view',
                     route_name='track_view',
+                    #permission='viewTrack',
                     renderer='templates/track_view.pt')
     # edit
-    config.add_route('track_edit', '/track/edit/{track_id}')
+    config.add_route('track_edit', '/track/edit/{track_id}',
+                     factory=TrackFactory,
+                     traverse='/{track_id}'
+                     )
     config.add_view('c3sar.views.track.track_edit',
-                     route_name='track_edit',
-                     renderer='templates/track_edit.pt')
+                    route_name='track_edit',
+                    permission='editTrack',
+                    renderer='templates/track_edit.pt')
 
     # track: add license
     config.add_route('track_add_license', '/track/add_license/{track_id}')

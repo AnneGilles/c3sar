@@ -87,6 +87,8 @@ def sanitize_filename(value):
 def track_add(request):
 
     viewer_username = authenticated_userid(request)
+#    if hasattr(request, user):
+#        viewer_username = request.user.username
     if viewer_username == "":  # pragma: no cover
         viewer_username = "not logged in"
 
@@ -205,6 +207,7 @@ def track_add(request):
             filepath=unicode(file_path),
             bytesize=output_file_size,
             )
+        track.registrar_id = viewer_username
 
         dbsession.add(track)
         dbsession.flush()

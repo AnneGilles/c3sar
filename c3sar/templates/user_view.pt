@@ -10,7 +10,7 @@
       <a href="${prev_id}">previous</a> |
       <a href="/user/list">all</a> |
       <a href="${next_id}">next</a> |
-      <a href="/user/edit">edit</a> |
+      <a href="/user/edit/${request.matchdict['user_id']}">edit</a> |
       <a href="/user/rm">delete</a>
     </p>
 
@@ -41,7 +41,7 @@
       <li>Last login: <b>${user.last_login}</b>.</li>
       <li>Last password change: <b>${user.last_password_change}</b>.</li>
       <li>Active? <b>${user.is_active}</b>.</li>
-      <li>Groups: <b>$ off {user.get_group_list()} </b></li>
+      <li>Groups: <b>${user.get_group_list()} </b></li>
     </ul>
 
     <hr>

@@ -131,6 +131,18 @@ class TrackViewIntegrationTests(unittest.TestCase):
         result = sanitize_filename('foo123.mp3')
         self.assertEquals(result, 'foo123.mp3', 'wrong result')
 
+#    def test_get_registrar_by_id(self):
+#        instance = self._makeTrack()  # a track
+#        instance.registrar_id = 1
+#        self.dbsession.add(instance)
+#        import pdb
+#        pdb.set_trace()
+
+#        # from c3sar.models import Track
+#        name = instance.get_registrar_by_id(instance.registrar_id)
+#        print name
+#        #self.assertEqual(1, name)
+
     def test_track_add_view(self):
         """
         add track -- form test
