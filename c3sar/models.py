@@ -381,17 +381,32 @@ class Playlist(Base):  # ####################################################
     """
     __tablename__ = 'playlists'
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode(255), unique=True)
+    name = Column(Unicode(255), unique=False)
+    issuer = Column(Integer, ForeignKey('users.id'))
     # list of track ids .... = Column(Integer)
+    date_created = Column(DateTime,
+                                  default=func.current_timestamp())
 
-    def __init__(self, name,):
+    def __init__(self, name, issuer):
         self.name = name
+        self.issuer = issuer
+        self.date_created = datetime.now()
         #self.value = value
+
+    @classmethod
+    def get_by_id(cls, id):
+        dbSession = DBSession()
+        return DBSession.query(cls).filter(cls.id == id).first()
 
     @classmethod
     def get_max_id(cls):
         """return the highest id (by counting rows in table)"""
         return DBSession.query(cls).count()
+
+    @classmethod
+    def playlist_listing(cls, order_by, how_many=10):
+        q = DBSession.query(cls).all()
+        return q
 
 
 def populate():
@@ -465,6 +480,10 @@ def populate():
                        img=u"",
                        author=u"Somebody")
     dbsession.add(license2)
+
+    # add a playlist
+    pl1 = Playlist(name=u'foo', issuer=user1.id)
+    dbsession.add(pl1)
 
     try:
         dbsession.flush()
