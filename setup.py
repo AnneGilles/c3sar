@@ -21,6 +21,9 @@ requires = [
     'pyramid_mailer',
     'boto',
     'fdfgen',
+    'wtforms',
+    'Babel',
+    'lingua',
     ]
 
 test_requirements = [
@@ -28,7 +31,7 @@ test_requirements = [
     'nose'
     ]
 
-if sys.version_info[:3] < (2,5,0):
+if sys.version_info[:3] < (2, 5, 0):
     requires.append('pysqlite')
 
 setup(name='c3sar',
@@ -48,6 +51,10 @@ setup(name='c3sar',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
+      message_extractors = { '.': [
+            ('**.py',   'lingua_python', None ),
+            ('**.pt',   'lingua_xml', None ),
+            ]},
       test_suite='c3sar.tests',
       install_requires=requires,
       tests_require=test_requirements,
