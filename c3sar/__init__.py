@@ -305,6 +305,31 @@ def main(global_config, **settings):
                     route_name='license_search',
                     renderer='templates/license_search.pt')
 
+    # ###### PLAYLISTS ###### #
+    config.add_route('playlist_list', '/playlist/list')
+    config.add_view('c3sar.views.playlist.playlist_list',
+                    route_name='playlist_list',
+                    renderer='templates/playlist_list.pt')
+
+    # playlist create
+    config.add_route('playlist_add', '/playlist/add')
+    config.add_view('c3sar.views.playlist.playlist_add',
+                    route_name='playlist_add',
+                    #permission='system.authenticated',
+                    renderer='templates/playlist_add.pt'
+                    )
+    # view
+    config.add_route('playlist_view', '/playlist/view/{playlist_id}')
+    config.add_view('c3sar.views.playlist.playlist_view',
+                    route_name='playlist_view',
+                    # permission='playlistView',
+                    renderer='templates/playlist_view.pt')
+    # edit
+    config.add_route('playlist_edit', '/playlist/edit/{playlist_id}')
+    config.add_view('c3sar.views.playlist.playlist_edit',
+                    route_name='playlist_edit',
+                    renderer='templates/playlist_edit.pt')
+
     ## routes for RESTful interface ##
     config.add_route('api_get_user', '/api/get/user/{id}')
     config.add_view('c3sar.views.rest.show_user_view',
