@@ -51,9 +51,9 @@ setup(name='c3sar',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      message_extractors = { '.': [
-            ('**.py',   'lingua_python', None ),
-            ('**.pt',   'lingua_xml', None ),
+      message_extractors={'.': [
+            ('**.py', 'lingua_python', None),
+            ('**.pt', 'lingua_xml', None),
             ]},
       test_suite='c3sar.tests',
       install_requires=requires,
