@@ -136,6 +136,7 @@ class BandViewIntegrationTests(unittest.TestCase):
                   })
         self.config = testing.setUp(request=request)
         result = band_add(request)
+
         self.assertTrue('form' in result, 'form was not seen.')
         self.assertTrue('viewer_username' in result,
                         'viewer_username was not seen.')
@@ -168,7 +169,9 @@ class BandViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp(request=request)
         _registerRoutes(self.config)
         result = band_add(request)
-
+        if DEBUG:  # pragma: no cover
+            print "def test_band_add_view_validating"
+            pp.pprint(result)
         self.assertTrue(isinstance(result, HTTPFound),
                         "expected redirect not seen")
         # check database contents
@@ -242,8 +245,8 @@ class BandViewIntegrationTests(unittest.TestCase):
         self.config = testing.setUp(request=request)
         result = band_view(request)
         self.assertTrue('band' in result, 'band was not seen.')
-        self.assertTrue(result['prev_id'] is 2, 'wrong nav id.')
-        self.assertTrue(result['next_id'] is 2, 'wrong nav id.')
+        self.assertEquals(result['prev_id'], 4)
+        self.assertEquals(result['next_id'], 2)
         self.assertTrue('viewer_username' in result,
                         'viewer_username was not seen.')
         self.assertTrue(result['viewer_username'] is None,
@@ -266,9 +269,10 @@ class BandViewIntegrationTests(unittest.TestCase):
         request.matchdict['band_id'] = 3
         self.config = testing.setUp(request=request)
         result = band_view(request)
+
         self.assertTrue('band' in result, 'band was not seen.')
-        self.assertTrue(result['prev_id'] is 2, 'wrong nav id.')
-        self.assertTrue(result['next_id'] is 1, 'wrong nav id.')
+        self.assertEquals(result['prev_id'], 2)
+        self.assertEquals(result['next_id'], 4)
         self.assertTrue('viewer_username' in result,
                         'viewer_username was not seen.')
         self.assertTrue(result['viewer_username'] is None,

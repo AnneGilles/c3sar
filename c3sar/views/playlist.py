@@ -34,7 +34,8 @@ _ = TranslationStringFactory('c3sar')
 
 dbsession = DBSession()
 
-DEBUG = True
+#DEBUG = True
+DEBUG = False
 
 if DEBUG:  # pragma: no cover
     import pprint
@@ -55,12 +56,11 @@ class PlaylistCreationForm(Form):
 
 def playlist_add(request):
     """add a playlist (of tracks)"""
-    print "this is playlist_add"
-    print request.method
-    print request.POST
+    #print "this is playlist_add"
+    #print request.method
+    #print request.POST
     form = PlaylistCreationForm(request.POST)
-    print request.POST
-
+    
     if request.method == 'POST' and form.validate():
 
         dbsession = DBSession()
@@ -68,25 +68,26 @@ def playlist_add(request):
         pl = Playlist(
             name=form.name.data,
             issuer=authenticated_userid(request))
-        print pl
-        print pl.name
+        #print pl
+        #print pl.name
         dbsession.add(pl)
         dbsession.flush()
-        print pl.id
-        return HTTPFound(route_url('playlist_view', request, playlist_id=pl.id))
+        #print pl.id
+        return HTTPFound(
+            route_url('playlist_view', request, playlist_id=pl.id))
 
     return {'form': form}
 
 
 def playlist_view(request):
     id = request.matchdict['playlist_id']
-    print "id: " + str(id)
+    #print "id: " + str(id)
     playlist = Playlist.get_by_id(id)
 
     if not isinstance(playlist, Playlist):
-        msg = "Band id not found in database"  # TODO: check template!
-        print "Band id not found in database"  # TODO: check template!
-        raise HTTPFound(request.route_url('not_found'), msg)
+        msg = "Playlist id not found in database"
+        #print "Playlist id not found in database"
+        return HTTPFound(request.route_url('not_found'))
 
     #calculate for next/previous-navigation
     max_id = Playlist.get_max_id()
@@ -119,19 +120,19 @@ def playlist_view(request):
 def playlist_edit(request):
 
     id = request.matchdict['playlist_id']
-    print "id: " + str(id)
+    #print "id: " + str(id)
     playlist = Playlist.get_by_id(id)
-    print "playlist: " + str(playlist)
+    #print "playlist: " + str(playlist)
     if not isinstance(playlist, Playlist):
         msg = "Playlist id not found in database"
-        print "Playlist id not found in database"
-        raise HTTPFound(request.route_url('not_found'), msg)
+        #print "Playlist id not found in database"
+        return HTTPFound(request.route_url('not_found'))
 
     # no change through form, so reuse old value (for now)
     playlist_issuer = playlist.issuer
 
     locale_name = get_locale_name(request)
-    print locale_name
+    #print locale_name
 
     appstruct = {
         u'name': playlist.name
@@ -162,9 +163,9 @@ def playlist_edit(request):
     form = deform.Form(schema,
                        buttons=[deform.Button('submit', _('Submit'))])
 
-    print "the request: "
+    #print "the request: "
     #    print request
-    pp.pprint(request.POST.items())
+    #pp.pprint(request.POST.items())
 
     if 'submit' in request.POST:
         # form was submitted
@@ -172,7 +173,7 @@ def playlist_edit(request):
 
         try:  # will it validate?
             appstruct = form.validate(request.POST.items())
-            pp.pprint(appstruct)
+            #pp.pprint(appstruct)
             return {
                 'form': form.render(appstruct)  # , True)
                 }

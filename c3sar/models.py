@@ -62,12 +62,12 @@ class Group(Base):
         self.name = name
 
     @classmethod
-    def get_Users_group(cls, groupname="User"):
+    def get_Users_group(cls, groupname=u"User"):
         """Choose the right group for users"""
         dbsession = DBSession()
         users_group = dbsession.query(
             cls).filter(cls.name == groupname).first()
-        print('=== get_Users_group:' + str(users_group))
+        #print('=== get_Users_group:' + str(users_group))
         return users_group
 #    def set_group(cls, )
 
@@ -113,7 +113,7 @@ class User(Base):
 
     groups = relationship(Group,
                           secondary=users_groups,
-                          backref="users")
+                          backref=u"users")
 
     @property
     def __acl__(self):
@@ -376,10 +376,10 @@ class Band(Base):  # ################################################## B A N D
     is_active = Column(Boolean, default=True, nullable=False)
     members = relationship(User,
                            secondary=bands_members,
-                           backref="bands")
+                           backref=u"bands")
     tracks = relationship(Track,
                            secondary=bands_tracks,
-                           backref="bands")
+                           backref=u"bands")
     #band_registrar_rel = relation(User, cascade="delete", backref="bands")
     # band_tracks = list of tracks...
     # band_bucket ...
