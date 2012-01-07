@@ -24,6 +24,8 @@ requires = [
     'wtforms',
     'Babel',
     'lingua',
+    'colander',
+    'deform',
     ]
 
 test_requirements = [
