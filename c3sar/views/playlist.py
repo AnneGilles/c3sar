@@ -60,21 +60,25 @@ def playlist_add(request):
     #print request.method
     #print request.POST
     form = PlaylistCreationForm(request.POST)
-    
+
     if request.method == 'POST' and form.validate():
 
         dbsession = DBSession()
 
         pl = Playlist(
             name=form.name.data,
-            issuer=authenticated_userid(request))
+            issuer=request.user.id
+            )
+
         #print pl
         #print pl.name
+        #print pl.issuer
         dbsession.add(pl)
         dbsession.flush()
         #print pl.id
         return HTTPFound(
-            route_url('playlist_view', request, playlist_id=pl.id))
+            route_url('playlist_view', request, playlist_id=pl.id)
+            )
 
     return {'form': form}
 
@@ -120,25 +124,29 @@ def playlist_view(request):
 def playlist_edit(request):
 
     id = request.matchdict['playlist_id']
-    #print "id: " + str(id)
     playlist = Playlist.get_by_id(id)
-    #print "playlist: " + str(playlist)
+    if DEBUG:  # pragma: no cover
+        print "playlist from matchdict for editing: " + str(playlist)
+
     if not isinstance(playlist, Playlist):
+        # the playlist to be edited could not be found
         msg = "Playlist id not found in database"
         #print "Playlist id not found in database"
         return HTTPFound(request.route_url('not_found'))
 
-    # no change through form, so reuse old value (for now)
+    # issuer: no change through form, so reuse old value (for now)
     playlist_issuer = playlist.issuer
 
     locale_name = get_locale_name(request)
-    #print locale_name
+    if DEBUG:   # pragma: no cover
+        print "locale name: " + locale_name
 
-    appstruct = {
+    appstruct = {               # load playlist name into appstruct
         u'name': playlist.name
         }
 
-    class PlayDateSequence(colander.SequenceSchema):
+    class PlaylistEntrySchema(colander.Schema):
+        '''this is how a playlist entry will look like in the form '''
         date = colander.SchemaNode(
             colander.Date(),
             title=_('Play Date'),
@@ -147,12 +155,29 @@ def playlist_edit(request):
                 min_err=_('${val} is earlier than earliest date ${min}')
                 )
             )
+        track = colander.SchemaNode(
+            colander.String(),
+            title=_('Track Name')
+            )
+        artist = colander.SchemaNode(
+            colander.String(),
+            title=_('by Artist:')
+            )
+        length = colander.SchemaNode(
+            colander.String(),
+            title=_('Length')
+            )
+
+    class PlaylistEntrySequence(colander.SequenceSchema):
+        '''a sequence/list of playlist entries '''
+        entry = PlaylistEntrySchema()
 
     class PlaylistSchema(colander.Schema):
+        '''a playlist has a name and a sequence of entries'''
         name = colander.SchemaNode(
             colander.String(),
             )
-        dates = PlayDateSequence()
+        entries = PlaylistEntrySequence()
         _LOCALE_ = colander.SchemaNode(
             colander.String(),
             widget=deform.widget.HiddenWidget(),
@@ -163,42 +188,45 @@ def playlist_edit(request):
     form = deform.Form(schema,
                        buttons=[deform.Button('submit', _('Submit'))])
 
-    #print "the request: "
-    #    print request
-    #pp.pprint(request.POST.items())
-
-    if 'submit' in request.POST:
-        # form was submitted
-        print "form was submitted !!!"
+    if 'submit' in request.POST:              # form was submitted
+        if DEBUG:  # pragma: no cover
+            print "form was submitted !!!"
 
         try:  # will it validate?
             appstruct = form.validate(request.POST.items())
-            #pp.pprint(appstruct)
-            return {
-                'form': form.render(appstruct)  # , True)
-                }
 
-        # if it does not validate, show it again
+            if DEBUG:  # pragma: no cover
+                print "appstruct from validation of request.POST:"
+                print(appstruct)
+
+            # time to store stuff away...
+            if appstruct['name'] != playlist.name:
+                # playlist.name was changed
+                playlist.name = appstruct['name']
+
+            # TODO: handle the entries in appstruct['entries']
+
+            return HTTPFound(
+                route_url('playlist_view', request, playlist_id=playlist.id))
+            # show the form with the data again
+            #return {
+            #    'form': form.render(appstruct)  # , True)
+            #    }
+
+        # if form does not validate, show it again with faulty values
         except ValidationFailure, e:
+            if DEBUG:  # pragma: no cover
+                print "validation must have failed...!"
+                print(request.POST.items())
             return {'form': e.render()}
 
-# and not form.validate():
-        #         # form didn't validate
-#         request.session.flash('form does not validate!')
-#         request.session.flash(form.data['name'])
-#         #request.session.flash(form.data['homepage'])
-#         #request.session.flash(form.data['email'])
-
-# #    print form.validate(appstruct)
-
-#     if 'form.submitted' in request.POST and form.validate():
-
+#
 #         if form.data['name'] != playlist.name:
 #             playlist.name = form.data['name']
 #             if DEBUG:  # pragma: no cover
 #                 print "changing playlist name"
 #                 request.session.flash('changing playlist name')
-
+#
 #         request.session.flash(u'writing to database ...')
 #         dbsession.flush()
 #         # if all went well, redirect to band view
